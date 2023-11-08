@@ -180,7 +180,7 @@ namespace RyuHelpers
 
                 Console.WriteLine(" DONE!\n");
             }
-            else if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
+            else if (GamePath.GetGame() >= Game.Judgment)
             {
                 IsRebuildMLOSupported = false;
 
