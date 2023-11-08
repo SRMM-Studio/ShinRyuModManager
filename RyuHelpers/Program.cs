@@ -20,8 +20,8 @@ namespace RyuHelpers
 {
     public static class Program
     {
-        public const string VERSION = "v3.3";
-        public const string AUTHOR = "SutandoTsukai181";
+        public const string VERSION = "v3.4";
+        public const string AUTHOR = "Fronkln";
         public const string REPO = "RyuModManager";
 
         private static bool externalModsOnly = true;
@@ -38,7 +38,7 @@ namespace RyuHelpers
         public static async Task Main(string[] args)
         {
             Console.WriteLine($"Ryu Mod Manager {VERSION}");
-            Console.WriteLine($"By {AUTHOR}\n");
+            Console.WriteLine($"By Jhrino (a fork of SutandoTsukai181's work)\n");
 
             // Parse arguments
             List<string> list = new List<string>(args);

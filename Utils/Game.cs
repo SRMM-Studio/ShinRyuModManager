@@ -20,5 +20,7 @@
         Judgment,
         LostJudgment,
         eve, // Virtua Fighter eSports
+        likeadragongaiden,
+	likeadragon8
     }
 }
