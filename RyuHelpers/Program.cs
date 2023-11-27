@@ -20,7 +20,7 @@ namespace RyuHelpers
 {
     public static class Program
     {
-        public const string VERSION = "v3.4";
+        public const string VERSION = "v3.4.1";
         public const string AUTHOR = "Fronkln";
         public const string REPO = "RyuModManager";
 
