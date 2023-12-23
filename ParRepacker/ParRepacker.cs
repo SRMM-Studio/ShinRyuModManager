@@ -14,6 +14,29 @@ namespace ParRepacker
     public static class Repacker
     {
 
+        //Necessary to avoid rare UnauthorizedException errors.
+        //https://stackoverflow.com/a/8521573
+        public static void DeleteDirectory(string targetDir)
+        {
+            File.SetAttributes(targetDir, FileAttributes.Normal);
+
+            string[] files = Directory.GetFiles(targetDir);
+            string[] dirs = Directory.GetDirectories(targetDir);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in dirs)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(targetDir, false);
+        }
+
         public static void RemoveOldRepackedPars()
         {
             string pathToParlessMods = Path.Combine(GamePath.GetModsPath(), "Parless");
@@ -21,7 +44,14 @@ namespace ParRepacker
             if (Directory.Exists(pathToParlessMods))
             {
                 Console.Write("Removing old pars...");
-                Directory.Delete(pathToParlessMods, true);
+                try
+                {
+                    DeleteDirectory(pathToParlessMods);
+                }
+                catch
+                {
+                    Console.WriteLine($" FAIL! {pathToParlessMods}\n");
+                }
                 Console.WriteLine(" DONE!\n");
             }
         }
@@ -114,7 +144,7 @@ namespace ParRepacker
             if (Directory.Exists(pathToTempPar))
             {
                 // Make sure that the .partemp directory is empty
-                Directory.Delete(pathToTempPar, true);
+                DeleteDirectory(pathToTempPar);
                 Directory.CreateDirectory(pathToTempPar);
             }
             else
@@ -204,7 +234,7 @@ namespace ParRepacker
             containerNode.Root.Dispose();
 
             // Remove the .partemp directory
-            Directory.Delete(pathToTempPar, true);
+            DeleteDirectory(pathToTempPar);
 
             console.WriteLineIfVerbose();
             console.WriteLine($"Repacked {fileDict.Count} file(s) in {parPath + ".par"}!");

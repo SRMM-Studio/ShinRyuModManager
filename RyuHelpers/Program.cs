@@ -20,7 +20,7 @@ namespace RyuHelpers
 {
     public static class Program
     {
-        public const string VERSION = "v3.4.1";
+        public const string VERSION = "v4.0.0";
         public const string AUTHOR = "Fronkln";
         public const string REPO = "RyuModManager";
 
@@ -37,8 +37,8 @@ namespace RyuHelpers
 
         public static async Task Main(string[] args)
         {
-            Console.WriteLine($"Ryu Mod Manager {VERSION}");
-            Console.WriteLine($"By Jhrino (a fork of SutandoTsukai181's work)\n");
+            Console.WriteLine($"Shin Ryu Mod Manager {VERSION}");
+            Console.WriteLine($"By Jhrino (a continuation of SutandoTsukai181's work)\n");
 
             // Parse arguments
             List<string> list = new List<string>(args);
@@ -209,7 +209,7 @@ namespace RyuHelpers
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"WARNING: {WINMMLJ} was not found. Judgment games will NOT load mods without this file. Please redownload Ryu Mod Manager.\n");
+                        Console.WriteLine($"WARNING: {WINMMLJ} was not found. Judgment games will NOT load mods without this file. Please redownload Shin Ryu Mod Manager.\n");
                         Console.ResetColor();
                     }
                 }
@@ -389,7 +389,7 @@ namespace RyuHelpers
         public static bool InvalidGameExe()
         {
             string path = Path.Combine(GetGamePath(), GetGameExe());
-            return GetGame() == Game.Unsupported || GamePath.IsXbox(path) || !GameHash.ValidateFile(path, GetGame());
+            return GetGame() == Game.Unsupported || !GameHash.ValidateFile(path, GetGame());
         }
 
         /// <summary>
@@ -568,7 +568,7 @@ namespace RyuHelpers
 
             var latestRelease = await CheckForUpdates().ConfigureAwait(true);
 
-            if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != VERSION)
+            if (latestRelease != null && latestRelease.Name.Contains("Shin Ryu Mod Manager") && latestRelease.TagName != VERSION)
             {
                 console.WriteLine("New version detected!\n");
                 console.WriteLine($"Current version: {VERSION}");
