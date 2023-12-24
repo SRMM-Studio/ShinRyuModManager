@@ -1,9 +1,13 @@
 ﻿using ModLoadOrder.Mods;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System;
+using ICSharpCode.SharpZipLib;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace RyuGUI
 {
@@ -146,19 +150,72 @@ namespace RyuGUI
 
         private void ModInstall_Click(object sender, RoutedEventArgs e)
         {
+            if (!Directory.Exists("mods"))
+                Directory.CreateDirectory("mods");
 
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog.DefaultExt = "*.zip";
+            openFileDialog.Filter = "ZIP files (.zip)|*.zip";
+
+            if (!openFileDialog.ShowDialog().Value)
+                return;
+
+            if (!File.Exists(openFileDialog.FileName))
+                return;
+
+            ZipFile zip = new ZipFile(openFileDialog.FileName);
+            ZipEntry[] files = zip.Cast<ZipEntry>().ToArray();
+
+            ZipEntry[] rootdirs = files.Where(x => x.IsDirectory && x.ToString().Split('/').Length <= 2).ToArray();
+
+            if (rootdirs.Length <= 0)
+                return;
+
+            int bufferSize = 256 * 1024;
+
+            foreach (ZipEntry entry in files)
+            {
+                if (entry.IsDirectory)
+                    Directory.CreateDirectory(Path.Combine("mods", entry.ToString()));
+                else
+                {
+                    using (FileStream outputFile = File.Create(Path.Combine("mods", entry.ToString())))
+                    {
+                        if(entry.Size > 0)
+                        {
+                            Stream fileStream = zip.GetInputStream(entry);
+                            byte[] dataBuffer = new byte[bufferSize];
+
+                            int readBytes;
+                            while ((readBytes = fileStream.Read(dataBuffer, 0, bufferSize)) > 0)
+                            {
+                                outputFile.Write(dataBuffer, 0, readBytes);
+                                outputFile.Flush();
+                            }
+                        }
+                    }
+                }
+            }
+
+            Refresh();
         }
 
 
         private void ModUninstall_Click(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
 
         private void ModListViewRefresh_Click(object sender, RoutedEventArgs e)
         {
+            Refresh();
+        }
 
+        private void Refresh()
+        {
+            SetupModList(RyuHelpers.Program.PreRun());
+            ModListView.ItemsSource = ModList;
         }
     }
 }
