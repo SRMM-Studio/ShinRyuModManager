@@ -1,33 +1,30 @@
-﻿using ModLoadOrder.Mods;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using ModLoadOrder.Mods;
 
 namespace RyuGUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class LegacyMainWindow : Window
     {
         public ObservableCollection<ModInfo> ModList { get; set; }
 
-
-        public MainWindow()
+        public LegacyMainWindow()
         {
             InitializeComponent();
         }
-
 
         public void SetupModList(List<ModInfo> mods)
         {
             this.ModList = new ObservableCollection<ModInfo>(mods);
         }
 
-
-        private void ModToggle_Click(object sender, RoutedEventArgs e)
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
             foreach (ModInfo m in this.ModListView.SelectedItems)
             {
@@ -35,8 +32,7 @@ namespace RyuGUI
             }
         }
 
-
-        private void ModUp_Click(object sender, RoutedEventArgs e)
+        private void UpButton_Click(object sender, RoutedEventArgs e)
         {
             List<ModInfo> selection = new List<ModInfo>(this.ModListView.SelectedItems.Cast<ModInfo>());
 
@@ -62,8 +58,7 @@ namespace RyuGUI
             }
         }
 
-
-        private void ModDown_Click(object sender, RoutedEventArgs e)
+        private void DownButton_Click(object sender, RoutedEventArgs e)
         {
             List<ModInfo> selection = new List<ModInfo>(this.ModListView.SelectedItems.Cast<ModInfo>());
 
@@ -89,8 +84,12 @@ namespace RyuGUI
             }
         }
 
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
 
-        private void ModSave_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (RyuHelpers.Program.SaveModList(this.ModList.ToList()))
             {
@@ -135,30 +134,6 @@ namespace RyuGUI
             }
 
             Application.Current.Shutdown();
-        }
-
-
-        private void ModClose_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Shutdown();
-        }
-
-
-        private void ModInstall_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-
-        private void ModUninstall_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-
-        private void ModListViewRefresh_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

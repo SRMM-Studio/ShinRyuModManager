@@ -3,70 +3,113 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:local="clr-namespace:RyuGUI"
         mc:Ignorable="d"
-        Title="Ryu Mod Manager" Height="568" Width="456" ResizeMode="NoResize" Background="#FF373535" Foreground="White" SizeToContent="WidthAndHeight">
+        Title="Shin Ryu Mod Manager" Height="600" Width="900" ResizeMode="CanMinimize" Background="#FF373535" Foreground="White">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="350*" MaxWidth="350"/>
-            <ColumnDefinition Width="100*"/>
-        </Grid.ColumnDefinitions>
-        <ListView x:Name="ModListView" ItemsSource="{Binding ModList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Margin="25,25,24.6,0" Background="#FF4B4B4B" Foreground="White" Opacity="0.8" Height="418" VerticalAlignment="Top">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Enabled" Width="50">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox Margin="5, 0" IsChecked="{Binding Enabled}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Mod Name" Width="200">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Margin="5, 0" Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="true" >
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
-                            <Setter Property="Background" Value="#FF4B4B4B" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
-                            <Setter Property="Background" Value="#FF4B4B4B" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
-        <Grid Margin="75,475,74.6,23.4">
-            <Button Content="Save" Click="SaveButton_Click" Height="40" VerticalAlignment="Top" BorderThickness="3" BorderBrush="#FF58F028" Opacity="0.8" Background="#FF4B4B4B" Foreground="White" Margin="0,0,125,0" Padding="10" ToolTip="Save mod list and close"/>
-            <Button Content="Close" Click="CloseButton_Click" Height="40" VerticalAlignment="Top" BorderThickness="3" BorderBrush="#FFFC5555" Opacity="0.8" Background="#FF4B4B4B" Foreground="White" Margin="125,0,0,0" Padding="10" ToolTip="Close and cancel all changes"/>
-        </Grid>
-        <Grid Grid.Column="1" Margin="10,80,20,238.4" Height="200" Width="70" MaxWidth="70" MaxHeight="200">
-            <Button Content="" Margin="10,20,20,140" Click="ToggleButton_Click" Opacity="0.8" Foreground="White" BorderThickness="2" ToolTip="Toggle the selected mod(s)">
-                <Button.Background>
-                    <ImageBrush ImageSource="/toggle.png" Stretch="Uniform"/>
-                </Button.Background>
-            </Button>
-            <Button Content="" Margin="10,80,20,80" Click="UpButton_Click" Opacity="0.8" Foreground="White" BorderThickness="2" ToolTip="Move the selected mod(s) up">
-                <Button.Background>
-                    <ImageBrush ImageSource="/up.png" Stretch="Uniform"/>
-                </Button.Background>
-            </Button>
-            <Button Content="" Margin="10,140,20,20" Click="DownButton_Click" Opacity="0.785" Foreground="White" BorderThickness="2" ToolTip="Move the selected mod(s) down">
-                <Button.Background>
-                    <ImageBrush ImageSource="/down.png" Stretch="Uniform"/>
-                </Button.Background>
-            </Button>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
 
-        </Grid>
+        <Menu Grid.Row="0">
+            <MenuItem Header="Manage">
+                <MenuItem Header="Install mod" Click="ModInstall_Click"/>
+                <MenuItem Header="Uninstall mod" Click="ModUninstall_Click"/>
+            </MenuItem>
+        </Menu>
 
+        <Image Grid.Row="1" Source="Resources/SRMMLogo1BG.png" Opacity="0.05"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="0.5*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.75*"/>
+                    <ColumnDefinition Width="0.25*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.85*"/>
+                        <RowDefinition Height="0.15*"/>
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="ModListView" ItemsSource="{Binding ModList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Margin="20,20,20,20" Background="#FF4B4B4B" Foreground="White" Opacity="0.8" Height="Auto" VerticalAlignment="Stretch" d:ItemsSource="{d:SampleData ItemCount=5}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Enabled" Width="50">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Margin="5, 0" IsChecked="{Binding Enabled}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Mod Name" Width="200">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Margin="5, 0" Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="true" >
+                                        <Setter Property="Foreground" Value="#FFFFFFFF" />
+                                        <Setter Property="Background" Value="#FF4B4B4B" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="#FFFFFFFF" />
+                                        <Setter Property="Background" Value="#FF4B4B4B" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="20, 0, 20, 40">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="0.5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="btn_ModInstall" Grid.Column="0" Click="ModInstall_Click" Margin="0" Background="#FF4B4B4B" Foreground="White" Content="Install mod" FontSize="16"/>
+                        <Button x:Name="btn_ModListViewRefresh" Grid.Column="1" Click="ModListViewRefresh_Click" Margin="0" Background="#FF4B4B4B" Foreground="White" Content="Refresh list" FontSize="16"/>
+                    </Grid>
+                </Grid>
+
+                
+                <Grid Grid.Column="1">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0, -70, 0, 0" Width="Auto" Height="Auto">
+
+
+                        <Button x:Name="btn_ModToggle" Margin="5" Click="ModToggle_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="2" ToolTip="Toggle the selected mod(s)" Width="44" Height="44">
+                            <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/Toggle.svg}"/>
+                        </Button>
+                        <Button x:Name="btn_ModUp" Margin="5" Click="ModUp_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="2" ToolTip="Move the selected mod(s) up" Width="44" Height="44">
+                            <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/ArrowUp.svg}"/>
+                        </Button>
+                        <Button x:Name="btn_ModDown" Margin="5" Click="ModDown_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="2" ToolTip="Move the selected mod(s) down" Width="44" Height="44">
+                            <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/ArrowDown.svg}"/>
+                        </Button>
+                        <Button x:Name="btn_ModSave" Margin="5, 55, 5, 5" Click="ModSave_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="3" BorderBrush="#FF58F028" ToolTip="Save mod list and close" Width="44" Height="44">
+                            <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/Check.svg}"/>
+                        </Button>
+                        <Button x:Name="btn_ModClose" Margin="5" Click="ModClose_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="3" BorderBrush="#FFFC5555" ToolTip="Close and cancel all changes" Width="44" Height="44">
+                            <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/X.svg}"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

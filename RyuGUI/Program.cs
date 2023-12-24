@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using ModLoadOrder.Mods;
+using YamlDotNet.Serialization;
 using static Utils.Constants;
 
 namespace RyuGUI
@@ -37,16 +40,9 @@ namespace RyuGUI
                     return;
                 }
 
-                if (mods.Count == 0)
-                {
-                    MessageBox.Show("No mods were found. Add some mods to the \"\\mods\\\" directory first.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 if (RyuHelpers.Program.ShouldCheckForUpdates())
                 {
-                    // Run the task and let it show the message whenever it's done
-                    Task.Run(() => CheckForUpdatesGUI());
+                    CheckForUpdatesGUI();
                 }
 
                 if (RyuHelpers.Program.ShowWarnings())
@@ -77,6 +73,7 @@ namespace RyuGUI
                     }
                 }
 
+                //LegacyMainWindow window = new LegacyMainWindow();
                 MainWindow window = new MainWindow();
 
                 // Add the mod list to the listview
@@ -108,31 +105,87 @@ namespace RyuGUI
             }
         }
 
-        private static async Task CheckForUpdatesGUI()
+
+        private static void CheckForUpdatesGUI()
         {
-            var latestRelease = await RyuHelpers.Program.CheckForUpdates().ConfigureAwait(false);
-
-            if (latestRelease != null && latestRelease.Name.Contains("Ryu Mod Manager") && latestRelease.TagName != RyuHelpers.Program.VERSION)
+            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string updaterPath = Path.Combine(currentPath, "RyuUpdater.exe");
+            string updateFlagPath = Path.Combine(currentPath, "update.txt");
+            bool updaterResult = false;
+            if (File.Exists(updaterPath))
             {
-                MessageBoxResult result = MessageBox.Show(
-                    "New version available! Go to the release webpage?",
-                    "Update", MessageBoxButton.OKCancel, MessageBoxImage.Question,
-                    MessageBoxResult.OK);
+                var versionInfo = FileVersionInfo.GetVersionInfo(updaterPath);
+                string version = versionInfo.FileVersion;
+                updaterResult = UpdateUpdater(updaterPath, version);
+            }
+            else //Updater not present. Download latest
+            {
+                updaterResult = UpdateUpdater(updaterPath);
+            }
 
-                if (result == MessageBoxResult.OK)
+            if (updaterResult)
+            {
+                Process proc = new Process();
+                proc.StartInfo.FileName = updaterPath;
+                proc.StartInfo.Arguments = $"-v {Util.GetAppVersion()} -c";
+                proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                proc.Start();
+                proc.WaitForExit();
+            }
+
+            if (File.Exists(updateFlagPath))
+            {
+                string updateVersion = File.ReadAllText(updateFlagPath);
+                File.Delete(updateFlagPath);
+                MessageBoxResult result = MessageBox.Show($"Shin Ryu Mod Manager version {updateVersion} is available for download.\nWould you like to update now?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                if (result == MessageBoxResult.Yes)
                 {
-                    try
-                    {
-                        Process.Start(latestRelease.HtmlUrl);
-                    }
-                    catch
-                    {
-                        MessageBox.Show(
-                            "Browser could not be opened. Please go to this URL to download the update: " + latestRelease.HtmlUrl,
-                            "Update", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    Process proc = new Process();
+                    proc.StartInfo.FileName = updaterPath;
+                    proc.StartInfo.Arguments = $"-v {Util.GetAppVersion()}";
+                    proc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                    proc.Start();
+                    Environment.Exit(0x55504454); //UPDT
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    return;
                 }
             }
         }
+
+
+        private static bool UpdateUpdater(string updaterPath, string currentVersion = "0.0.0")
+        {
+            try
+            {
+                WebClient client = new WebClient();
+                string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{RyuHelpers.Program.AUTHOR}/{RyuHelpers.Program.UPDATE_INFO_REPO}/main/{RyuHelpers.Program.UPDATE_INFO_FILE_PATH}");
+
+                var deserializer = new DeserializerBuilder().Build();
+                var yamlObject = deserializer.Deserialize<Updater>(yamlString);
+
+                bool isHigher = Util.CompareVersionIsHigher(yamlObject.Version, currentVersion);
+                if (isHigher)
+                {
+                    client.DownloadFile(yamlObject.Download, updaterPath);
+                    MessageBox.Show($"RyuUpdater has been updated to version {yamlObject.Version}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                client.Dispose();
+                return true;
+            }
+            catch (WebException)
+            {
+                MessageBox.Show("Could not fetch update data.\nThis could be a problem with your internet connection or GitHub.\nPlease try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+        }
+    }
+
+    public class Updater
+    {
+        public string Version { get; set; }
+        public string Download {  get; set; }
     }
 }

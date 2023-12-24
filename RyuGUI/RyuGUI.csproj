@@ -6,19 +6,41 @@
     <UseWPF>true</UseWPF>
     <StartupObject>RyuGUI.Program</StartupObject>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <ApplicationIcon>rmm_icon_2.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Icons\SRMM_icon.ico</ApplicationIcon>
     <AssemblyName>RyuModManagerGUI</AssemblyName>
-    <Version>3.3</Version>
-    <Authors>SutandoTsukai181</Authors>
+    <Version>4.0.0</Version>
+    <Authors>Shin Ryu Mod Manager Studio</Authors>
     <Company />
-    <Product>Ryu Mod Manager</Product>
-    <RepositoryUrl>https://github.com/SutandoTsukai181/RyuModManager</RepositoryUrl>
+    <Product></Product>
+    <RepositoryUrl>https://github.com/SRMM-Studio/ShinRyuModManager</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="toggle.png" />
-    <Resource Include="up.png" />
-    <Resource Include="down.png" />
+    <None Remove="Resources\Icons\SRMM_icon.ico" />
+    <None Remove="Resources\Icons\SVG\ArrowDown.svg" />
+    <None Remove="Resources\Icons\SVG\ArrowUp.svg" />
+    <None Remove="Resources\Icons\SVG\Check.svg" />
+    <None Remove="Resources\Icons\SVG\Toggle.svg" />
+    <None Remove="Resources\Icons\SVG\X.svg" />
+    <None Remove="Resources\Icons\toggle.png" />
+    <None Remove="Resources\SRMMLogo1BG.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Icons\Legacy\rmm_icon_2.ico" />
+    <Content Include="Resources\Icons\SRMM_icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Icons\Legacy\toggle.png" />
+    <Resource Include="Resources\Icons\Legacy\up.png" />
+    <Resource Include="Resources\Icons\Legacy\down.png" />
+    <Resource Include="Resources\Icons\SVG\ArrowDown.svg" />
+    <Resource Include="Resources\Icons\SVG\ArrowUp.svg" />
+    <Resource Include="Resources\Icons\SVG\Check.svg" />
+    <Resource Include="Resources\Icons\SVG\Toggle.svg" />
+    <Resource Include="Resources\Icons\SVG\X.svg" />
+    <Resource Include="Resources\SRMMLogo1BG.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,10 +48,16 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SharpVectors" Version="1.8.2" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RyuHelpers\RyuHelpers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
 </Project>

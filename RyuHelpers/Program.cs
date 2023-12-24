@@ -1,11 +1,11 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using IniParser;
 using IniParser.Model;
-using Octokit;
 using Utils;
 using RyuHelpers.Templates;
 using ParRepacker;
@@ -14,15 +14,15 @@ using ModLoadOrder.Mods;
 using static ModLoadOrder.Generator;
 using static Utils.GamePath;
 using static Utils.Constants;
-using System.Diagnostics;
 
 namespace RyuHelpers
 {
     public static class Program
     {
-        public const string VERSION = "v4.0.0";
-        public const string AUTHOR = "Fronkln";
-        public const string REPO = "RyuModManager";
+        public const string VERSION = "4.0.0";
+        public const string AUTHOR = "SRMM-Studio";
+        public const string UPDATE_INFO_REPO = "srmm-version-info";
+        public const string UPDATE_INFO_FILE_PATH = "RyuUpdater/config.yaml";
 
         private static bool externalModsOnly = true;
         private static bool looseFilesEnabled = false;
@@ -30,14 +30,12 @@ namespace RyuHelpers
         private static bool isSilent = false;
         private static bool migrated = false;
 
-        private static Task<ConsoleOutput> updateCheck = null;
-
         public static bool RebuildMLO = true;
         public static bool IsRebuildMLOSupported = true;
 
         public static async Task Main(string[] args)
         {
-            Console.WriteLine($"Shin Ryu Mod Manager {VERSION}");
+            Console.WriteLine($"Shin Ryu Mod Manager v{VERSION}");
             Console.WriteLine($"By Jhrino (a continuation of SutandoTsukai181's work)\n");
 
             // Parse arguments
@@ -138,17 +136,6 @@ namespace RyuHelpers
                 Console.Write(INI + " was not found. Creating default ini... ");
                 iniParser.WriteFile(INI, IniTemplate.NewIni());
                 Console.WriteLine("DONE!\n");
-            }
-
-            if (isSilent)
-            {
-                // No need to check if console won't be shown anyway
-                checkForUpdates = false;
-            }
-            else if (checkForUpdates)
-            {
-                // Start checking for updates before the actual generation is done
-                updateCheck = Task.Run(() => CheckForUpdatesCLI());
             }
 
             if (GamePath.GetGame() != Game.Unsupported && !Directory.Exists(MODS))
@@ -346,24 +333,6 @@ namespace RyuHelpers
                 Console.ResetColor();
             }
 
-            if (checkForUpdates)
-            {
-                Console.WriteLine("Checking for updates...");
-
-                // Wait for a maximum of 5 seconds for the update check if it was not finished
-                updateCheck.Wait(5000);
-                var updateConsole = await updateCheck.ConfigureAwait(false);
-
-                if (updateConsole != null)
-                {
-                    updateConsole.Flush();
-                }
-                else
-                {
-                    Console.WriteLine("Unable to check for updates\n");
-                }
-            }
-
             if (!isSilent)
             {
                 Console.WriteLine("Program finished. Press any key to exit...");
@@ -545,43 +514,6 @@ namespace RyuHelpers
         private static bool EqualModNames(string m, string n)
         {
             return string.Compare(m, n, StringComparison.InvariantCultureIgnoreCase) == 0;
-        }
-
-        public static async Task<Release> CheckForUpdates()
-        {
-            try
-            {
-                var client = new GitHubClient(new ProductHeaderValue(REPO));
-                return await client.Repository.Release.GetLatest(AUTHOR, REPO).ConfigureAwait(false);
-            }
-            catch
-            {
-
-            }
-
-            return null;
-        }
-
-        private static async Task<ConsoleOutput> CheckForUpdatesCLI()
-        {
-            ConsoleOutput console = new ConsoleOutput();
-
-            var latestRelease = await CheckForUpdates().ConfigureAwait(true);
-
-            if (latestRelease != null && latestRelease.Name.Contains("Shin Ryu Mod Manager") && latestRelease.TagName != VERSION)
-            {
-                console.WriteLine("New version detected!\n");
-                console.WriteLine($"Current version: {VERSION}");
-                console.WriteLine($"Latest version: {latestRelease.TagName}\n");
-
-                console.WriteLine($"Please update by going to {latestRelease.HtmlUrl}");
-            }
-            else
-            {
-                console.WriteLine("Current version is up to date");
-            }
-
-            return console;
         }
     }
 }
