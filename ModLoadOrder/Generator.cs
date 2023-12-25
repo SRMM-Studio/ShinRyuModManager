@@ -175,7 +175,7 @@ namespace ModLoadOrder
 
             // Repack pars
             await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
-            await CPKPatcher.RepackDictionary(cpkRepackDict).ConfigureAwait(false);
+            //await CPKPatcher.RepackDictionary(cpkRepackDict).ConfigureAwait(false);
 
             if (ConsoleOutput.ShowWarnings)
             {
