@@ -27,12 +27,18 @@ namespace ModLoadOrder.Mods
         /// </summary>
         public List<string> CpkFolders { get; }
 
+        /// <summary>
+        /// Folders that need to be repacked.
+        /// </summary>
+        public List<string> RepackCPKs { get; }
+
         public Mod(string name, int indent = 2)
         {
             this.Name = name;
             this.Files = new List<string>();
             this.ParFolders = new List<string>();
             this.CpkFolders = new List<string>();
+            this.RepackCPKs = new List<string>();
 
             this.console = new ConsoleOutput(indent);
             this.console.WriteLine($"Reading directory: {name} ...");
@@ -120,6 +126,11 @@ namespace ModLoadOrder.Mods
             string cpkDataPath;
             switch (basename)
             {
+                case "bgm":
+                    cpkDataPath = GamePath.RemoveModPath(path);
+                    this.RepackCPKs.Add(cpkDataPath);
+                    break;
+
                 case "se":
                 case "speech":
                     cpkDataPath = GamePath.RemoveModPath(path);
@@ -127,6 +138,10 @@ namespace ModLoadOrder.Mods
                     {
                         this.CpkFolders.Add(cpkDataPath + ".cpk");
                         this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
+                    }
+                    else
+                    {
+                        this.RepackCPKs.Add(cpkDataPath + ".cpk");
                     }
 
                     break;

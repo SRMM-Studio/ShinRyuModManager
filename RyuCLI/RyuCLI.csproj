@@ -6,6 +6,7 @@
     <ApplicationIcon>Resources\Icons\SRMM_icon.ico</ApplicationIcon>
     <AssemblyName>RyuModManager</AssemblyName>
     <Version>4.0.0</Version>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

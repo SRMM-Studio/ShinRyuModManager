@@ -242,7 +242,7 @@ namespace ParRepacker
             return console;
         }
 
-        private static List<string> GetModFiles(string par, string mod, ConsoleOutput console)
+        public static List<string> GetModFiles(string par, string mod, ConsoleOutput console)
         {
             List<string> result;
             if (mod.StartsWith(Constants.PARLESS_NAME))

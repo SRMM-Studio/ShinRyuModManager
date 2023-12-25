@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ModLoadOrder.Mods;
 using Utils;
 using ParRepacker;
+using CPKRepatcher;
 using static Utils.ConsoleOutput;
 
 namespace ModLoadOrder
@@ -50,6 +51,8 @@ namespace ModLoadOrder
 
                 Console.WriteLine($"Done reading {Constants.PARLESS_NAME}\n");
             }
+
+            Mod[] modsObjects = new Mod[mods.Count];
 
             Mod mod;
             string modPath;
@@ -120,6 +123,8 @@ namespace ModLoadOrder
                 {
                     modsWithFoldersNotFound.Add(mod.Name, foldersNotFound);
                 }
+
+                modsObjects[i] = mod;
             }
 
             Console.WriteLine($"Added {mods.Count} mod(s) and {files.Count} file(s)!\n");
@@ -155,8 +160,22 @@ namespace ModLoadOrder
                 }
             }
 
+            Dictionary<string, List<string>> cpkRepackDict = new Dictionary<string, List<string>>();
+
+            foreach(Mod modObj in modsObjects)
+            {
+                foreach (string str in modObj.RepackCPKs)
+                {
+                    if (!cpkDictionary.ContainsKey(str))
+                        cpkRepackDict.Add(str, new List<string>());
+
+                    cpkRepackDict[str].Add(modObj.Name);
+                }
+            }
+
             // Repack pars
             await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
+            await CPKPatcher.RepackDictionary(cpkRepackDict).ConfigureAwait(false);
 
             if (ConsoleOutput.ShowWarnings)
             {
