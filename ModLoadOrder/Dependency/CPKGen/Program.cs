@@ -54,8 +54,7 @@ namespace CriPakTools
             time.Start();
 
 
-            MemoryStream ms = new MemoryStream();
-            BinaryWriter newCPK = new BinaryWriter(ms);
+            BinaryWriter newCPK = new BinaryWriter(new FileStream(outputCpk, FileMode.Create));
 
             List<FileEntry> entries = cpk.FileTable.OrderBy(x => x.FileOffset).ToList();
 
@@ -125,8 +124,6 @@ namespace CriPakTools
             cpk.WriteGTOC(newCPK);
 
             newCPK.Close();
-            Console.WriteLine("Writing to " + outputCpk);
-            File.WriteAllBytes(outputCpk, ms.ToArray());
             oldFile.Close();
 
             Console.WriteLine("Done in " + time.Elapsed.TotalSeconds);
