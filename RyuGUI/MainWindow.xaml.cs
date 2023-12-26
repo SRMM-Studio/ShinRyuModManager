@@ -246,7 +246,7 @@ namespace RyuGUI
 
                 if (File.Exists(pathModMeta))
                 {
-                    string yamlString = File.ReadAllText(pathModMeta);
+                    string yamlString = File.ReadAllText(pathModMeta, System.Text.Encoding.UTF8);
                     var deserializer = new DeserializerBuilder().Build();
                     meta = deserializer.Deserialize<ModMeta>(yamlString);
                 }
@@ -316,11 +316,11 @@ namespace RyuGUI
                     Name = "Your mod name",
                     Author = "Author name",
                     Version = "1.0.0",
-                    Description = "Mod description example.\nThis is in a new line.\nLeading spaces are ignored."
+                    Description = "Mod description example.\nThis is in a new line.\n\nYou can use single (') or double (\u0022) quotes in your text.\n\nIf you want your text to be more organized in the yaml file, make sure the new line is indented (press TAB)."
                 };
-                var serializer = new SerializerBuilder().WithDefaultScalarStyle(ScalarStyle.SingleQuoted).Build();
+                var serializer = new SerializerBuilder().WithDefaultScalarStyle(ScalarStyle.Plain).Build();
                 var yaml = serializer.Serialize(sampleMeta);
-                File.WriteAllText(saveFileDialog.FileName, yaml);
+                File.WriteAllText(saveFileDialog.FileName, yaml, System.Text.Encoding.UTF8);
             }
         }
 
