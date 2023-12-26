@@ -73,7 +73,6 @@ namespace RyuGUI
                     }
                 }
 
-                //LegacyMainWindow window = new LegacyMainWindow();
                 MainWindow window = new MainWindow();
 
                 // Add the mod list to the listview
@@ -106,12 +105,13 @@ namespace RyuGUI
         }
 
 
-        private static void CheckForUpdatesGUI()
+        internal static void CheckForUpdatesGUI(bool notifyResult = false)
         {
             string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string updaterPath = Path.Combine(currentPath, "RyuUpdater.exe");
             string updateFlagPath = Path.Combine(currentPath, "update.txt");
             bool updaterResult = false;
+
             if (File.Exists(updaterPath))
             {
                 var versionInfo = FileVersionInfo.GetVersionInfo(updaterPath);
@@ -151,6 +151,10 @@ namespace RyuGUI
                 {
                     return;
                 }
+            }
+            else if (notifyResult)
+            {
+                MessageBox.Show("No SRMM updates available.", "No updates", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 

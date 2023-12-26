@@ -5,9 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System;
-using ICSharpCode.SharpZipLib;
 using ICSharpCode.SharpZipLib.Zip;
+using System.Windows.Controls;
+using Utils;
+using YamlDotNet.Serialization;
+using System;
+using System.Windows.Media.Imaging;
+using YamlDotNet.Core;
 
 namespace RyuGUI
 {
@@ -22,6 +26,7 @@ namespace RyuGUI
         public MainWindow()
         {
             InitializeComponent();
+            lbl_SRMMVersion.Content = $"v{Util.GetAppVersion()}";
         }
 
 
@@ -203,7 +208,7 @@ namespace RyuGUI
 
         private void ModUninstall_Click(object sender, RoutedEventArgs e)
         {
-            
+            //TODO
         }
 
 
@@ -212,10 +217,129 @@ namespace RyuGUI
             Refresh();
         }
 
+
         private void Refresh()
         {
             SetupModList(RyuHelpers.Program.PreRun());
             ModListView.ItemsSource = ModList;
+        }
+
+
+        private void ModListView_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ListView lv = sender as ListView;
+            ModInfo selected = lv.SelectedItem as ModInfo;
+            if (selected == null) return;
+            string modPath = Path.Combine(GamePath.GetModsPath(), selected.Name);
+            UpdateModMeta(selected.Name, modPath);
+        }
+
+
+        private void UpdateModMeta(string modName, string modPath)
+        {
+            string pathModMeta = Path.Combine(modPath, "mod-meta.yaml");
+            string pathModImage = Path.Combine(modPath, "mod-image.png");
+
+            try
+            {
+                ModMeta meta = ModMeta.GetPlaceholderModMeta(modName);
+
+                if (File.Exists(pathModMeta))
+                {
+                    string yamlString = File.ReadAllText(pathModMeta);
+                    var deserializer = new DeserializerBuilder().Build();
+                    meta = deserializer.Deserialize<ModMeta>(yamlString);
+                }
+
+                lbl_ModName.Text = meta.Name;
+                lbl_ModAuthor.Content = meta.Author;
+                lbl_ModVersion.Content = meta.Version;
+                sp_ModDescription.Children.Clear();
+                TextBlock tb = new TextBlock();
+                tb.TextWrapping = TextWrapping.Wrap;
+                tb.Text = meta.Description;
+                sp_ModDescription.Children.Add(tb);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error has occurred while trying to load mod-meta. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                if (File.Exists(pathModImage))
+                {
+                    var uri = new Uri($"file://{pathModImage}");
+                    var bitmap = new BitmapImage(uri);
+                    img_ModImage.Source = bitmap;
+                }
+                else
+                {
+                    var uri = new Uri("pack://application:,,,/Resources/NoImage.png");
+                    var bitmap = new BitmapImage(uri);
+                    img_ModImage.Source = bitmap;
+                }
+            } 
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error has occurred while trying to load mod-image. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+        private void mi_AboutSRMM_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = new AboutWindow();
+            window.Show();
+        }
+
+
+        private void mi_CheckUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            Program.CheckForUpdatesGUI(true);
+        }
+
+
+        private void mi_ModMetaSampleYAML_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.FileName = "mod-meta";
+            saveFileDialog.DefaultExt = ".yaml";
+            saveFileDialog.Filter = "YAML Files (.yaml)|*.yaml";
+            saveFileDialog.InitialDirectory = GamePath.GetModsPath();
+            Nullable<bool> result = saveFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                ModMeta sampleMeta = new ModMeta()
+                {
+                    Name = "Your mod name",
+                    Author = "Author name",
+                    Version = "1.0.0",
+                    Description = "Mod description example.\nThis is in a new line.\nLeading spaces are ignored."
+                };
+                var serializer = new SerializerBuilder().WithDefaultScalarStyle(ScalarStyle.SingleQuoted).Build();
+                var yaml = serializer.Serialize(sampleMeta);
+                File.WriteAllText(saveFileDialog.FileName, yaml);
+            }
+        }
+
+
+        private void mi_ModMetaSampleImage_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.FileName = "mod-image";
+            saveFileDialog.DefaultExt = ".png";
+            saveFileDialog.Filter = "PNG Files (.png)|*.png";
+            saveFileDialog.InitialDirectory = GamePath.GetModsPath();
+            Nullable<bool> result = saveFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                var uri = new Uri("pack://application:,,,/Resources/NoImage.png");
+                var bitmap = new BitmapImage(uri);
+                bitmap.Save(saveFileDialog.FileName);
+            }
         }
     }
 }

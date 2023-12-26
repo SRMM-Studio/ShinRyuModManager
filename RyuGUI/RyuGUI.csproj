@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="credits.txt" />
     <None Remove="Resources\Icons\SRMM_icon.ico" />
     <None Remove="Resources\Icons\SVG\ArrowDown.svg" />
     <None Remove="Resources\Icons\SVG\ArrowUp.svg" />
@@ -23,7 +24,9 @@
     <None Remove="Resources\Icons\SVG\Toggle.svg" />
     <None Remove="Resources\Icons\SVG\X.svg" />
     <None Remove="Resources\Icons\toggle.png" />
+    <None Remove="Resources\NoImage.png" />
     <None Remove="Resources\SRMMLogo1BG.png" />
+    <None Remove="Resources\SRMMLogo250.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="credits.txt" />
     <Resource Include="Resources\Icons\Legacy\toggle.png" />
     <Resource Include="Resources\Icons\Legacy\up.png" />
     <Resource Include="Resources\Icons\Legacy\down.png" />
@@ -40,7 +44,9 @@
     <Resource Include="Resources\Icons\SVG\Check.svg" />
     <Resource Include="Resources\Icons\SVG\Toggle.svg" />
     <Resource Include="Resources\Icons\SVG\X.svg" />
+    <Resource Include="Resources\NoImage.png" />
     <Resource Include="Resources\SRMMLogo1BG.png" />
+    <Resource Include="Resources\SRMMLogo250.png" />
   </ItemGroup>
 
   <ItemGroup>

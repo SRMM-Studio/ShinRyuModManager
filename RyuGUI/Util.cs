@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Reflection;
+using System.Windows.Media.Imaging;
 
 namespace RyuGUI
 {
-    internal class Util
+    internal static class Util
     {
         /// <summary>
         /// Compares two versions and returns true if the target version is higher than the current one.
@@ -36,6 +37,20 @@ namespace RyuGUI
         {
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             return version;
+        }
+
+
+
+        // EXTENSIONS
+        public static void Save(this BitmapImage image, string filePath)
+        {
+            BitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+
+            using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+            {
+                encoder.Save(fileStream);
+            }
         }
     }
 }

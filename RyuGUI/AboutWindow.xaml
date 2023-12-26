@@ -1,0 +1,27 @@
+﻿<Window x:Class="RyuGUI.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RyuGUI"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Title="About" Height="600" Width="500" Background="#FF373535" Foreground="White">
+    <StackPanel VerticalAlignment="Stretch">
+        <Image Source="Resources/SRMMLogo250.png" Width="250" Height="250"/>
+        <TextBlock Margin="20, 0, 20, 0" FontSize="20" TextAlignment="Center">
+            <LineBreak/>
+            <Hyperlink 
+            NavigateUri="https://github.com/SRMM-Studio/ShinRyuModManager"
+            RequestNavigate="Hyperlink_RequestNavigate"
+            Foreground="Gold"
+            TextDecorations="None">
+            Shin Ryu Mod Manager
+            </Hyperlink>
+        </TextBlock>
+        <TextBlock x:Name="txt_Version" Margin="20, 0, 20, 0" Text="version" TextAlignment="Center"/>
+        <TextBlock Margin="0, 40, 0, 0" Text="Credits" TextAlignment="Center" FontSize="16" Foreground="#FFf59b42"/>
+        <TextBlock x:Name="txt_Credits" Margin="15" TextAlignment="Center"/>
+    </StackPanel>
+</Window>
