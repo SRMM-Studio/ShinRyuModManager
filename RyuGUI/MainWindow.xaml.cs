@@ -35,6 +35,40 @@ namespace RyuGUI
             this.ModList = new ObservableCollection<ModInfo>(mods);
         }
 
+        private bool TryInstallModZip(string path)
+        {
+            if (!File.Exists(path))
+                return false;
+
+            using (ZipFile zip = new ZipFile(path))
+            {
+                ZipEntry[] files = zip.Cast<ZipEntry>().ToArray();
+
+                ZipEntry[] rootdirs = files.Where(x => x.IsDirectory && x.ToString().Split('/').Length <= 2).ToArray();
+
+                if (rootdirs.Length <= 0)
+                    return false;
+
+                foreach (ZipEntry entry in files)
+                {
+                    if (entry.IsDirectory)
+                        Directory.CreateDirectory(Path.Combine("mods", entry.ToString()));
+                    else
+                    {
+                        using (FileStream outputFile = File.Create(Path.Combine("mods", entry.ToString())))
+                        {
+                            if (entry.Size > 0)
+                            {
+                                Stream fileStream = zip.GetInputStream(entry);
+                                fileStream.CopyTo(outputFile);
+                                fileStream.Close();
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
 
         private void ModToggle_Click(object sender, RoutedEventArgs e)
         {
@@ -168,41 +202,8 @@ namespace RyuGUI
             if (!File.Exists(openFileDialog.FileName))
                 return;
 
-            ZipFile zip = new ZipFile(openFileDialog.FileName);
-            ZipEntry[] files = zip.Cast<ZipEntry>().ToArray();
-
-            ZipEntry[] rootdirs = files.Where(x => x.IsDirectory && x.ToString().Split('/').Length <= 2).ToArray();
-
-            if (rootdirs.Length <= 0)
-                return;
-
-            int bufferSize = 256 * 1024;
-
-            foreach (ZipEntry entry in files)
-            {
-                if (entry.IsDirectory)
-                    Directory.CreateDirectory(Path.Combine("mods", entry.ToString()));
-                else
-                {
-                    using (FileStream outputFile = File.Create(Path.Combine("mods", entry.ToString())))
-                    {
-                        if(entry.Size > 0)
-                        {
-                            Stream fileStream = zip.GetInputStream(entry);
-                            byte[] dataBuffer = new byte[bufferSize];
-
-                            int readBytes;
-                            while ((readBytes = fileStream.Read(dataBuffer, 0, bufferSize)) > 0)
-                            {
-                                outputFile.Write(dataBuffer, 0, readBytes);
-                                outputFile.Flush();
-                            }
-                        }
-                    }
-                }
-            }
-
-            Refresh();
+            if (TryInstallModZip(openFileDialog.FileName))
+                Refresh();
         }
 
 
@@ -339,6 +340,19 @@ namespace RyuGUI
                 var uri = new Uri("pack://application:,,,/Resources/NoImage.png");
                 var bitmap = new BitmapImage(uri);
                 bitmap.Save(saveFileDialog.FileName);
+            }
+        }
+
+        private void ModListView_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] dt = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string a in dt.Where(path => path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
+                {
+                    TryInstallModZip(a);
+                }
+                Refresh();
             }
         }
     }
