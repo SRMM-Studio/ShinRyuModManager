@@ -10,6 +10,12 @@ namespace Utils
     {
         public static bool ValidateFile(string path, Game game)
         {
+            //Xbox doesnt like being read!
+            if(GamePath.IsXbox(path))
+            {
+                return true;
+            }
+
             using MD5 md5Hash = MD5.Create();
             using FileStream file = File.OpenRead(path);
             var gameHash = GetGameHash(game);
