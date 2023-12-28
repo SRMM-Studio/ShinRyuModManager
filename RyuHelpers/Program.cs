@@ -19,7 +19,7 @@ namespace RyuHelpers
 {
     public static class Program
     {
-        public const string VERSION = "4.0.1";
+        public const string VERSION = "4.0.2";
         public const string AUTHOR = "SRMM-Studio";
         public const string UPDATE_INFO_REPO = "srmm-version-info";
         public const string UPDATE_INFO_FILE_PATH = "RyuUpdater/config.yaml";

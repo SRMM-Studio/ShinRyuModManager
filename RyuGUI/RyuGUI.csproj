@@ -8,7 +8,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <ApplicationIcon>Resources\Icons\SRMM_icon.ico</ApplicationIcon>
     <AssemblyName>RyuModManagerGUI</AssemblyName>
-    <Version>4.0.1</Version>
+    <Version>4.0.2</Version>
     <Authors>Shin Ryu Mod Manager Studio</Authors>
     <Company />
     <Product></Product>
