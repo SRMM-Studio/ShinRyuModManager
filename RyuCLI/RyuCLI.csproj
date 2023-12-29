@@ -5,7 +5,7 @@
     <TargetFramework>netframework4.8</TargetFramework>
     <ApplicationIcon>Resources\Icons\SRMM_icon.ico</ApplicationIcon>
     <AssemblyName>RyuModManager</AssemblyName>
-    <Version>4.0.2</Version>
+    <Version>4.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
