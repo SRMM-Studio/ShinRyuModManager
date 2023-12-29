@@ -29,6 +29,8 @@ namespace RyuGUI
             InitializeComponent();
             lbl_SRMMVersion.Content = $"v{Util.GetAppVersion()}";
 
+            this.Title = $"Shin Ryu Mod Manager [{Utils.GamePath.GetGameFriendlyName(Utils.GamePath.GetGame())}]";
+
             if (!Directory.Exists("mods"))
                 Directory.CreateDirectory("mods");
 

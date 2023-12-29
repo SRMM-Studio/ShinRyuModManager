@@ -145,6 +145,25 @@ namespace Utils
             return currentGame.Value;
         }
 
+        public static string GetGameFriendlyName(Game g) {
+            return g switch
+            {
+                Game.Yakuza3 => "Yakuza 3 Remastered",
+                Game.Yakuza4 => "Yakuza 4 Remastered",
+                Game.Yakuza5 => "Yakuza 5 Remastered",
+                Game.Yakuza0 => "Yakuza 0",
+                Game.YakuzaKiwami => "Yakuza Kiwami",
+                Game.Yakuza6 => "Yakuza 6",
+                Game.YakuzaKiwami2 => "Yakuza Kiwami 2",
+                Game.YakuzaLikeADragon => "Yakuza: Like a Dragon",
+                Game.Judgment => "Judgment",
+                Game.LostJudgment => "Lost Judgment",
+                Game.likeadragongaiden => "Like a Dragon Gaiden: The Man Who Erased His Name",
+                Game.likeadragon8 => "Like a Dragon: Infinite Wealth",
+                _ => "<unknown>"
+            };
+        }
+
         public static string GetGameExe()
         {
             return currentGame.ToString() + ".exe";
