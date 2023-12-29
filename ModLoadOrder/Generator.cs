@@ -15,7 +15,7 @@ namespace ModLoadOrder
 {
     public static class Generator
     {
-        public static async Task GenerateModLoadOrder(List<string> mods, bool looseFilesEnabled)
+        public static async Task GenerateModLoadOrder(List<string> mods, bool looseFilesEnabled, bool cpkRepackingEnabled)
         {
             List<int> modIndices = new List<int> { 0 };
             OrderedSet<string> files = new OrderedSet<string>();
@@ -175,7 +175,9 @@ namespace ModLoadOrder
 
             // Repack pars
             await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
-            //await CPKPatcher.RepackDictionary(cpkRepackDict).ConfigureAwait(false);
+
+            if(cpkRepackingEnabled)
+                await CPKPatcher.RepackDictionary(cpkRepackDict).ConfigureAwait(false);
 
             if (ConsoleOutput.ShowWarnings)
             {

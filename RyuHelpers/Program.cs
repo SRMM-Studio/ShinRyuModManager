@@ -26,6 +26,7 @@ namespace RyuHelpers
 
         private static bool externalModsOnly = true;
         private static bool looseFilesEnabled = false;
+        private static bool cpkRepackingEnabled = false;
         private static bool checkForUpdates = true;
         private static bool isSilent = false;
         private static bool migrated = false;
@@ -83,6 +84,11 @@ namespace RyuHelpers
             if (File.Exists(INI))
             {
                 ini = iniParser.ReadFile(INI);
+
+                if (ini.TryGetKey("Debug.CPKRepackingTest", out string cpkRepatch))
+                {
+                    cpkRepackingEnabled = int.Parse(cpkRepatch) == 1;
+                }
 
                 if (ini.TryGetKey("Overrides.LooseFilesEnabled", out string looseFiles))
                 {
@@ -296,7 +302,7 @@ namespace RyuHelpers
             {
                 if (mods?.Count > 0 || looseFilesEnabled)
                 {
-                    await GenerateModLoadOrder(mods, looseFilesEnabled).ConfigureAwait(false);
+                    await GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
                     return true;
                 }
 
