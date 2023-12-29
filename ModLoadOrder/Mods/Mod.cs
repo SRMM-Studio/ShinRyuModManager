@@ -82,19 +82,33 @@ namespace ModLoadOrder.Mods
             switch (check)
             {
                 case "chara":
+                    needsRepack = GamePath.ExistsInDataAsPar(path);
+                    break;
                 case "map_":
+                    needsRepack = GamePath.ExistsInDataAsPar(path);
+                    break;
                 case "effect":
                     needsRepack = GamePath.ExistsInDataAsPar(path);
                     break;
                 case "prep":
+                    needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
+                    break;
                 case "light_anim":
                     needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
                     break;
                 case "2d":
+                    needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
+                    break;
                 case "cse":
                     needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
                     break;
                 case "pausepar":
+                    if (GamePath.GetGame() >= Game.Yakuza0)
+                        needsRepack = true;
+                    else
+                        needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
+                    break;
+                case "pausepar_e":
                     needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
                     break;
                 case "particle":
