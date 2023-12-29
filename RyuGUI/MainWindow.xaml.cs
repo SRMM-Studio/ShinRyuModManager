@@ -21,12 +21,24 @@ namespace RyuGUI
     public partial class MainWindow : Window
     {
         public ObservableCollection<ModInfo> ModList { get; set; }
+        private FileSystemWatcher modsFolderWatcher;
 
 
         public MainWindow()
         {
             InitializeComponent();
             lbl_SRMMVersion.Content = $"v{Util.GetAppVersion()}";
+
+            this.Title = $"Shin Ryu Mod Manager [{Utils.GamePath.GetGameFriendlyName(Utils.GamePath.GetGame())}]";
+
+            if (!Directory.Exists("mods"))
+                Directory.CreateDirectory("mods");
+
+            modsFolderWatcher = new FileSystemWatcher("mods");
+            modsFolderWatcher.Created += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
+            modsFolderWatcher.Deleted += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
+            modsFolderWatcher.Renamed += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
+            modsFolderWatcher.EnableRaisingEvents = true;
         }
 
 
