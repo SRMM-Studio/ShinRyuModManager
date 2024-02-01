@@ -283,7 +283,7 @@ namespace RyuGUI
                 if (File.Exists(pathModImage))
                 {
                     var uri = new Uri($"file://{pathModImage}");
-                    var bitmap = new BitmapImage(uri);
+                    var bitmap = Util.OpenBitmapImage(uri);
                     img_ModImage.Source = bitmap;
                 }
                 else

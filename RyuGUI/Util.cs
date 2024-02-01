@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 
@@ -37,6 +38,27 @@ namespace RyuGUI
         {
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             return version;
+        }
+
+
+        internal static BitmapImage OpenBitmapImage(byte[] array)
+        {
+            using (var ms = new MemoryStream(array))
+            {
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad; //Closes the stream after the bitmap is created
+                image.StreamSource = ms;
+                image.EndInit();
+                return image;
+            }
+        }
+
+
+        internal static BitmapImage OpenBitmapImage(Uri uri)
+        {
+            byte[] file = File.ReadAllBytes(uri.AbsolutePath);
+            return OpenBitmapImage(file);
         }
 
 
