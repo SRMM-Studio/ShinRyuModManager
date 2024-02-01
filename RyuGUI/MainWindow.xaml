@@ -137,7 +137,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Border BorderThickness="2" BorderBrush="#32808080" Background="#32808080" HorizontalAlignment="Left">
-                        <Image x:Name="img_ModImage" Source="Resources/NoImage.png" Height="150" Width="150" HorizontalAlignment="Left"/>
+                        <Image x:Name="img_ModImage" RenderOptions.BitmapScalingMode="HighQuality" Source="Resources/NoImage.png" Height="150" Width="150" HorizontalAlignment="Left"/>
                     </Border>
 
                     <Grid Grid.Column="1">
