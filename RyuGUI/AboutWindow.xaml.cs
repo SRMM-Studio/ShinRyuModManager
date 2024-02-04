@@ -23,7 +23,7 @@ namespace RyuGUI
 
         private void SetCredits()
         {
-            var uri = new Uri("pack://application:,,,/credits.txt");
+            var uri = new Uri("pack://application:,,,/Resources/credits.txt");
             var resourceStream = Application.GetResourceStream(uri);
             using (var reader = new StreamReader(resourceStream.Stream))
             {

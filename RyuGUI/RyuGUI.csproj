@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="credits.txt" />
+    <Resource Include="Resources\credits.txt" />
     <Resource Include="Resources\Icons\Legacy\toggle.png" />
     <Resource Include="Resources\Icons\Legacy\up.png" />
     <Resource Include="Resources\Icons\Legacy\down.png" />
