@@ -251,7 +251,9 @@ namespace RyuGUI
         private void UpdateModMeta(string modName, string modPath)
         {
             string pathModMeta = Path.Combine(modPath, "mod-meta.yaml");
-            string pathModImage = Path.Combine(modPath, "mod-image.png");
+            string patternModImage = "mod-image.*";
+            List<string> matchingModImageFiles = Directory.EnumerateFiles(modPath, patternModImage).ToList();
+            BitmapImage modImage = new BitmapImage(new Uri("pack://application:,,,/Resources/NoImage.png"));
 
             try
             {
@@ -278,25 +280,28 @@ namespace RyuGUI
                 MessageBox.Show($"An error has occurred while trying to load mod-meta. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            try
+
+            if (matchingModImageFiles.Count > 0)
             {
-                if (File.Exists(pathModImage))
+                foreach (string filePath in matchingModImageFiles)
                 {
-                    var uri = new Uri($"file://{pathModImage}");
-                    var bitmap = Util.OpenBitmapImage(uri);
-                    img_ModImage.Source = bitmap;
+                    try
+                    {
+                        var uri = new Uri($"file://{filePath}");
+                        var bitmap = Util.OpenBitmapImage(uri);
+                        
+                        //bitmap manages to load
+                        modImage = bitmap;
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error has occurred while trying to load {Path.GetFileName(filePath)}. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
-                else
-                {
-                    var uri = new Uri("pack://application:,,,/Resources/NoImage.png");
-                    var bitmap = new BitmapImage(uri);
-                    img_ModImage.Source = bitmap;
-                }
-            } 
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error has occurred while trying to load mod-image. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+            img_ModImage.Source = modImage;
         }
 
 
