@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using ModLoadOrder.Mods;
 using YamlDotNet.Serialization;
@@ -42,7 +43,9 @@ namespace RyuGUI
 
                 if (RyuHelpers.Program.ShouldCheckForUpdates())
                 {
-                    CheckForUpdatesGUI();
+                    new Thread(delegate () {
+                        CheckForUpdatesGUI();
+                    }).Start();
                 }
 
                 if (RyuHelpers.Program.ShowWarnings())

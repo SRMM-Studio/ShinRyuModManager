@@ -12,6 +12,7 @@ using YamlDotNet.Serialization;
 using System;
 using System.Windows.Media.Imaging;
 using YamlDotNet.Core;
+using System.Threading;
 
 namespace RyuGUI
 {
@@ -314,7 +315,9 @@ namespace RyuGUI
 
         private void mi_CheckUpdates_Click(object sender, RoutedEventArgs e)
         {
-            Program.CheckForUpdatesGUI(true);
+            new Thread(delegate () {
+                Program.CheckForUpdatesGUI(true);
+            }).Start();
         }
 
 
