@@ -25,6 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RyuCLI", "RyuCLI\RyuCLI.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RyuUpdater", "RyuUpdater\RyuUpdater.csproj", "{2209817A-1EEF-40D2-B272-A2E60ACB06F6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35E50F8C-F28E-4019-A811-A58F7F54B927}"
+	ProjectSection(SolutionItems) = preProject
+		RyuAssemblyInfo.cs = RyuAssemblyInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

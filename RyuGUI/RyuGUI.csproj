@@ -3,16 +3,12 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netframework4.8</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
     <StartupObject>RyuGUI.Program</StartupObject>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <ApplicationIcon>Resources\Icons\SRMM_icon.ico</ApplicationIcon>
     <AssemblyName>RyuModManagerGUI</AssemblyName>
-    <Version>4.0.3</Version>
-    <Authors>Shin Ryu Mod Manager Studio</Authors>
-    <Company />
-    <Product></Product>
-    <RepositoryUrl>https://github.com/SRMM-Studio/ShinRyuModManager</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +23,10 @@
     <None Remove="Resources\NoImage.png" />
     <None Remove="Resources\SRMMLogo1BG.png" />
     <None Remove="Resources\SRMMLogo250.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\RyuAssemblyInfo.cs" Link="Properties\RyuAssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
