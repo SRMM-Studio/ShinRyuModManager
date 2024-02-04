@@ -313,6 +313,13 @@ namespace RyuGUI
         }
 
 
+        private void mi_Changelog_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = new ChangelogWindow();
+            window.Show();
+        }
+
+
         private void mi_CheckUpdates_Click(object sender, RoutedEventArgs e)
         {
             new Thread(delegate () {

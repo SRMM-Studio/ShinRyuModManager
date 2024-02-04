@@ -24,6 +24,7 @@
             </MenuItem>
             <MenuItem Header="Help">
                 <MenuItem x:Name="mi_AboutSRMM" Header="About Shin Ryu Mod Manager" Click="mi_AboutSRMM_Click"/>
+                <MenuItem x:Name="mi_Changelog" Header="Changelog" Click="mi_Changelog_Click"/>
                 <MenuItem x:Name="mi_CheckUpdates" Header="Check for updates" Click="mi_CheckUpdates_Click"/>
             </MenuItem>
         </Menu>
