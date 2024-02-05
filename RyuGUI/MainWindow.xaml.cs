@@ -13,6 +13,7 @@ using System;
 using System.Windows.Media.Imaging;
 using YamlDotNet.Core;
 using System.Threading;
+using System.Reflection;
 
 namespace RyuGUI
 {
@@ -40,6 +41,16 @@ namespace RyuGUI
             modsFolderWatcher.Deleted += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
             modsFolderWatcher.Renamed += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
             modsFolderWatcher.EnableRaisingEvents = true;
+
+            //Display changelog if the recent update flag exists
+            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string updateFlagFilePath = Path.Combine(currentPath, "SRMM_RECENT_UPDATE_FLAG");
+            if (File.Exists(updateFlagFilePath))
+            {
+                ChangelogWindow changelog = new ChangelogWindow();
+                changelog.Show();
+                File.Delete(updateFlagFilePath);
+            }
         }
 
 
