@@ -50,6 +50,7 @@ namespace RyuUpdater
                     DownloadUpdate(branch);
                     Console.WriteLine("Extracting update files...");
                     ExtractUpdate();
+                    WriteRecentUpdateFlag();
                 }
             });
         }
@@ -120,6 +121,15 @@ namespace RyuUpdater
             {
                 File.Delete(Settings.PathTempUpdateFile);
             }
+        }
+
+
+        private static void WriteRecentUpdateFlag()
+        {
+            string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string flagPath = Path.Combine(exePath, Settings.RecentUpdateFlagName);
+            File.Create(flagPath);
+            File.SetAttributes(flagPath, File.GetAttributes(flagPath) | FileAttributes.Hidden);
         }
     }
 }

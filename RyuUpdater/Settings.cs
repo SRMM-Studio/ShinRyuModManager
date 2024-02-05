@@ -18,5 +18,9 @@ namespace RyuUpdater
         internal static string PathTempFolder = Path.Combine(Path.GetTempPath(), "SRMM_Updater");
         internal static string PathTempFileName = "SRMM_Update.zip";
         internal static string PathTempUpdateFile = Path.Combine(PathTempFolder, PathTempFileName);
+
+
+        //Flag
+        internal static string RecentUpdateFlagName = "SRMM_RECENT_UPDATE_FLAG";
     }
 }
