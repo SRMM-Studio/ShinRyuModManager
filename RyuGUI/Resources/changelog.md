@@ -1,4 +1,8 @@
-﻿> ### **%{color:gold} Version 4.1.0 %** ###
+﻿> ### **%{color:gold} Version 4.1.1 %** ###
+* Fix incorrect path encoding when attempting to open a mod-image
+---
+
+> ### **%{color:orange} Version 4.1.0 %** ###
 * Add a changelog *(this window!)*
 * Fix update checks not being performed on a separate thread
 * The mod-image now supports a variety of formats (PNG, JPEG, BMP, GIF, TIFF, ICO)
