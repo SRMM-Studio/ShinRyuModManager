@@ -57,7 +57,7 @@ namespace RyuGUI
 
         internal static BitmapImage OpenBitmapImage(Uri uri)
         {
-            byte[] file = File.ReadAllBytes(uri.AbsolutePath);
+            byte[] file = File.ReadAllBytes(uri.LocalPath);
             return OpenBitmapImage(file);
         }
 
