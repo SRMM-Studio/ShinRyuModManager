@@ -19,7 +19,6 @@ namespace RyuHelpers
 {
     public static class Program
     {
-        public const string VERSION = "4.0.3";
         public const string AUTHOR = "SRMM-Studio";
         public const string UPDATE_INFO_REPO = "srmm-version-info";
         public const string UPDATE_INFO_FILE_PATH = "RyuUpdater/config.yaml";
@@ -36,7 +35,7 @@ namespace RyuHelpers
 
         public static async Task Main(string[] args)
         {
-            Console.WriteLine($"Shin Ryu Mod Manager v{VERSION}");
+            Console.WriteLine($"Shin Ryu Mod Manager v{AssemblyVersion.GetVersion()}");
             Console.WriteLine($"By Jhrino (a continuation of SutandoTsukai181's work)\n");
 
             // Parse arguments
