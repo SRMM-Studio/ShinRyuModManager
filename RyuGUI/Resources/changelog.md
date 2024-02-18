@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.1.1 %** ###
+﻿> ### **%{color:gold} Version 4.1.2 %** ###
+* Improve performance
+* Remove MLO reloading feature (no modder used it)
+---
+
+> ### **%{color:orange} Version 4.1.1 %** ###
 * Fix incorrect path encoding when attempting to open a mod-image
 ---
 
