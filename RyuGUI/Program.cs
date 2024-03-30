@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -75,6 +76,23 @@ namespace RyuGUI
                             "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
+
+                // Seasonal Event
+                string FLAG_FOOLS24 = "SRMM_FOOLS24_FLAG";
+                if (DateTime.Now.ToString("dd/MM/yy", CultureInfo.InvariantCulture) == "01/04/24")
+                {
+                    if (!Util.CheckFlag(FLAG_FOOLS24))
+                    {
+                        Miscellaneous.Fools24.Fools24Window fools24Window = new Miscellaneous.Fools24.Fools24Window();
+                        fools24Window.ShowDialog();
+                        Util.CreateFlag(FLAG_FOOLS24);
+                    }
+                }
+                else
+                {
+                    Util.DeleteFlag(FLAG_FOOLS24);
+                }
+
 
                 MainWindow window = new MainWindow();
 

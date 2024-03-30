@@ -43,14 +43,15 @@ namespace RyuGUI
             modsFolderWatcher.EnableRaisingEvents = true;
 
             //Display changelog if the recent update flag exists
-            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string updateFlagFilePath = Path.Combine(currentPath, "SRMM_RECENT_UPDATE_FLAG");
-            if (File.Exists(updateFlagFilePath))
+            string updateFlagName = "SRMM_RECENT_UPDATE_FLAG";
+            if (Util.CheckFlag(updateFlagName))
             {
                 ChangelogWindow changelog = new ChangelogWindow();
                 changelog.Show();
-                File.Delete(updateFlagFilePath);
+                Util.DeleteFlag(updateFlagName);
             }
+
+            Refresh();
         }
 
 

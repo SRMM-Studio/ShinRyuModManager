@@ -62,6 +62,37 @@ namespace RyuGUI
         }
 
 
+        internal static bool CheckFlag(string flagName)
+        {
+            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            string flagFilePath = Path.Combine(currentPath, flagName);
+            if (File.Exists(flagFilePath)) return true;
+            else return false;
+        }
+
+
+        internal static void CreateFlag(string flagName)
+        {
+            if (!CheckFlag(flagName))
+            {
+                string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                string flagFilePath = Path.Combine(currentPath, flagName);
+                File.Create(flagFilePath);
+                File.SetAttributes(flagFilePath, File.GetAttributes(flagFilePath) | FileAttributes.Hidden);
+            }
+        }
+
+
+        internal static void DeleteFlag(string flagName)
+        {
+            if (CheckFlag(flagName))
+            {
+                string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                string flagFilePath = Path.Combine(currentPath, flagName);
+                File.Delete(flagFilePath);
+            }
+        }
+
 
         // EXTENSIONS
         public static void Save(this BitmapImage image, string filePath)
