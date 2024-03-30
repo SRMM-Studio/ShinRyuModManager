@@ -1,4 +1,8 @@
-﻿> ### **%{color:gold} Version 4.1.2 %** ###
+﻿> ### **%{color:gold} Version 4.1.3 %** ###
+* Further improvements to overall system stability and other minor adjustments have been made to enhance the user experience.
+---
+
+> ### **%{color:orange} Version 4.1.2 %** ###
 * Improve performance
 * Remove MLO reloading feature (no modder used it)
 ---
