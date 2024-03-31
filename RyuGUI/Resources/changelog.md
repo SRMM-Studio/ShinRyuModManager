@@ -1,4 +1,8 @@
-﻿> ### **%{color:gold} Version 4.1.3 %** ###
+﻿> ### **%{color:gold} Version 4.1.4 %** ###
+* Reverted a fix that would cause crashes when changing mod priorities.
+---
+
+> ### **%{color:orange} Version 4.1.3 %** ###
 * Further improvements to overall system stability and other minor adjustments have been made to enhance the user experience.
 ---
 
