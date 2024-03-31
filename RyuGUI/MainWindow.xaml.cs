@@ -50,8 +50,6 @@ namespace RyuGUI
                 changelog.Show();
                 Util.DeleteFlag(updateFlagName);
             }
-
-            Refresh();
         }
 
 
