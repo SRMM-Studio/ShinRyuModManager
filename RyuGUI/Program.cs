@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 using ModLoadOrder.Mods;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
@@ -27,7 +28,8 @@ namespace RyuGUI
         [STAThread]
         public static void Main(string[] args)
         {
-            if (args.Length == 0)
+            // Check if left ctrl is pressed to open in CLI (legacy) mode
+            if (args.Length == 0 && !Keyboard.IsKeyDown(Key.LeftCtrl))
             {
                 // Read the mod list (and execute other RMM stuff)
                 List<ModInfo> mods = RyuHelpers.Program.PreRun();
