@@ -1,4 +1,4 @@
-﻿namespace RyuGUI
+﻿namespace ShinRyuModManager
 {
     class ModMeta
     {

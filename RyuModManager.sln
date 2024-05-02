@@ -16,7 +16,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModLoadOrder", "ModLoadOrde
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj", "{A1A0AE14-3F2F-4213-B22F-6EC20F2BFE0D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RyuGUI", "RyuGUI\RyuGUI.csproj", "{86DD46D2-E68A-4D1B-A339-48C99A916652}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShinRyuModManager", "ShinRyuModManager\ShinRyuModManager.csproj", "{86DD46D2-E68A-4D1B-A339-48C99A916652}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DD6F4A69-AC5E-4D9D-858A-C269F1A266F1} = {DD6F4A69-AC5E-4D9D-858A-C269F1A266F1}
 	EndProjectSection

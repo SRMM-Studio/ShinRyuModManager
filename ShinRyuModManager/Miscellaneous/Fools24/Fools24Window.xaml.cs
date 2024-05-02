@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace RyuGUI.Miscellaneous.Fools24
+namespace ShinRyuModManager.Miscellaneous.Fools24
 {
     /// <summary>
     /// Don't say anything if you find this ahead of time ;)

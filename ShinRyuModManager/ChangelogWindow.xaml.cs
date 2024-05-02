@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 
-namespace RyuGUI
+namespace ShinRyuModManager
 {
     /// <summary>
     /// Interaction logic for ChangelogWindow.xaml

@@ -13,7 +13,7 @@ using ModLoadOrder.Mods;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
 
-namespace RyuGUI
+namespace ShinRyuModManager
 {
     public static class Program
     {

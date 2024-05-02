@@ -15,7 +15,7 @@ using YamlDotNet.Core;
 using System.Threading;
 using System.Reflection;
 
-namespace RyuGUI
+namespace ShinRyuModManager
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 
-namespace RyuGUI
+namespace ShinRyuModManager
 {
     internal static class Util
     {

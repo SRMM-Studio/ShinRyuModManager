@@ -2,7 +2,7 @@
 using System;
 using System.Windows;
 
-namespace RyuGUI
+namespace ShinRyuModManager
 {
     /// <summary>
     /// Interaction logic for AboutWindow.xaml

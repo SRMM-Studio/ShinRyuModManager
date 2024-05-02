@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ModLoadOrder.Mods;
 
-namespace RyuGUI
+namespace ShinRyuModManager
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
