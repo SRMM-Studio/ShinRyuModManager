@@ -1,4 +1,4 @@
-﻿using ModLoadOrder.Mods;
+﻿using ShinRyuModManager.ModLoadOrder.Mods;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -43,12 +43,11 @@ namespace ShinRyuModManager
             modsFolderWatcher.EnableRaisingEvents = true;
 
             //Display changelog if the recent update flag exists
-            string updateFlagName = "SRMM_RECENT_UPDATE_FLAG";
-            if (Util.CheckFlag(updateFlagName))
+            if (Util.CheckFlag(Settings.UPDATE_RECENT_FLAG_FILE_NAME))
             {
                 ChangelogWindow changelog = new ChangelogWindow();
                 changelog.Show();
-                Util.DeleteFlag(updateFlagName);
+                Util.DeleteFlag(Settings.UPDATE_RECENT_FLAG_FILE_NAME);
             }
         }
 
@@ -158,10 +157,10 @@ namespace ShinRyuModManager
 
         private void ModSave_Click(object sender, RoutedEventArgs e)
         {
-            if (RyuHelpers.Program.SaveModList(this.ModList.ToList()))
+            if (Program.SaveModList(this.ModList.ToList()))
             {
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled or unsupported)
-                if (RyuHelpers.Program.RebuildMLO && RyuHelpers.Program.IsRebuildMLOSupported)
+                if (Program.RebuildMLO && Program.IsRebuildMLOSupported)
                 {
                     MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -174,7 +173,7 @@ namespace ShinRyuModManager
                     bool success;
                     try
                     {
-                        Task<bool> gen = RyuHelpers.Program.RunGeneration(RyuHelpers.Program.ConvertNewToOldModList(this.ModList.ToList()));
+                        Task<bool> gen = Program.RunGeneration(Program.ConvertNewToOldModList(this.ModList.ToList()));
                         gen.Wait();
                         success = gen.Result;
                     }
@@ -244,7 +243,7 @@ namespace ShinRyuModManager
 
         private void Refresh()
         {
-            SetupModList(RyuHelpers.Program.PreRun());
+            SetupModList(Program.PreRun());
             ModListView.ItemsSource = ModList;
         }
 

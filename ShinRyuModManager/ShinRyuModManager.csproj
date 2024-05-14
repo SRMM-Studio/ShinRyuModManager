@@ -56,6 +56,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="ini-parser" Version="2.5.2" />
     <PackageReference Include="MdXaml" Version="1.26.0" />
     <PackageReference Include="SharpVectors" Version="1.8.2" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
@@ -63,7 +64,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RyuHelpers\RyuHelpers.csproj" />
+    <ProjectReference Include="..\ParManager\ParLibrary\ParLibrary.csproj" />
+    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

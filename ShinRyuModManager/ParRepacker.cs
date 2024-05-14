@@ -3,15 +3,13 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using ParLibrary.Converter;
 using Utils;
-
 using Yarhl.FileSystem;
 
-namespace ParRepacker
+namespace ShinRyuModManager
 {
-    public static class Repacker
+    public static class ParRepacker
     {
 
         //Necessary to avoid rare UnauthorizedException errors.

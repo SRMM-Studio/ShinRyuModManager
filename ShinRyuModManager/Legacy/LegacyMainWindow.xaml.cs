@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using ModLoadOrder.Mods;
+using ShinRyuModManager.ModLoadOrder.Mods;
 
 namespace ShinRyuModManager
 {
@@ -91,10 +91,10 @@ namespace ShinRyuModManager
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (RyuHelpers.Program.SaveModList(this.ModList.ToList()))
+            if (Program.SaveModList(this.ModList.ToList()))
             {
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled or unsupported)
-                if (RyuHelpers.Program.RebuildMLO && RyuHelpers.Program.IsRebuildMLOSupported)
+                if (Program.RebuildMLO && Program.IsRebuildMLOSupported)
                 {
                     MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -107,7 +107,7 @@ namespace ShinRyuModManager
                     bool success;
                     try
                     {
-                        Task<bool> gen = RyuHelpers.Program.RunGeneration(RyuHelpers.Program.ConvertNewToOldModList(this.ModList.ToList()));
+                        Task<bool> gen = Program.RunGeneration(Program.ConvertNewToOldModList(this.ModList.ToList()));
                         gen.Wait();
                         success = gen.Result;
                     }

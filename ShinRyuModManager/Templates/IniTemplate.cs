@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using IniParser.Model;
 
-namespace RyuHelpers.Templates
+namespace ShinRyuModManager.Templates
 {
     public static class IniTemplate
     {

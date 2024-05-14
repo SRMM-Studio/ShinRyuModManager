@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Utils;
 
-namespace ModLoadOrder.Mods
+namespace ShinRyuModManager.ModLoadOrder.Mods
 {
     public class ParlessMod : Mod
     {

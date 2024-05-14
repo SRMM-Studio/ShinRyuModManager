@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Utils;
-using CriPakTools;
 
-namespace CPKRepatcher
+namespace ShinRyuModManager.CPKRepatcher
 {
     //Intended only for OE bgm/se.cpk
     internal static class CPKPatcher
@@ -41,7 +39,7 @@ namespace CPKRepatcher
                         File.Copy(str, Path.Combine(cpkDir, Path.GetFileName(str)) , true);
                 }
 
-                Program.Modify(origCpk, cpkDir, new DirectoryInfo(cpkDir).FullName + ".cpk");
+                CriPakTools.Program.Modify(origCpk, cpkDir, new DirectoryInfo(cpkDir).FullName + ".cpk");
             }
 
 

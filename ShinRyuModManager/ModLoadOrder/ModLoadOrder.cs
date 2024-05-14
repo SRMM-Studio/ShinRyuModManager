@@ -5,7 +5,7 @@ using System.Linq;
 using Yarhl.IO;
 using Utils;
 
-namespace ModLoadOrder
+namespace ShinRyuModManager.ModLoadOrder
 {
     public class ModLoadOrder
     {

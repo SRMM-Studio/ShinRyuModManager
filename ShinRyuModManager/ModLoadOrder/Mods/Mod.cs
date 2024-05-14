@@ -4,7 +4,7 @@ using System.Linq;
 
 using Utils;
 
-namespace ModLoadOrder.Mods
+namespace ShinRyuModManager.ModLoadOrder.Mods
 {
     public class Mod
     {

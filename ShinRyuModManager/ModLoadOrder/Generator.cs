@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using ModLoadOrder.Mods;
+using ShinRyuModManager.ModLoadOrder.Mods;
 using Utils;
-using ParRepacker;
-using CPKRepatcher;
+using ShinRyuModManager.CPKRepatcher;
 using static Utils.ConsoleOutput;
 
-namespace ModLoadOrder
+namespace ShinRyuModManager.ModLoadOrder
 {
     public static class Generator
     {
@@ -174,7 +172,7 @@ namespace ModLoadOrder
             }
 
             // Repack pars
-            await Repacker.RepackDictionary(parDictionary).ConfigureAwait(false);
+            await ParRepacker.RepackDictionary(parDictionary).ConfigureAwait(false);
 
             if(cpkRepackingEnabled)
                 await CPKPatcher.RepackDictionary(cpkRepackDict).ConfigureAwait(false);

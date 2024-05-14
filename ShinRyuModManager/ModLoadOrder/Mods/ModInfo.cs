@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Utils;
 
-namespace ModLoadOrder.Mods
+namespace ShinRyuModManager.ModLoadOrder.Mods
 {
     public class ModInfo : IEqualityComparer<ModInfo>, INotifyPropertyChanged
     {
