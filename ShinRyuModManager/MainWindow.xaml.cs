@@ -13,7 +13,6 @@ using System;
 using System.Windows.Media.Imaging;
 using YamlDotNet.Core;
 using System.Threading;
-using System.Reflection;
 
 namespace ShinRyuModManager
 {
@@ -41,7 +40,11 @@ namespace ShinRyuModManager
             modsFolderWatcher.Deleted += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
             modsFolderWatcher.Renamed += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
             modsFolderWatcher.EnableRaisingEvents = true;
+        }
 
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
             //Display changelog if the recent update flag exists
             if (Util.CheckFlag(Settings.UPDATE_RECENT_FLAG_FILE_NAME))
             {
@@ -49,6 +52,8 @@ namespace ShinRyuModManager
                 changelog.Show();
                 Util.DeleteFlag(Settings.UPDATE_RECENT_FLAG_FILE_NAME);
             }
+            
+            Refresh();
         }
 
 

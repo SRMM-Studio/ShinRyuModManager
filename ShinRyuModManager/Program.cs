@@ -116,10 +116,6 @@ namespace ShinRyuModManager
 
 
                 MainWindow window = new MainWindow();
-
-                // Add the mod list to the listview
-                window.SetupModList(mods);
-
                 App app = new App();
                 app.Run(window);
             }

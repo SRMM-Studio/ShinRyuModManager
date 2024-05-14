@@ -6,7 +6,7 @@
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:local="clr-namespace:ShinRyuModManager"
         mc:Ignorable="d"
-        Title="Shin Ryu Mod Manager" Height="600" Width="950" ResizeMode="CanMinimize" Background="#FF373535" Foreground="White">
+        Title="Shin Ryu Mod Manager" Height="600" Width="950" ResizeMode="CanMinimize" Background="#FF373535" Foreground="White" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -54,7 +54,7 @@
 
                     <TextBlock Grid.Row="0" Margin="20" Text="MOD LOAD ORDER (Hover for more information)" ToolTip="Mods will get loaded in order (top to bottom).&#x0a;&#x0a;If a mod has a file conflict with another, the files&#x0a;of the latest mod to load will have priority." Foreground="LightGray"/>
 
-                    <ListView x:Name="ModListView" Grid.Row="1" ItemsSource="{Binding ModList, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}}}" Margin="20,0,20,20" Background="#FF4B4B4B" Foreground="White" Opacity="0.8" Height="Auto" VerticalAlignment="Stretch" d:ItemsSource="{d:SampleData ItemCount=5}" SelectionChanged="ModListView_SelectionChanged" AllowDrop="True" Drop="ModListView_Drop">
+                    <ListView x:Name="ModListView" Grid.Row="1" ItemsSource="{Binding ModList}" Margin="20,0,20,20" Background="#FF4B4B4B" Foreground="White" Opacity="0.8" Height="Auto" VerticalAlignment="Stretch" d:ItemsSource="{d:SampleData ItemCount=5}" SelectionChanged="ModListView_SelectionChanged" AllowDrop="True" Drop="ModListView_Drop">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Enabled" Width="50">
