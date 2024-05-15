@@ -171,8 +171,8 @@ namespace ShinRyuModManager
                 }
                 else
                 {
-                    // Open MessageBox on a separate thread
-                    Task.Run(() => MessageBox.Show("Applying mods. Please wait...", "Info", MessageBoxButton.OK, MessageBoxImage.Information));
+                    ProgressWindow progressWindowApplyMods = new ProgressWindow("Applying mods. Please wait...", true);
+                    progressWindowApplyMods.Show();
 
                     // Wait for the generation to finish
                     bool success;
@@ -187,15 +187,17 @@ namespace ShinRyuModManager
                         success = false;
                     }
 
+                    progressWindowApplyMods.Close();
                     if (success)
                     {
-                        MessageBox.Show("Mod list was saved and mods have been applied.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        // Play success sound
+                        System.Media.SystemSounds.Asterisk.Play(); //Placeholder
                     }
                     else
                     {
                         MessageBox.Show(
                             "Mods could not be applied. Please make sure that the game directory has write access. " +
-                            "\n\nRun Ryu Mod Manager in command line mode (use --cli parameter) for more info.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            "\n\nRun Shin Ryu Mod Manager in command line mode (use --cli parameter) for more info.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
