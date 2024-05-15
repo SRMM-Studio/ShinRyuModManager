@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace ShinRyuModManager
@@ -92,6 +93,20 @@ namespace ShinRyuModManager
                 File.Delete(flagFilePath);
             }
         }
+
+
+        internal static void PlayAudio(string audioName)
+        {
+            var sri = Application.GetResourceStream(new Uri($"pack://application:,,,/Resources/Audio/{audioName}"));
+            
+            if (sri != null)
+            {
+                System.Media.SoundPlayer player = new System.Media.SoundPlayer(sri.Stream);
+                player.PlaySync();
+                player.Dispose();
+            }
+        }
+
 
 
         // EXTENSIONS

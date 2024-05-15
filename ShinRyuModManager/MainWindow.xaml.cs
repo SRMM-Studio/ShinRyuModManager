@@ -191,7 +191,7 @@ namespace ShinRyuModManager
                     if (success)
                     {
                         // Play success sound
-                        System.Media.SystemSounds.Asterisk.Play(); //Placeholder
+                        Util.PlayAudio("JingleSuccess.wav");
                     }
                     else
                     {

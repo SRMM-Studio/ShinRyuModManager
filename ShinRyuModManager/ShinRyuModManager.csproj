@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <None Remove="credits.txt" />
+    <None Remove="Resources\Audio\JingleSuccess.wav" />
     <None Remove="Resources\changelog.md" />
     <None Remove="Resources\Icons\SRMM_icon.ico" />
     <None Remove="Resources\Icons\SVG\ArrowDown.svg" />
@@ -36,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Audio\JingleSuccess.wav" />
     <Resource Include="Resources\changelog.md" />
     <Resource Include="Resources\credits.txt" />
     <Resource Include="Resources\Icons\Legacy\toggle.png" />
