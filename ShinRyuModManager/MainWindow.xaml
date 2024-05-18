@@ -6,6 +6,7 @@
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:local="clr-namespace:ShinRyuModManager"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         Title="Shin Ryu Mod Manager" Height="600" Width="950" ResizeMode="CanMinimize" Background="#FF373535" Foreground="White" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
