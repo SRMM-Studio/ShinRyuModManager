@@ -1,4 +1,16 @@
-﻿> ### **%{color:gold} Version 4.1.4 %** ###
+﻿> ### **%{color:gold} Version 4.2.0 %** ###
+* Removed the CLI executable and merged all functionality into this one (execute with commandline arguments or open while holding 'left ctrl' to enable CLI mode)
+* Renamed the executable to %{color:#fcbe03}**ShinRyuModManager**%
+* The GUI will no longer close after applying mods
+* Added a sound to notify when the MLO is finished rebuilding if done through the GUI
+* The RebuildMLO feature now supports all games
+* Added USM support for Yakuza 3 and 4
+* Added entity support for Lost Judgment, Gaiden and 8
+* Fixed an issue that would make the wrong error message appear when saving a mod list with all mods disabled
+* Fixed an issue that would make the mod list appear empty when displaying the changelog after an update (this window!)
+---
+
+> ### **%{color:orange} Version 4.1.4 %** ###
 * Reverted a fix that would cause crashes when changing mod priorities.
 ---
 
