@@ -367,8 +367,6 @@ namespace ShinRyuModManager
             }
             else if (GamePath.GetGame() >= Game.Judgment)
             {
-                IsRebuildMLOSupported = false;
-
                 // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
                 if (File.Exists(DINPUT8DLL))
                 {

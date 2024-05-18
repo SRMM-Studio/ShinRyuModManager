@@ -173,7 +173,7 @@ namespace ShinRyuModManager
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled or unsupported)
                 if (Program.RebuildMLO && Program.IsRebuildMLOSupported)
                 {
-                    MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Mod list was saved. Mods will be applied next time the game is run.", "RebuildMLO setting is enabled", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
