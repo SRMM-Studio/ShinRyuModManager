@@ -7,7 +7,8 @@ namespace RyuUpdater
         //Repository
         internal static string RepoOwner = "SRMM-Studio";
         internal static string RepoName = "srmm-version-info";
-        internal static string RepoPath = "ShinRyuModManager/config.yaml";
+        internal static string RepoPathBranchData = "ShinRyuModManager/config.yaml";
+        internal static string RepoPathManifest = "ShinRyuModManager/manifest.yaml";
 
 
         //User Agent

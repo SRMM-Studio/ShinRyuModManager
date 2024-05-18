@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Reflection;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace RyuUpdater
 {
@@ -51,6 +52,8 @@ namespace RyuUpdater
                     Console.WriteLine("Extracting update files...");
                     ExtractUpdate();
                     WriteRecentUpdateFlag();
+                    Console.WriteLine("Processing manifest...");
+                    ProcessManifest(GetManifest());
                 }
             });
         }
@@ -59,7 +62,7 @@ namespace RyuUpdater
         private static Branch GetBranchData(string branch, string key)
         {
             WebClient client = new WebClient();
-            string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.RepoOwner}/{Settings.RepoName}/main/{Settings.RepoPath}");
+            string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.RepoOwner}/{Settings.RepoName}/main/{Settings.RepoPathBranchData}");
 
 #if DEBUG
             Console.WriteLine(yamlString);
@@ -124,10 +127,50 @@ namespace RyuUpdater
         }
 
 
+        private static Manifest GetManifest()
+        {
+            try
+            {
+                WebClient client = new WebClient();
+                string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.RepoOwner}/{Settings.RepoName}/main/{Settings.RepoPathManifest}");
+
+#if DEBUG
+                Console.WriteLine(yamlString);
+#endif
+
+                var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).IgnoreUnmatchedProperties().Build();
+                return deserializer.Deserialize<Manifest>(yamlString);
+            } catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return new Manifest();
+            }
+        }
+
+
+        private static void ProcessManifest(Manifest manifest)
+        {
+            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            if (manifest.Remove != null)
+            {
+                foreach (string file in manifest.Remove)
+                {
+                    string filePath = Path.Combine(currentPath, file);
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                        Console.WriteLine($"Removed {file}");
+                    }
+                }
+            }
+        }
+
+
         private static void WriteRecentUpdateFlag()
         {
             string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string flagPath = Path.Combine(exePath, Settings.RecentUpdateFlagName);
+            if (File.Exists(flagPath)) return;
             File.Create(flagPath);
             File.SetAttributes(flagPath, File.GetAttributes(flagPath) | FileAttributes.Hidden);
         }
