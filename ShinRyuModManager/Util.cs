@@ -102,7 +102,7 @@ namespace ShinRyuModManager
             if (sri != null)
             {
                 System.Media.SoundPlayer player = new System.Media.SoundPlayer(sri.Stream);
-                player.PlaySync();
+                player.Play();
                 player.Dispose();
             }
         }
