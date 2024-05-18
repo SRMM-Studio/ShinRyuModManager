@@ -6,7 +6,7 @@
         xmlns:svgc="http://sharpvectors.codeplex.com/svgc/"
         xmlns:local="clr-namespace:ShinRyuModManager"
         mc:Ignorable="d"
-        Title="Shin Ryu Mod Manager" Height="600" Width="950" ResizeMode="CanMinimize" Background="#FF373535" Foreground="White" Loaded="Window_Loaded">
+        Title="Shin Ryu Mod Manager" Height="600" Width="950" ResizeMode="CanMinimize" Background="#FF373535" Foreground="White" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -114,7 +114,7 @@
                         <Button x:Name="btn_ModDown" Margin="5" Click="ModDown_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="2" ToolTip="Move the selected mod(s) down" Width="44" Height="44">
                             <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/ArrowDown.svg}"/>
                         </Button>
-                        <Button x:Name="btn_ModSave" Margin="5, 55, 5, 5" Click="ModSave_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="3" BorderBrush="#FF58F028" ToolTip="Save mod list and close" Width="44" Height="44">
+                        <Button x:Name="btn_ModSave" Margin="5, 55, 5, 5" Click="ModSave_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="3" BorderBrush="#FF58F028" ToolTip="Save mod list" Width="44" Height="44">
                             <Image Source="{svgc:SvgImage Source=/Resources/Icons/SVG/Check.svg}"/>
                         </Button>
                         <Button x:Name="btn_ModClose" Margin="5" Click="ModClose_Click" Opacity="0.8" Background="#FF252525" Foreground="White" BorderThickness="3" BorderBrush="#FFFC5555" ToolTip="Close and cancel all changes" Width="44" Height="44">

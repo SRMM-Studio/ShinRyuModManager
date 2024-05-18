@@ -57,6 +57,12 @@ namespace ShinRyuModManager
         }
 
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+
         public void SetupModList(List<ModInfo> mods)
         {
             this.ModList = new ObservableCollection<ModInfo>(mods);
@@ -205,8 +211,6 @@ namespace ShinRyuModManager
             {
                 MessageBox.Show("Mod list is empty and was not saved.", "Info", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
-
-            Application.Current.Shutdown();
         }
 
 
@@ -385,6 +389,7 @@ namespace ShinRyuModManager
                 bitmap.Save(saveFileDialog.FileName);
             }
         }
+
 
         private void ModListView_Drop(object sender, DragEventArgs e)
         {
