@@ -166,7 +166,7 @@ namespace ShinRyuModManager
         }
 
 
-        private void ModSave_Click(object sender, RoutedEventArgs e)
+        private async void ModSave_Click(object sender, RoutedEventArgs e)
         {
             if (Program.SaveModList(this.ModList.ToList()))
             {
@@ -184,9 +184,8 @@ namespace ShinRyuModManager
                     bool success;
                     try
                     {
-                        Task<bool> gen = Program.RunGeneration(Program.ConvertNewToOldModList(this.ModList.ToList()));
-                        gen.Wait();
-                        success = gen.Result;
+                        await Program.RunGeneration(Program.ConvertNewToOldModList(this.ModList.ToList()));
+                        success = true;
                     }
                     catch
                     {
