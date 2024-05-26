@@ -11,7 +11,7 @@ namespace Utils
         public static bool ValidateFile(string path, Game game)
         {
             //Xbox doesnt like being read!
-            if(GamePath.IsXbox(path))
+            if(GamePath.IsXbox(new FileInfo(path).Directory.FullName))
             {
                 return true;
             }

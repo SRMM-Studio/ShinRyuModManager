@@ -93,7 +93,7 @@ namespace ShinRyuModManager
                     if (Program.InvalidGameExe())
                     {
                         MessageBox.Show(
-                            "Game version is unsupported. Please use the latest Steam version of the game. " +
+                            "Game version is unrecognized. Please use the latest Steam version of the game. " +
                             "The mod list will still be saved, but mods might not work.",
                             "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
@@ -457,7 +457,7 @@ namespace ShinRyuModManager
                 }
             }
 
-            if (GamePath.IsXbox(Path.Combine(GetGamePath(), GetGameExe())))
+            if (GamePath.IsXbox(Path.Combine(GetGamePath())))
             {
                 if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
                 {
@@ -526,7 +526,7 @@ namespace ShinRyuModManager
             if (ConsoleOutput.ShowWarnings && InvalidGameExe())
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Warning: Game version is unsupported. Please use the latest Steam version of the game.");
+                Console.WriteLine("Warning: Game version is unrecognized. Please use the latest Steam version of the game.");
                 Console.WriteLine($"Shin Ryu Mod Manager will still generate the load order, but the game might CRASH or not function properly\n");
                 Console.ResetColor();
             }

@@ -91,7 +91,7 @@ namespace ShinRyuModManager
             }
         }
 
-        private static async Task<ConsoleOutput> RepackPar(string parPath, List<string> mods, ConsoleOutput console)
+        private static ConsoleOutput RepackPar(string parPath, List<string> mods, ConsoleOutput console)
         {
             parPath = parPath.TrimStart(Path.DirectorySeparatorChar);
             string parPathReal = GamePath.GetRootParPath(parPath + ".par");

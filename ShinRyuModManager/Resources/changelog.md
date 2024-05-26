@@ -1,4 +1,11 @@
-﻿> ### **%{color:gold} Version 4.2.0 %** ###
+﻿> ### **%{color:gold} Version 4.3.0 %** ###
+* Gamepass fix for Yakuza 3 and 4
+* Kiwami 2 Gamepass Support
+* Improve Gamepass version detection
+* Fix SRMM not starting up at all on some instances on Gamepass
+---
+
+> ### **%{color:orange} Version 4.2.0 %** ###
 * Removed the CLI executable and merged all functionality into this one (execute with commandline arguments or open while holding 'left ctrl' to enable CLI mode)
 * Renamed the executable to %{color:#fcbe03}**ShinRyuModManager**%
 * The GUI will no longer close after applying mods
