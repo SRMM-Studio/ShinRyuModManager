@@ -1,4 +1,12 @@
-﻿> ### **%{color:gold} Version 4.3.0 %** ###
+﻿> ### **%{color:gold} Version 4.3.1 %** ###
+* Gamepass fix for Like a Dragon
+* Gamepass fix for The Man Who Erased His Name
+* Improve Gamepass version detection
+* Fix DLLExport functions
+* Add YP_GET_NUM_MOD_FILES and YP_GET_MOD_FILE DLLExport functions
+---
+
+> ### **%{color:orange} Version 4.3.0 %** ###
 * Gamepass fix for Yakuza 3 and 4
 * Kiwami 2 Gamepass Support
 * Improve Gamepass version detection
