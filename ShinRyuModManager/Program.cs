@@ -20,6 +20,9 @@ using Utils;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
 using static Utils.GamePath;
+using ParLibrary.Converter;
+using YamlDotNet.Core;
+using Yarhl.FileSystem;
 
 namespace ShinRyuModManager
 {
@@ -94,7 +97,7 @@ namespace ShinRyuModManager
                     {
                         MessageBox.Show(
                             "Game version is unrecognized. Please use the latest Steam version of the game. " +
-                            "The mod list will still be saved, but mods might not work.",
+                            "The mod list will still be saved.\nMods may still work depending on the version.",
                             "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -272,6 +275,8 @@ namespace ShinRyuModManager
             var iniParser = new FileIniDataParser();
             iniParser.Parser.Configuration.AssigmentSpacer = string.Empty;
 
+            Game game = GamePath.GetGame();
+
             IniData ini;
             if (File.Exists(INI))
             {
@@ -336,7 +341,7 @@ namespace ShinRyuModManager
                 Console.WriteLine("DONE!\n");
             }
 
-            if (GamePath.GetGame() != Game.Unsupported && !Directory.Exists(MODS))
+            if (game != Game.Unsupported && !Directory.Exists(MODS))
             {
                 // Create mods folder if it does not exist
                 Console.Write($"\"{MODS}\" folder was not found. Creating empty folder... ");
@@ -346,7 +351,7 @@ namespace ShinRyuModManager
 
             // TODO: Maybe move this to a separate "Game patches" file
             // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
-            if (GamePath.GetGame() == Game.eve && File.Exists(DINPUT8DLL))
+            if (game == Game.eve && File.Exists(DINPUT8DLL))
             {
                 if (File.Exists(VERSIONDLL))
                 {
@@ -365,7 +370,7 @@ namespace ShinRyuModManager
 
                 Console.WriteLine(" DONE!\n");
             }
-            else if (GamePath.GetGame() >= Game.Judgment)
+            else if (game >= Game.Judgment && game != Game.likeadragongaiden)
             {
                 // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
                 if (File.Exists(DINPUT8DLL))
@@ -476,12 +481,12 @@ namespace ShinRyuModManager
 
         public static async Task<bool> RunGeneration(List<string> mods)
         {
-            if (File.Exists(MLO))
+            if (File.Exists(Utils.Constants.MLO))
             {
                 Console.Write("Removing old MLO...");
 
                 // Remove existing MLO file to avoid it being used if a new MLO won't be generated
-                File.Delete(MLO);
+                File.Delete(Utils.Constants.MLO);
 
                 Console.WriteLine(" DONE!\n");
             }
@@ -493,7 +498,15 @@ namespace ShinRyuModManager
             {
                 if (mods?.Count > 0 || looseFilesEnabled)
                 {
-                    await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
+                    MLO result =  await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
+
+                    if (GameModel.SupportsUBIK(GamePath.GetGame()))
+                    {
+                        GameModel.DoUBIKProcedure(result);
+                    }
+
+
+
                     return true;
                 }
 
@@ -559,8 +572,12 @@ namespace ShinRyuModManager
 
         public static bool InvalidGameExe()
         {
+            return false;
+
+            /*
             string path = Path.Combine(GetGamePath(), GetGameExe());
             return GetGame() == Game.Unsupported || !GameHash.ValidateFile(path, GetGame());
+            */
         }
 
 

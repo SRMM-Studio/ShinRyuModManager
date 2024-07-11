@@ -10,26 +10,33 @@ namespace Utils
     {
         public static bool ValidateFile(string path, Game game)
         {
-            //Xbox doesnt like being read!
-            if(GamePath.IsXbox(new FileInfo(path).Directory.FullName))
+            try
+            {
+                //Xbox doesnt like being read!
+                if (GamePath.IsXbox(new FileInfo(path).Directory.FullName))
+                {
+                    return true;
+                }
+
+                using MD5 md5Hash = MD5.Create();
+                using FileStream file = File.OpenRead(path);
+                var gameHash = GetGameHash(game);
+
+                byte[] computedHash = md5Hash.ComputeHash(file);
+
+                if (gameHash.Count <= 0)
+                    return true;
+
+                foreach (byte[] arr in gameHash)
+                    if (arr.SequenceEqual(computedHash))
+                        return true;
+
+                return false;
+            }
+            catch
             {
                 return true;
             }
-
-            using MD5 md5Hash = MD5.Create();
-            using FileStream file = File.OpenRead(path);
-            var gameHash = GetGameHash(game);
-
-            byte[] computedHash = md5Hash.ComputeHash(file);
-
-            if (gameHash.Count <= 0)
-                return true;
-
-            foreach (byte[] arr in gameHash)
-                if (arr.SequenceEqual(computedHash))
-                    return true;
-
-            return false;
         }
 
         private static List<byte[]> GetGameHash(Game game)

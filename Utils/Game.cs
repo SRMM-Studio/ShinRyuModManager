@@ -1,4 +1,6 @@
-﻿namespace Utils
+﻿using System.Security.Cryptography;
+
+namespace Utils
 {
     public enum Game
     {

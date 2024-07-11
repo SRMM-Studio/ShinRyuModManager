@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ShinRyuModManager": {
+      "commandName": "Project",
+      "workingDirectory": "E:\\SteamLibrary\\steamapps\\common\\LikeADragonGaiden\\runtime\\media"
+    }
+  }
+}

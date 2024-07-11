@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.3.1 %** ###
+﻿> ### **%{color:gold} Version 4.3.2 %** ###
+* Gaiden uses dinput8.dll instead now
+* Gamepass detection improvement (biweekly occurence)
+---
+
+> ### **%{color:orange} Version 4.3.1 %** ###
 * Gamepass fix for Like a Dragon
 * Gamepass fix for The Man Who Erased His Name
 * Improve Gamepass version detection

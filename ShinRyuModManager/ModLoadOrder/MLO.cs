@@ -5,9 +5,9 @@ using System.Linq;
 using Yarhl.IO;
 using Utils;
 
-namespace ShinRyuModManager.ModLoadOrder
+namespace ShinRyuModManager
 {
-    public class ModLoadOrder
+    public class MLO
     {
         public const string MAGIC    = "_OLM"; // MLO_ but in little endian cause that's how the yakuza works
         public const uint ENDIANNESS = 0x21; // Little endian
@@ -19,7 +19,7 @@ namespace ShinRyuModManager.ModLoadOrder
         public List<(string, int)> ParlessFolders;
         public List<(string, List<ushort>)> CpkFolders;
 
-        public ModLoadOrder(List<int> modIndices, List<string> mods, OrderedSet<string> fileSet, List<(string, int)> parlessFolders, Dictionary<string, List<int>> cpkFolders)
+        public MLO(List<int> modIndices, List<string> mods, OrderedSet<string> fileSet, List<(string, int)> parlessFolders, Dictionary<string, List<int>> cpkFolders)
         {
             List<string> files = fileSet.ToList();
 

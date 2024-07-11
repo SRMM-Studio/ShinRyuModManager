@@ -13,7 +13,7 @@ namespace ShinRyuModManager.ModLoadOrder
 {
     public static class Generator
     {
-        public static async Task GenerateModLoadOrder(List<string> mods, bool looseFilesEnabled, bool cpkRepackingEnabled)
+        public static async Task<MLO> GenerateModLoadOrder(List<string> mods, bool looseFilesEnabled, bool cpkRepackingEnabled)
         {
             List<int> modIndices = new List<int> { 0 };
             OrderedSet<string> files = new OrderedSet<string>();
@@ -133,7 +133,7 @@ namespace ShinRyuModManager.ModLoadOrder
             Console.Write($"Generating {Constants.MLO} file...");
 
             // Generate MLO
-            ModLoadOrder mlo = new ModLoadOrder(modIndices, mods, files, loose.ParlessFolders, cpkDictionary);
+            MLO mlo = new MLO(modIndices, mods, files, loose.ParlessFolders, cpkDictionary);
             mlo.WriteMLO(Path.Combine(GamePath.GetGamePath(), Constants.MLO));
 
             Console.WriteLine(" DONE!\n");
@@ -194,6 +194,8 @@ namespace ShinRyuModManager.ModLoadOrder
                     Console.WriteLine();
                 }
             }
+
+            return mlo;
         }
     }
 }

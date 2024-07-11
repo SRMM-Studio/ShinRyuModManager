@@ -123,7 +123,7 @@ namespace Utils
 
         public static bool IsXbox(string path)
         {
-            return path.Contains(Path.DirectorySeparatorChar + "Content" + Path.DirectorySeparatorChar) || File.Exists(Path.Combine(path, "MicrosoftGame.config"));
+            return path.Contains("Xbox") || path.Contains("WindowsApps") || path.Contains(Path.DirectorySeparatorChar + "Content" + Path.DirectorySeparatorChar) || File.Exists(Path.Combine(path, "MicrosoftGame.config"));
         }
 
         public static Game GetGame()
