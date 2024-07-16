@@ -1,4 +1,11 @@
-﻿> ### **%{color:gold} Version 4.3.2 %** ###
+﻿> ### **%{color:gold} Version 4.3.3 %** ###
+* Shin Ryu Mod Manager is now 64 bits
+* Add UBIK (cloth physics) support for Dragon Engine games
+* Exe validity check removed
+* Fix a bug with Yakuza 5
+---
+
+> ### **%{color:orange} Version 4.3.2 %** ###
 * Gaiden uses dinput8.dll instead now
 * Gamepass detection improvement (biweekly occurence)
 ---
