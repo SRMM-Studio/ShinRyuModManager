@@ -39,7 +39,7 @@ namespace ShinRyuModManager
 
         public void WriteMLO(string path)
         {
-            DataWriter writer = new DataWriter(DataStreamFactory.FromFile(path, FileOpenMode.ReadWrite));
+            DataWriter writer = new DataWriter(new FileStream(path, FileMode.Create, FileAccess.Write));
 
             // Write header
             writer.Write(MAGIC, false);
@@ -113,19 +113,19 @@ namespace ShinRyuModManager
             }
 
             // Write file size
-            writer.Stream.Seek(0xC, SeekMode.Start);
+            writer.Stream.Seek(0xC, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), writer.Stream.Length);
 
             // Write files start position
-            writer.Stream.Seek(0x18, SeekMode.Start);
+            writer.Stream.Seek(0x18, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), fileStartPos);
 
             // Write parless folders start position
-            writer.Stream.Seek(0x20, SeekMode.Start);
+            writer.Stream.Seek(0x20, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), parlessStartPos);
 
             // Write cpk folders start position
-            writer.Stream.Seek(0x28, SeekMode.Start);
+            writer.Stream.Seek(0x28, SeekOrigin.Begin);
             writer.WriteOfType(typeof(uint), cpkFoldersStartPos);
 
             // Close the file stream

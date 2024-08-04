@@ -3,6 +3,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Yarhl.FileSystem;
+using Yarhl.IO;
 
 namespace ShinRyuModManager
 {
@@ -98,7 +100,7 @@ namespace ShinRyuModManager
         internal static void PlayAudio(string audioName)
         {
             var sri = Application.GetResourceStream(new Uri($"pack://application:,,,/Resources/Audio/{audioName}"));
-            
+
             if (sri != null)
             {
                 System.Media.SoundPlayer player = new System.Media.SoundPlayer(sri.Stream);
@@ -119,6 +121,28 @@ namespace ShinRyuModManager
             {
                 encoder.Save(fileStream);
             }
+        }
+
+        public static Node FromFile(string filePath, string nodeName, FileOpenMode mode)
+        {
+            // We need to catch if the node creation fails
+            // for instance for null names, to dispose the stream.
+            var format = new BinaryFormat(DataStreamFactory.FromFile(filePath, mode));
+            Node node;
+            try
+            {
+                node = new Node(nodeName, format)
+                {
+                    Tags = { ["FileInfo"] = new FileInfo(filePath) },
+                };
+            }
+            catch
+            {
+                format.Dispose();
+                throw;
+            }
+
+            return node;
         }
     }
 }

@@ -191,7 +191,7 @@ namespace ShinRyuModManager
             // Store a reference to the nodes in the container to dispose of them later, as they are not disposed properly
             NodeContainerFormat containerNode = node.GetFormatAs<NodeContainerFormat>();
 
-            Node par = NodeFactory.FromFile(pathToPar);
+            Node par = NodeFactory.FromFile(pathToPar, Yarhl.IO.FileOpenMode.Read);
             par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParameters);
 
             Node searchResult = null;
@@ -294,7 +294,7 @@ namespace ShinRyuModManager
             var files = directoryInfo.GetFiles();
             foreach (FileInfo file in files)
             {
-                Node fileNode = NodeFactory.FromFile(file.FullName);
+                Node fileNode = NodeFactory.FromFile(file.FullName, Yarhl.IO.FileOpenMode.Read);
                 container.Add(fileNode);
             }
 

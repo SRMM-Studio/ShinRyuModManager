@@ -116,6 +116,9 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                     {
                         check = "particle/arc";
                     }
+
+                    if (new DirectoryInfo(path).Parent.Name == "arc_list")
+                        needsRepack = true;
                     break;
                 case "particle/arc":
                     needsRepack = GamePath.ExistsInDataAsParNested(path);
