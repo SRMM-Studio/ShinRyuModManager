@@ -1,4 +1,13 @@
-﻿> ### **%{color:gold} Version 4.3.3 %** ###
+﻿> ### **%{color:gold} Version 4.3.5 %** ###
+* Fix UBIK redirection bug for Lost Judgment
+---
+
+> ### **%{color:orange} Version 4.3.4 %** ###
+* Repack particle/arc_list in new DE games
+* Fix repacking that broke specific things like UI mods in Yakuza 0/Kiwami 1
+---
+
+> ### **%{color:orange} Version 4.3.3 %** ###
 * Shin Ryu Mod Manager is now 64 bits
 * Add UBIK (cloth physics) support for Dragon Engine games
 * Exe validity check removed
