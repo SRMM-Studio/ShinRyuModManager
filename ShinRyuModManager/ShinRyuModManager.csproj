@@ -74,6 +74,9 @@
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="Yarhl">
+      <HintPath>..\Dependencies\Yarhl.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
