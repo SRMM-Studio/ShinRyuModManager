@@ -271,6 +271,7 @@ namespace ShinRyuModManager
         private void UpdateModMeta(string modName, string modPath)
         {
             string pathModMeta = Path.Combine(modPath, "mod-meta.yaml");
+            string pathLibMeta = Path.Combine(modPath, "lib-meta.yaml");
             string patternModImage = "mod-image.*";
             List<string> matchingModImageFiles = Directory.EnumerateFiles(modPath, patternModImage).ToList();
             BitmapImage modImage = new BitmapImage(new Uri("pack://application:,,,/Resources/NoImage.png"));
