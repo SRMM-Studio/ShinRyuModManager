@@ -11,6 +11,7 @@ namespace Utils
     {
         public const string DATA = "data";
         public const string MODS = "mods";
+        public const string LIBRARIES = "srmm-libs";
 
         private static Game? currentGame = null;
 
@@ -37,6 +38,11 @@ namespace Utils
         public static string GetExternalModsPath()
         {
             return Path.Combine(GetModsPath(), Constants.EXTERNAL_MODS);
+        }
+
+        public static string GetLibrariesPath()
+        {
+            return Path.Combine(GetGamePath(), LIBRARIES);
         }
 
         /// <summary>

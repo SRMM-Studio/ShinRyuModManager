@@ -34,6 +34,8 @@ namespace ShinRyuModManager
 
             if (!Directory.Exists("mods"))
                 Directory.CreateDirectory("mods");
+            if (!Directory.Exists(GamePath.LIBRARIES))
+                Directory.CreateDirectory(GamePath.LIBRARIES);
 
             modsFolderWatcher = new FileSystemWatcher("mods");
             modsFolderWatcher.Created += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
@@ -323,6 +325,13 @@ namespace ShinRyuModManager
             }
 
             img_ModImage.Source = modImage;
+        }
+
+
+        private void mi_LibrariesManager_Click(object sender, RoutedEventArgs e)
+        {
+            Window window = new LibraryManagerWindow();
+            window.ShowDialog();
         }
 
 

@@ -343,10 +343,21 @@ namespace ShinRyuModManager
 
             if (game != Game.Unsupported && !Directory.Exists(MODS))
             {
-                // Create mods folder if it does not exist
-                Console.Write($"\"{MODS}\" folder was not found. Creating empty folder... ");
-                Directory.CreateDirectory(MODS);
-                Console.WriteLine("DONE!\n");
+                if (!Directory.Exists(MODS))
+                {
+                    // Create mods folder if it does not exist
+                    Console.Write($"\"{MODS}\" folder was not found. Creating empty folder... ");
+                    Directory.CreateDirectory(MODS);
+                    Console.WriteLine("DONE!\n");
+                }
+
+                if (!Directory.Exists(LIBRARIES))
+                {
+                    // Create libraries folder if it does not exist
+                    Console.Write($"\"{LIBRARIES}\" folder was not found. Creating empty folder... ");
+                    Directory.CreateDirectory(LIBRARIES);
+                    Console.WriteLine("DONE!\n");
+                }
             }
 
             // TODO: Maybe move this to a separate "Game patches" file
