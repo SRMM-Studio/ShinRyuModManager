@@ -36,6 +36,9 @@ namespace ShinRyuModManager
         [DllImport(Kernel32Dll)]
         private static extern bool FreeConsole();
 
+        [DllImport(Kernel32Dll, SetLastError = true)]
+        private static extern bool SetDefaultDllDirectories(int directoryFlags);
+
 
         private static bool externalModsOnly = true;
         private static bool looseFilesEnabled = false;
@@ -51,6 +54,13 @@ namespace ShinRyuModManager
         [STAThread]
         public static void Main(string[] args)
         {
+            // Try to prevent DLL hijacking by limiting the DLL search path to System32. This should avoid the GUI from crashing due to mod injections.
+            // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
+            if (!SetDefaultDllDirectories(0x00000800)) // 0x00000800 corresponds to %windows%\system32
+            {
+                Console.WriteLine($"Failed to set DLL search path.\nError: {Marshal.GetLastWin32Error()}");
+            }
+
             // Check if left ctrl is pressed to open in CLI (legacy) mode
             if (args.Length == 0 && !Keyboard.IsKeyDown(Key.LeftCtrl))
             {
