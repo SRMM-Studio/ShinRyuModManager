@@ -154,6 +154,7 @@ namespace Utils
         public static string GetGameFriendlyName(Game g) {
             return g switch
             {
+                Game.BinaryDomain => "Binary Domain",
                 Game.Yakuza3 => "Yakuza 3 Remastered",
                 Game.Yakuza4 => "Yakuza 4 Remastered",
                 Game.Yakuza5 => "Yakuza 5 Remastered",
