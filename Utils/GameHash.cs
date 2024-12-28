@@ -8,7 +8,7 @@ namespace Utils
 {
     public class GameHash
     {
-        public static bool ValidateFile(string path, Game game)
+        public static bool ValidateFile(Game game, string path)
         {
             try
             {
