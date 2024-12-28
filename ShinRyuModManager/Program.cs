@@ -371,8 +371,29 @@ namespace ShinRyuModManager
             }
 
             // TODO: Maybe move this to a separate "Game patches" file
+            // Binary Domain does not load dinput8.dll, only d3d9 or dsound
+            if (game == Game.BinaryDomain && File.Exists(DINPUT8DLL))
+            {
+                if (File.Exists(D3D9DLL))
+                {
+                    Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because {D3D9DLL} exists...");
+
+                    // Remove dinput8.dll
+                    File.Delete(DINPUT8DLL);
+                }
+                else
+                {
+                    Console.Write($"Game specific patch: Renaming {DINPUT8DLL} to {D3D9DLL}...");
+
+                    // Rename dinput8.dll to version.dll to prevent the game from crashing
+                    File.Move(DINPUT8DLL, D3D9DLL);
+                }
+
+                Console.WriteLine(" DONE!\n");
+            }
+            // TODO: Maybe move this to a separate "Game patches" file
             // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
-            if (game == Game.eve && File.Exists(DINPUT8DLL))
+            else if (game == Game.eve && File.Exists(DINPUT8DLL))
             {
                 if (File.Exists(VERSIONDLL))
                 {
@@ -581,7 +602,7 @@ namespace ShinRyuModManager
 
         public static bool MissingDLL()
         {
-            return !(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL) || File.Exists(WINMMDLL));
+            return !(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL) || File.Exists(D3D9DLL) || File.Exists(WINMMDLL));
         }
 
 
