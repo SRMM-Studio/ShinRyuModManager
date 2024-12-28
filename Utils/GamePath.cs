@@ -25,9 +25,12 @@ namespace Utils
             return Directory.GetCurrentDirectory();
         }
 
-        public static string GetDataPath()
+        public static string GetDataPath(Game game = null)
         {
-            return Path.Combine(GetGamePath(), DATA);
+            if (game == Game.BinaryDomain)
+                return GetGamePath();
+            else
+                return Path.Combine(GetGamePath(), DATA);
         }
 
         public static string GetModsPath()
@@ -55,19 +58,23 @@ namespace Utils
             return path.Substring(path.IndexOf(Path.DirectorySeparatorChar, path.IndexOf("mods" + Path.DirectorySeparatorChar) + 5));
         }
 
-        public static string RemoveParlessPath(string path)
+        public static string RemoveParlessPath(string path, Game game = null)
         {
+            string data = game == Game.BinaryDomain ? string.Empty : DATA;
+
             path = path.Replace(".parless", "");
 
-            return path.Substring(path.IndexOf("data" + Path.DirectorySeparatorChar) + 4);
+            return path.Substring(path.IndexOf(data + Path.DirectorySeparatorChar) + 4);
         }
 
-        public static string GetDataPathFrom(string path)
+        public static string GetDataPathFrom(string path, Game game = null)
         {
+            string data = game == Game.BinaryDomain ? string.Empty : DATA;
+
             if (path.Contains(".parless"))
             {
                 // Preserve .parless in path instead of removing it
-                return path.Substring(path.IndexOf("data" + Path.DirectorySeparatorChar) + 4);
+                return path.Substring(path.IndexOf(data + Path.DirectorySeparatorChar) + 4);
             }
 
             return RemoveModPath(path);
