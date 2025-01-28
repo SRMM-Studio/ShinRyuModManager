@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.4.1 %** ###
+﻿> ### **%{color:gold} Version 4.4.2 %** ###
+* Fix par repacking breaking itself out of nowhere (the wonders of software development)
+---
+> ### **%{color:orange} Version 4.4.1 %** ###
 * Improve file redirection for VF5 REVO. Some files not being picked up will now appear
 ---
 
