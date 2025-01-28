@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.3.6 %** ###
+﻿> ### **%{color:gold} Version 4.4.0 %** ###
+* Virtua Fighter 5 R.E.V.O support
+* Fix GUI crashes caused by DLL injections from mods or other utilities
+---
+
+> ### **%{color:orange} Version 4.3.6 %** ###
 * Add YP_GET_FILE_PATH export to YakuzaParless. This will allow script mods to better access files. It will return the true path of a provided file. Example: passing "data/ogre_command.ofc" to it may return "mods/MyMod/ogre_command.ofc" if it has been overriden by any mod, if not, it will return the original value provided.
 ---
 
