@@ -1,4 +1,8 @@
-﻿> ### **%{color:gold} Version 4.4.0 %** ###
+﻿> ### **%{color:gold} Version 4.4.1 %** ###
+* Improve file redirection for VF5 REVO. Some files not being picked up will now appear
+---
+
+> ### **%{color:orange} Version 4.4.0 %** ###
 * Virtua Fighter 5 R.E.V.O support
 * Fix GUI crashes caused by DLL injections from mods or other utilities
 ---
