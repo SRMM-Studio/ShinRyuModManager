@@ -24,7 +24,7 @@ namespace Utils
         eve, // Virtua Fighter eSports
         likeadragongaiden,
 	    likeadragon8,
-        likeadragonpirates,
+        likeadragonpirate,
         VFREVOBETA,
         VFREVO,
         century
