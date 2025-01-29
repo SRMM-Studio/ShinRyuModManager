@@ -1,4 +1,10 @@
-﻿> ### **%{color:gold} Version 4.4.3 %** ###
+﻿> ### **%{color:orange} Version 4.4.4 %** ###
+* Disable GUI crash fixes if SRMM is being emulated on Linux, otherwise the application will crash! Bad news for Reshade/Legend fix users on Linux
+* Add "ReloadingEnabled" and "V5FSArcadeSupport" to "Debug" section in YakuzaParless.ini
+* Now, i don't know why you would do this but, this means you can mod the arcade versions of Virtua Fighter 5 in games like Yakuza 6 if you set V5FSArcadeSupport to 1
+---
+
+> ### **%{color:orange} Version 4.4.3 %** ###
 * Music modding support for VF5 R.E.V.O.
 ---
 

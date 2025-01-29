@@ -4,7 +4,7 @@ namespace ShinRyuModManager.Templates
 {
     public static class ParlessIni
     {
-        public const int CurrentVersion = 6;
+        public const int CurrentVersion = 7;
 
         public static List<IniSection> GetParlessSections()
         {
@@ -190,6 +190,18 @@ namespace ShinRyuModManager.Templates
                         {
                             Name = "ConsoleEnabled",
                             Comments = new List<string> { "Enable the debugging console" },
+                            DefaultValue = 0,
+                        },
+                        new IniKey
+                        {
+                            Name = "ReloadingEnabled",
+                            Comments = new List<string> { "Enable reloading mod files by pressing CTRL+Shift+R" },
+                            DefaultValue = 0,
+                        },
+                        new IniKey
+                        {
+                            Name = "V5FSArcadeSupport",
+                            Comments = new List<string> { "Enable modding Virtua Fighter 5 Final Showdown on Yakuza games who have it on their arcade." },
                             DefaultValue = 0,
                         },
                     },
