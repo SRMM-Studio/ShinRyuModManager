@@ -1,4 +1,8 @@
-﻿> ### **%{color:gold} Version 4.4.2 %** ###
+﻿> ### **%{color:gold} Version 4.4.3 %** ###
+* Music modding support for VF5 R.E.V.O.
+---
+
+> ### **%{color:orange} Version 4.4.2 %** ###
 * Fix par repacking breaking itself out of nowhere (the wonders of software development)
 ---
 > ### **%{color:orange} Version 4.4.1 %** ###
