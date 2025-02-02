@@ -35,6 +35,11 @@ namespace ShinRyuModManager
 
         [DllImport(Kernel32Dll)]
         private static extern bool FreeConsole();
+        [DllImport(Kernel32Dll, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr GetModuleHandle([MarshalAs(UnmanagedType.LPWStr)] string lpModuleName);
+
+        [DllImport(Kernel32Dll, CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
+        static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
         [DllImport(Kernel32Dll, SetLastError = true)]
         private static extern bool SetDefaultDllDirectories(int directoryFlags);
@@ -50,15 +55,33 @@ namespace ShinRyuModManager
         public static bool RebuildMLO = true;
         public static bool IsRebuildMLOSupported = true;
 
+        public static bool IsEmulated = false;
+
 
         [STAThread]
         public static void Main(string[] args)
         {
-            // Try to prevent DLL hijacking by limiting the DLL search path to System32. This should avoid the GUI from crashing due to mod injections.
-            // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
-            if (!SetDefaultDllDirectories(0x00000800)) // 0x00000800 corresponds to %windows%\system32
+            IntPtr ntDllModule = GetModuleHandle("ntdll");
+           
+            //jason098: Detect linux emulation like this
+            if(ntDllModule != IntPtr.Zero)
             {
-                Console.WriteLine($"Failed to set DLL search path.\nError: {Marshal.GetLastWin32Error()}");
+                IntPtr wineVersionFunction = GetProcAddress(ntDllModule, "wine_get_version");
+
+                if (wineVersionFunction != IntPtr.Zero)
+                    IsEmulated = true; 
+            }
+
+            //29.01.2025
+            //Jhrino: If we don't do this, we break support for linux emulation through protontricks! Meaning it no longer works on steamdeck
+            if(!IsEmulated)
+            {
+                // Try to prevent DLL hijacking by limiting the DLL search path to System32. This should avoid the GUI from crashing due to mod injections.
+                // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
+                if (!SetDefaultDllDirectories(0x00000800)) // 0x00000800 corresponds to %windows%\system32
+                {
+                    Console.WriteLine($"Failed to set DLL search path.\nError: {Marshal.GetLastWin32Error()}");
+                }
             }
 
             // Check if left ctrl is pressed to open in CLI (legacy) mode

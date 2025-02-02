@@ -1,4 +1,26 @@
-﻿> ### **%{color:gold} Version 4.3.6 %** ###
+﻿> ### **%{color:orange} Version 4.4.4 %** ###
+* Disable GUI crash fixes if SRMM is being emulated on Linux, otherwise the application will crash! Bad news for Reshade/Legend fix users on Linux
+* Add "ReloadingEnabled" and "V5FSArcadeSupport" to "Debug" section in YakuzaParless.ini
+* Now, i don't know why you would do this but, this means you can mod the arcade versions of Virtua Fighter 5 in games like Yakuza 6 if you set V5FSArcadeSupport to 1
+---
+
+> ### **%{color:orange} Version 4.4.3 %** ###
+* Music modding support for VF5 R.E.V.O.
+---
+
+> ### **%{color:orange} Version 4.4.2 %** ###
+* Fix par repacking breaking itself out of nowhere (the wonders of software development)
+---
+> ### **%{color:orange} Version 4.4.1 %** ###
+* Improve file redirection for VF5 REVO. Some files not being picked up will now appear
+---
+
+> ### **%{color:orange} Version 4.4.0 %** ###
+* Virtua Fighter 5 R.E.V.O support
+* Fix GUI crashes caused by DLL injections from mods or other utilities
+---
+
+> ### **%{color:orange} Version 4.3.6 %** ###
 * Add YP_GET_FILE_PATH export to YakuzaParless. This will allow script mods to better access files. It will return the true path of a provided file. Example: passing "data/ogre_command.ofc" to it may return "mods/MyMod/ogre_command.ofc" if it has been overriden by any mod, if not, it will return the original value provided.
 ---
 

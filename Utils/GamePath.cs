@@ -174,6 +174,9 @@ namespace Utils
                 Game.LostJudgment => "Lost Judgment",
                 Game.likeadragongaiden => "Like a Dragon Gaiden: The Man Who Erased His Name",
                 Game.likeadragon8 => "Like a Dragon: Infinite Wealth",
+                Game.likeadragonpirate => "Like a Dragon: Pirate Yakuza In Hawaii",
+                Game.VFREVOBETA => "Virtua Fighter 5 R.E.V.O. Beta",
+                Game.VFREVO => "Virtua Fighter 5 R.E.V.O.",
                 _ => "<unknown>"
             };
         }

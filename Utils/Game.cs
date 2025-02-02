@@ -24,6 +24,10 @@ namespace Utils
         LostJudgment,
         eve, // Virtua Fighter eSports
         likeadragongaiden,
-	    likeadragon8
+	    likeadragon8,
+        likeadragonpirate,
+        VFREVOBETA,
+        VFREVO,
+        century
     }
 }
