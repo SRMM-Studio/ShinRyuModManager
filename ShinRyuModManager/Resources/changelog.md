@@ -1,4 +1,13 @@
-﻿> ### **%{color:orange} Version 4.4.4 %** ###
+﻿> ### **%{color:gold} Version 4.4.6 %** ###
+* Pirate Yakuza in Hawaii gv_files modding support. Example: mods/MyMod/gv_files/gv_fighter_majima.awb
+* Fix path redirection in Pirate Yakuza in Hawaii that affected a small amount of files (mainly chara/dds_hires)
+---
+
+> ### **%{color:orange} Version 4.4.5 %** ###
+* Pirate Yakuza in Hawaii support
+---
+
+> ### **%{color:orange} Version 4.4.4 %** ###
 * Disable GUI crash fixes if SRMM is being emulated on Linux, otherwise the application will crash! Bad news for Reshade/Legend fix users on Linux
 * Add "ReloadingEnabled" and "V5FSArcadeSupport" to "Debug" section in YakuzaParless.ini
 * Now, i don't know why you would do this but, this means you can mod the arcade versions of Virtua Fighter 5 in games like Yakuza 6 if you set V5FSArcadeSupport to 1
