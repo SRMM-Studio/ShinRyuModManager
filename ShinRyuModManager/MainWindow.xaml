@@ -19,7 +19,7 @@
                 <MenuItem Header="Install mod" Click="ModInstall_Click"/>
                 <MenuItem Header="Uninstall mod (WIP)" Click="ModUninstall_Click" IsEnabled="False"/>
             </MenuItem>
-            <MenuItem x:Name="mi_LibrariesManager" Header="Libraries" Click="mi_LibrariesManager_Click"/>
+            <MenuItem x:Name="mi_LibrariesManager" Header="Libraries" Click="mi_LibrariesManager_Click" Visibility="Collapsed"/>
             <MenuItem Header="Mod Meta">
                 <MenuItem x:Name="mi_ModMetaSampleYAML" Header="Export sample mod-meta.yaml" Click="mi_ModMetaSampleYAML_Click"/>
                 <MenuItem x:Name="mi_ModMetaSampleImage" Header="Export sample mod-image.png" Click="mi_ModMetaSampleImage_Click"/>

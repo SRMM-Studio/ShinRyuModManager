@@ -168,11 +168,6 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                 case "stmdlc_en":
                 case "movie":
                 case "moviesd":
-                case "gv_files":
-                    cpkDataPath = GamePath.RemoveModPath(path);
-                        this.CpkFolders.Add(cpkDataPath + ".cpk");
-                        this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
-                    break;
                 case "moviesd_dlc":
                     cpkDataPath = GamePath.RemoveModPath(path);
                     if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
@@ -181,6 +176,11 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
                     }
 
+                    break;
+                case "gv_files":
+                    cpkDataPath = GamePath.RemoveModPath(path);
+                    this.CpkFolders.Add(cpkDataPath + ".cpk");
+                    this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
                     break;
                 default:
                     break;

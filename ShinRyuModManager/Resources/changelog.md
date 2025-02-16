@@ -1,4 +1,12 @@
-﻿> ### **%{color:gold} Version 4.4.6 %** ###
+﻿> ### **%{color:gold} Version 4.4.8 %** ###
+* Fix CPK binding problems
+---
+
+> ### **%{color:orange} Version 4.4.7 %** ###
+* Improve path redirection for Pirate Yakuza in Hawaii
+---
+
+> ### **%{color:orange} Version 4.4.6 %** ###
 * Pirate Yakuza in Hawaii gv_files modding support. Example: mods/MyMod/gv_files/gv_fighter_majima.awb
 * Fix path redirection in Pirate Yakuza in Hawaii that affected a small amount of files (mainly chara/dds_hires)
 ---
