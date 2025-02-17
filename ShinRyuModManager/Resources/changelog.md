@@ -1,4 +1,8 @@
-﻿> ### **%{color:gold} Version 4.4.8 %** ###
+﻿> ### **%{color:gold} Version 4.4.9 %** ###
+* Improve path redirection performance
+---
+
+> ### **%{color:gold} Version 4.4.8 %** ###
 * Fix CPK binding problems
 ---
 
