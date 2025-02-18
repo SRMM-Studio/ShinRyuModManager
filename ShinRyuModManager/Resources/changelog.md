@@ -1,8 +1,13 @@
-﻿> ### **%{color:gold} Version 4.4.9 %** ###
+﻿> ### **%{color:gold} Version 4.5.0 %** ###
+* Add run game button (@SilvaKabe)
+* Fix pirate game path redirection for the first time i hope
+---
+
+> ### **%{color:orange} Version 4.4.9 %** ###
 * Improve path redirection performance
 ---
 
-> ### **%{color:gold} Version 4.4.8 %** ###
+> ### **%{color:orange} Version 4.4.8 %** ###
 * Fix CPK binding problems
 ---
 
