@@ -13,6 +13,7 @@ using System;
 using System.Windows.Media.Imaging;
 using YamlDotNet.Core;
 using System.Threading;
+using System.Diagnostics;
 
 namespace ShinRyuModManager
 {
@@ -411,6 +412,25 @@ namespace ShinRyuModManager
                 }
                 Refresh();
             }
+        }
+
+        private void RunGame_Click(object sender, RoutedEventArgs e)
+        {
+            if (GamePath.GetGameExe() is "Unsupported.exe")
+            {
+                MessageBox.Show("Cannot run game! Either it's unsupported or not found!");
+                return;
+            }
+
+            if (GamePath.IsXbox(GamePath.GetGamePath()))
+            {
+                MessageBox.Show("Run game isn't supported for Xbox Store versions");
+                return;
+            }
+
+
+            Process.Start(GamePath.GetGameExe());
+
         }
     }
 }

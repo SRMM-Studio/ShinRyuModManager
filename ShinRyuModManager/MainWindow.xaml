@@ -95,10 +95,13 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="0.5*"/>
                             <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="0.5*"/>
                         </Grid.ColumnDefinitions>
 
                         <Button x:Name="btn_ModInstall" Grid.Column="0" Click="ModInstall_Click" Margin="0" Background="#FF4B4B4B" Foreground="White" Content="Install mod" FontSize="16"/>
                         <Button x:Name="btn_ModListViewRefresh" Grid.Column="1" Click="ModListViewRefresh_Click" Margin="0" Background="#FF4B4B4B" Foreground="White" Content="Refresh list" FontSize="16"/>
+                        <Button x:Name="btn_RunGame" Grid.Column="2" Click="RunGame_Click" Margin="0" Background="#FF4B4B4B" Foreground="White" Content="Run Game" FontSize="16" ToolTip="Launches the game, doesn't work on xbox versions"/>
+
                     </Grid>
                 </Grid>
 
