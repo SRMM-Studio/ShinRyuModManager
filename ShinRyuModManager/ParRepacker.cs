@@ -58,9 +58,6 @@ namespace ShinRyuModManager
         {
             var parTasks = new List<Task<ConsoleOutput>>();
 
-            // Clean up the /mods/Parless/ directory before processing the dictionary
-            RemoveOldRepackedPars();
-
             if (parDictionary.Count == 0)
             {
                 Console.WriteLine("No pars to repack\n");

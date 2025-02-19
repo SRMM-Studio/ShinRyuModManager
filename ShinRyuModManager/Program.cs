@@ -20,9 +20,6 @@ using Utils;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
 using static Utils.GamePath;
-using ParLibrary.Converter;
-using YamlDotNet.Core;
-using Yarhl.FileSystem;
 
 namespace ShinRyuModManager
 {
@@ -542,6 +539,14 @@ namespace ShinRyuModManager
             {
                 if (mods?.Count > 0 || looseFilesEnabled)
                 {
+                    // Create Parless mod as highest priority
+                    if (mods.Contains("Parless"))
+                    {
+                        mods.Remove("Parless");
+                    }
+                    mods.Insert(0, "Parless");
+                    Directory.CreateDirectory(PARLESS_MODS_PATH);
+
                     MLO result =  await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
 
                     if (GameModel.SupportsUBIK(GamePath.GetGame()))

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-
 using Utils;
+using System;
 
 namespace ShinRyuModManager.ModLoadOrder.Mods
 {
@@ -78,113 +78,146 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
             bool needsRepack = false;
             string basename = GamePath.GetBasename(path);
 
-            // Check if this path does not need repacking
-            switch (check)
+            // We dont want to do all these checks for contents in the Parless mod folder.
+            if (Name != "Parless")
             {
-                case "chara":
-                    needsRepack = GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "map_":
-                    needsRepack = GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "effect":
-                    needsRepack = GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "prep":
-                    needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "light_anim":
-                    needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "2d":
-                    needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
-                    break;
-                case "cse":
-                    needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
-                    break;
-                case "pausepar":
-                    if (GamePath.GetGame() >= Game.Yakuza0)
-                        needsRepack = true;
-                    else
+                // Check if this path does not need repacking
+                switch (check)
+                {
+                    case "chara":
+                        needsRepack = GamePath.ExistsInDataAsPar(path);
+                        break;
+                    case "map_":
+                        needsRepack = GamePath.ExistsInDataAsPar(path);
+                        break;
+                    case "effect":
+                        needsRepack = GamePath.ExistsInDataAsPar(path);
+                        break;
+                    case "prep":
+                        needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
+                        break;
+                    case "light_anim":
+                        needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
+                        break;
+                    case "2d":
+                        needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
+                        break;
+                    case "cse":
+                        needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
+                        break;
+                    case "pausepar":
+                        if (GamePath.GetGame() >= Game.Yakuza0)
+                            needsRepack = true;
+                        else
+                            needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
+                        break;
+                    case "pausepar_e":
                         needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "pausepar_e":
-                    needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
-                    break;
-                case "particle":
-                    if (GamePath.GetGame() >= Game.Yakuza6 && basename == "arc")
-                    {
-                        check = "particle/arc";
-                    }
+                        break;
+                    case "particle":
+                        if (GamePath.GetGame() >= Game.Yakuza6 && basename == "arc")
+                        {
+                            check = "particle/arc";
+                        }
 
-                    if (new DirectoryInfo(path).Parent.Name == "arc_list")
-                        needsRepack = true;
-                    break;
-                case "particle/arc":
-                    needsRepack = GamePath.ExistsInDataAsParNested(path);
-                    break;
-                case "stage":
-                    needsRepack = GamePath.GetGame() == Game.eve && basename == "sct" && GamePath.ExistsInDataAsParNested(path);
-                    break;
-                case "":
-                    needsRepack = (basename == "ptc" && GamePath.ExistsInDataAsParNested(path))
-                        || (basename == "entity_adam" && GamePath.ExistsInDataAsPar(path));
+                        if (new DirectoryInfo(path).Parent.Name == "arc_list")
+                            needsRepack = true;
+                        break;
+                    case "particle/arc":
+                        needsRepack = GamePath.ExistsInDataAsParNested(path);
+                        break;
+                    case "stage":
+                        needsRepack = GamePath.GetGame() == Game.eve && basename == "sct" && GamePath.ExistsInDataAsParNested(path);
+                        break;
+                    case "":
+                        needsRepack = (basename == "ptc" && GamePath.ExistsInDataAsParNested(path))
+                            || (basename == "entity_adam" && GamePath.ExistsInDataAsPar(path));
 
-                    if (!needsRepack)
-                    {
-                        check = this.CheckFolder(basename);
-                    }
-                    break;
-                default:
-                    break;
-            }
+                        if (!needsRepack)
+                        {
+                            check = this.CheckFolder(basename);
+                        }
+                        break;
+                    default:
+                        break;
+                }
 
-            // Check for CPK directories
-            string cpkDataPath;
-            switch (basename)
-            {
-                case "bgm":
-                    cpkDataPath = GamePath.RemoveModPath(path);
-                    this.RepackCPKs.Add(cpkDataPath);
-                    break;
+                // Check for CPK directories
+                string cpkDataPath;
+                switch (basename)
+                {
+                    case "bgm":
+                        cpkDataPath = GamePath.RemoveModPath(path);
+                        this.RepackCPKs.Add(cpkDataPath);
+                        break;
 
-                case "se":
-                case "speech":
-                    cpkDataPath = GamePath.RemoveModPath(path);
-                    if (GamePath.GetGame() == Game.Yakuza5)
-                    {
+                    case "se":
+                    case "speech":
+                        cpkDataPath = GamePath.RemoveModPath(path);
+                        if (GamePath.GetGame() == Game.Yakuza5)
+                        {
+                            this.CpkFolders.Add(cpkDataPath + ".cpk");
+                            this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
+                        }
+                        else
+                        {
+                            this.RepackCPKs.Add(cpkDataPath + ".cpk");
+                        }
+
+                        break;
+                    case "stream":
+                    case "stream_en":
+                    case "stmdlc":
+                    case "stmdlc_en":
+                    case "movie":
+                    case "moviesd":
+                    case "moviesd_dlc":
+                        cpkDataPath = GamePath.RemoveModPath(path);
+                        if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
+                        {
+                            this.CpkFolders.Add(cpkDataPath + ".par");
+                            this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
+                        }
+
+                        break;
+                    case "gv_files":
+                        cpkDataPath = GamePath.RemoveModPath(path);
                         this.CpkFolders.Add(cpkDataPath + ".cpk");
                         this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
-                    }
-                    else
-                    {
-                        this.RepackCPKs.Add(cpkDataPath + ".cpk");
-                    }
+                        break;
+                    default:
+                        break;
+                }
 
-                    break;
-                case "stream":
-                case "stream_en":
-                case "stmdlc":
-                case "stmdlc_en":
-                case "movie":
-                case "moviesd":
-                case "moviesd_dlc":
-                    cpkDataPath = GamePath.RemoveModPath(path);
-                    if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
-                    {
-                        this.CpkFolders.Add(cpkDataPath + ".par");
-                        this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
-                    }
-
-                    break;
-                case "gv_files":
-                    cpkDataPath = GamePath.RemoveModPath(path);
-                    this.CpkFolders.Add(cpkDataPath + ".cpk");
-                    this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
-                    break;
-                default:
-                    break;
+                // Additional game specific checks
+                switch (basename)
+                {
+                    // Pirates in Hawaii stores gmts inside folders based on the lowercase filename checksum.
+                    // For the modders' convenience, move any gmts in the folder root to the corresponding subdirectory.
+                    case "motion":
+                        {
+                            if (GamePath.GetGame() == Game.likeadragonpirates)
+                            {
+                                string gmtFolderPath = Path.Combine(path, "gmt");
+                                if (!Directory.Exists(gmtFolderPath)) break;
+                                string baseParlessPath = Path.Combine(GamePath.GetModsPath(), "Parless", "motion", "gmt");
+                                foreach (string p in Directory.GetFiles(gmtFolderPath).Where(f => !f.EndsWith(Constants.VORTEX_MANAGED_FILE)).Select(f => GamePath.GetDataPathFrom(f)))
+                                {
+                                    // Copy any gmts to the appropriate hash folder in Parless
+                                    if (!p.EndsWith(".gmt", StringComparison.InvariantCultureIgnoreCase)) continue;
+                                    string gmtPath = Path.Combine(gmtFolderPath, Path.GetFileName(p));
+                                    string checksum = ((Func<string, string>)(s => (System.Text.Encoding.UTF8.GetBytes(s).Sum(b => b) % 256).ToString("x2").PadLeft(4, '0')))(Path.GetFileNameWithoutExtension(p).ToLowerInvariant());
+                                    string destinationDirectory = Path.Combine(baseParlessPath, checksum);
+                                    if (!Directory.Exists(destinationDirectory))
+                                        Directory.CreateDirectory(destinationDirectory);
+                                    File.Copy(gmtPath, Path.Combine(destinationDirectory, Path.GetFileName(gmtPath)));
+                                }
+                            }
+                            break;
+                        }
+                }
             }
+
 
             if (needsRepack)
             {
