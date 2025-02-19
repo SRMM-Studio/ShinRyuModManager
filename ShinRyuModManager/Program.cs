@@ -447,26 +447,26 @@ namespace ShinRyuModManager
             // Read ini (again) to check if we should try importing the old load order file
             ini = iniParser.ReadFile(INI);
 
+            if (game == Game.Judgment || game == Game.LostJudgment || game == Game.likeadragonpirates)
+            {
+                // Disable RebuildMLO when using an external mod manager
+                if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
+                {
+                    Console.Write($"Game specific patch: Disabling RebuildMLO for some games when using an external mod manager...");
+
+                    ini.Sections["Overrides"]["RebuildMLO"] = "0";
+                    iniParser.WriteFile(INI, ini);
+
+                    Console.WriteLine(" DONE!\n");
+                }
+            }
+
             List<ModInfo> mods = new List<ModInfo>();
 
             if (ShouldBeExternalOnly())
             {
                 // Only load the files inside the external mods path, and ignore the load order in the txt
                 mods.Add(new ModInfo(EXTERNAL_MODS));
-
-                if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
-                {
-                    // Disable RebuildMLO when using an external mod manager
-                    if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
-                    {
-                        Console.Write($"Game specific patch: Disabling RebuildMLO for Judgment and Lost Judgment when using an external mod manager...");
-
-                        ini.Sections["Overrides"]["RebuildMLO"] = "0";
-                        iniParser.WriteFile(INI, ini);
-
-                        Console.WriteLine(" DONE!\n");
-                    }
-                }
             }
             else
             {
