@@ -195,7 +195,7 @@ namespace ShinRyuModManager.Templates
                         new IniKey
                         {
                             Name = "ReloadingEnabled",
-                            Comments = new List<string> { "Enable reloading mod files by pressing CTRL+Shift+R" },
+                            Comments = new List<string> { "Enable reloading mod files by pressing CTRL+ALT+R" },
                             DefaultValue = 0,
                         },
                         new IniKey

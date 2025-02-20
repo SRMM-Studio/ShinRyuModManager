@@ -1,4 +1,10 @@
-﻿> ### **%{color:gold} Version 4.5.0 %** ###
+﻿> ### **%{color:gold} Version 4.5.1 %** ###
+* Rewrite mod file handling in preparation for new system used in Pirates in Hawaii
+* SRMM will now automatically calculate hashes for gmts and beps and move them to appopriate folders in Pirates in Hawaii
+* Modders should continue to mod animations just like how they did before Pirates in Hawaii
+---
+
+> ### **%{color:orange} Version 4.5.0 %** ###
 * Add run game button (@SilvaKabe)
 * Fix pirate game path redirection for the first time i hope
 ---
