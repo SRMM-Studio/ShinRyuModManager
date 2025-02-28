@@ -1,4 +1,10 @@
-﻿> ### **%{color:gold} Version 4.5.1 %** ###
+﻿> ### **%{color:gold} Version 4.5.3 %** ###
+* Fix broken support for Pirates in Hawaii after the game got updated to 1.10
+* 
+> ### **%{color:orange} Version 4.5.2 %** ###
+* Fix Simplified Chinese file redirection in Pirates in Hawaii
+
+> ### **%{color:orange} Version 4.5.1 %** ###
 * Rewrite mod file handling in preparation for new system used in Pirates in Hawaii
 * SRMM will now automatically calculate hashes for gmts and beps and move them to appopriate folders in Pirates in Hawaii
 * Modders should continue to mod animations just like how they did before Pirates in Hawaii
