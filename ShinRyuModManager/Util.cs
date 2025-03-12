@@ -111,6 +111,28 @@ namespace ShinRyuModManager
         }
 
 
+        internal static bool IsFileBlocked(string path)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                {
+                    return false;
+                }
+            }
+            // File is in use
+            catch (IOException)
+            {
+                return true; 
+            }
+            // Unable to access
+            catch (UnauthorizedAccessException)
+            {
+                return true;
+            }
+        }
+
+
 
         // EXTENSIONS
         public static void Save(this BitmapImage image, string filePath)

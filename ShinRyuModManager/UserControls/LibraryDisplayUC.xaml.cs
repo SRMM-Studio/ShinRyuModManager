@@ -5,7 +5,6 @@ using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using Utils;
-using YamlDotNet.Serialization;
 
 namespace ShinRyuModManager.UserControls
 {
@@ -62,10 +61,9 @@ namespace ShinRyuModManager.UserControls
                     IsLibraryInstalled = true;
 
                     string yamlString = File.ReadAllText(metaFilePath);
-                    var deserializer = new DeserializerBuilder().Build();
-                    LocalMeta = deserializer.Deserialize<LibMeta>(yamlString);
+                    LocalMeta = LibMeta.ReadLibMeta(yamlString);
 
-                    IsLibraryEnabled = !LocalMeta.IsDisabled;
+                    IsLibraryEnabled = !File.Exists(Path.Combine(GamePath.GetLibrariesPath(), Meta.GUID.ToString(), ".disabled"));
                     IsLibraryUpdateAvailable = Util.CompareVersionIsHigher(Meta.Version, LocalMeta.Version);
 
                     if (IsLibraryUpdateAvailable)
@@ -150,7 +148,7 @@ namespace ShinRyuModManager.UserControls
                     {
                         string destinationDir = Path.Combine(GamePath.GetLibrariesPath(), Meta.GUID.ToString());
                         Directory.CreateDirectory(destinationDir);
-                        archive.ExtractToDirectory(destinationDir);
+                        archive.ExtractToDirectory(destinationDir, true);
                     }
                 }
             }
@@ -193,13 +191,29 @@ namespace ShinRyuModManager.UserControls
 
         private void btn_Enable_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            IsLibraryEnabled = true;
+
+            // Write invisible file as flag for Parless
+            string flagFilePath = Path.Combine(GamePath.GetLibrariesPath(), Meta.GUID.ToString(), ".disabled");
+            if (File.Exists(flagFilePath))
+            {
+                File.Delete(flagFilePath);
+            }
+
+            UpdateButtonVisibility();
         }
 
 
         private void btn_Disable_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            IsLibraryEnabled = false;
+
+            // Write invisible file as flag for Parless
+            string flagFilePath = Path.Combine(GamePath.GetLibrariesPath(), Meta.GUID.ToString(), ".disabled");
+            File.Create(flagFilePath);
+            File.SetAttributes(flagFilePath, File.GetAttributes(flagFilePath) | FileAttributes.Hidden);
+
+            UpdateButtonVisibility();
         }
 
 

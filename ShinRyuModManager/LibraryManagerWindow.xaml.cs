@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Windows;
 using Utils;
-using YamlDotNet.Serialization;
 
 namespace ShinRyuModManager
 {
@@ -28,18 +27,14 @@ namespace ShinRyuModManager
             //string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.LIBRARIES_INFO_REPO_OWNER}/{Settings.LIBRARIES_INFO_REPO}/main/{Settings.LIBRARIES_INFO_REPO_FILE_PATH}");
             string yamlString = File.ReadAllText("libs.yaml");
 
-            List<LibMeta> returnList = new List<LibMeta>();
-
-            var deserializer = new DeserializerBuilder().Build();
-            var yamlObject = deserializer.Deserialize<Dictionary<string, LibMeta>>(yamlString);
-            foreach (string key in yamlObject.Keys)
+            // Save a copy of the manifest for offline use
+            string localManifestCopyPath = Path.Combine(GamePath.GetLibrariesPath(), Settings.LIBRARIES_INFO_REPO_FILE_PATH);
+            if (File.Exists(localManifestCopyPath) && !Util.IsFileBlocked(localManifestCopyPath))
             {
-                LibMeta meta = yamlObject[key];
-                meta.GUID = new Guid(key);
-                returnList.Add(meta);
+                File.WriteAllText(localManifestCopyPath, yamlString);
             }
 
-            return returnList;
+            return LibMeta.ReadLibMetaManifest(yamlString);
         }
 
 
@@ -70,6 +65,7 @@ namespace ShinRyuModManager
             {
                 // Fetching library data from github failed. Connection issues or server down?
                 // Populate the list with data from the already installed libraries in case the user wants to uninstall or disable any
+                lbl_ManifestDownloadError.Visibility = Visibility.Visible;
 
                 List<LibMeta> metaList = new List<LibMeta>();
 
@@ -79,9 +75,7 @@ namespace ShinRyuModManager
                     if (File.Exists(path))
                     {
                         string yamlString = File.ReadAllText(path);
-
-                        var deserializer = new DeserializerBuilder().Build();
-                        LibMeta meta = deserializer.Deserialize<LibMeta>(yamlString);
+                        LibMeta meta = LibMeta.ReadLibMeta(yamlString);
                         metaList.Add(meta);
                     }
                 }

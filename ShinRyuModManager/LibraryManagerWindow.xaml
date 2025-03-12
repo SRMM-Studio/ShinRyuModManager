@@ -48,11 +48,15 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" Content="Library Manager" FontSize="30" Foreground="Gold" Margin="10"/>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+        <Label Grid.Row="1" Content="Libraries extend the game's functionality and allow mods to implement new features or edit hardcoded data" FontSize="14" Foreground="White" Margin="10,0,0,10"/>
+        <Label x:Name="lbl_ManifestDownloadError" Grid.Row="2" Content="Unable to download library manifest. Possible connection issues." FontSize="14" Foreground="OrangeRed" Margin="10,0,0,10" Visibility="Collapsed"/>
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
             <StackPanel x:Name="sp_Libraries" Orientation="Vertical" Margin="10"/>
         </ScrollViewer>
     </Grid>
