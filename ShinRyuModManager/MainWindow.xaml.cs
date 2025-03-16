@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using ICSharpCode.SharpZipLib.Zip;
+using SharpCompress;
 using System.Windows.Controls;
 using Utils;
 using YamlDotNet.Serialization;
@@ -76,33 +76,8 @@ namespace ShinRyuModManager
             if (!File.Exists(path))
                 return false;
 
-            using (ZipFile zip = new ZipFile(path))
-            {
-                ZipEntry[] files = zip.Cast<ZipEntry>().ToArray();
+            ArchiveUtils.ExtractArchive(path, "mods");
 
-                ZipEntry[] rootdirs = files.Where(x => x.IsDirectory && x.ToString().Split('/').Length <= 2).ToArray();
-
-                if (rootdirs.Length <= 0)
-                    return false;
-
-                foreach (ZipEntry entry in files)
-                {
-                    if (entry.IsDirectory)
-                        Directory.CreateDirectory(Path.Combine("mods", entry.ToString()));
-                    else
-                    {
-                        using (FileStream outputFile = File.Create(Path.Combine("mods", entry.ToString())))
-                        {
-                            if (entry.Size > 0)
-                            {
-                                Stream fileStream = zip.GetInputStream(entry);
-                                fileStream.CopyTo(outputFile);
-                                fileStream.Close();
-                            }
-                        }
-                    }
-                }
-            }
             return true;
         }
 
@@ -229,7 +204,7 @@ namespace ShinRyuModManager
 
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.DefaultExt = "*.zip";
-            openFileDialog.Filter = "ZIP files (.zip)|*.zip";
+            openFileDialog.Filter = "Archive files (*.zip,*.rar,*.7z)|*.zip;*.rar|ZIP files (.zip)|*.zip|RAR files (.rar)|*.rar|7z files (.7z)|*.7z";
 
             if (!openFileDialog.ShowDialog().Value)
                 return;
