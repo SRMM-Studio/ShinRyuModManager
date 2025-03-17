@@ -219,7 +219,36 @@ namespace ShinRyuModManager
 
         private void ModUninstall_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            if (ModListView.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("No mods selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            string deletionMessage = $"The following mods will be removed:\n\n";
+            foreach (ModInfo modInfo in ModListView.SelectedItems)
+            {
+                deletionMessage += $"• {modInfo.Name}\n";
+            }
+            deletionMessage += "\nWould you like to proceed?";
+
+            if (MessageBox.Show(deletionMessage, "Confirm mod removal", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                foreach (ModInfo modInfo in ModListView.SelectedItems)
+                {
+                    string modPath = Path.Combine(GamePath.GetModsPath(), modInfo.Name);
+                    try
+                    {
+                        Directory.Delete(modPath, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred when attempting to remove the \"{modInfo.Name}\" directory.\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                Refresh();
+            }
+
         }
 
 

@@ -57,7 +57,7 @@
         <Menu Grid.Row="0">
             <MenuItem Header="Manage">
                 <MenuItem Header="Install mod" Click="ModInstall_Click"/>
-                <MenuItem Header="Uninstall mod (WIP)" Click="ModUninstall_Click" IsEnabled="False"/>
+                <MenuItem Header="Uninstall mod" Click="ModUninstall_Click"/>
             </MenuItem>
             <MenuItem x:Name="mi_LibrariesManager" Header="Libraries" Click="mi_LibrariesManager_Click"/>
             <MenuItem Header="Mod Meta">
