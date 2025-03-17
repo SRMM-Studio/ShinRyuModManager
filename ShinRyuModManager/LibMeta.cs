@@ -62,6 +62,8 @@ namespace ShinRyuModManager
                 returnList.Add(meta);
             }
 
+            Program.LibraryMetaCache = returnList;
+
             return returnList;
         }
     }

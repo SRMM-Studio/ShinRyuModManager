@@ -55,7 +55,8 @@ namespace ShinRyuModManager
                 changelog.Show();
                 Util.DeleteFlag(Settings.UPDATE_RECENT_FLAG_FILE_NAME);
             }
-            
+
+            Program.ReadCachedLocalLibraryData();
             Refresh();
         }
 
@@ -148,6 +149,8 @@ namespace ShinRyuModManager
         {
             if (Program.SaveModList(this.ModList.ToList()))
             {
+                CheckModDependencies();
+
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMLO is disabled or unsupported)
                 if (Program.RebuildMLO && Program.IsRebuildMLOSupported)
                 {
@@ -278,7 +281,6 @@ namespace ShinRyuModManager
         private void UpdateModMeta(string modName, string modPath)
         {
             string pathModMeta = Path.Combine(modPath, "mod-meta.yaml");
-            string pathLibMeta = Path.Combine(modPath, "lib-meta.yaml");
             string patternModImage = "mod-image.*";
             List<string> matchingModImageFiles = Directory.EnumerateFiles(modPath, patternModImage).ToList();
             BitmapImage modImage = new BitmapImage(new Uri("pack://application:,,,/Resources/NoImage.png"));
@@ -332,6 +334,68 @@ namespace ShinRyuModManager
             img_ModImage.Source = modImage;
         }
 
+        private void CheckModDependencies()
+        {
+            List<ModInfo> t = Program.ReadModListTxt(Utils.Constants.TXT);
+            string modsPath = GamePath.GetModsPath();
+
+            List<string> modsWithDependencyProblems = new List<string>();
+            List<string> disabledLibraries = new List<string>();
+            List<string> missingLibraries = new List<string>();
+
+            foreach(ModInfo enabledMod in t.Where(x => x.Enabled))
+            {
+                foreach(string dependencyGuid in Program.GetModDependencies(enabledMod.Name))
+                {
+                    if (!Program.DoesLibraryExist(dependencyGuid))
+                    {
+                        modsWithDependencyProblems.Add(enabledMod.Name);
+                        missingLibraries.Add(dependencyGuid);
+                    }
+                    else if (!Program.IsLibraryEnabled(dependencyGuid))
+                    {
+                        modsWithDependencyProblems.Add(enabledMod.Name);
+                        disabledLibraries.Add(dependencyGuid);
+                    }
+                }
+            }
+
+            if (disabledLibraries.Count > 0 || missingLibraries.Count > 0)
+            {
+                string messageString = "";
+
+                if (missingLibraries.Count > 0)
+                {
+                    messageString += "Missing libraries:\n";
+                    
+                    foreach (string str in missingLibraries)
+                        messageString += Program.GetLibraryName(str) + "\n";
+
+                    messageString += "\n";
+                }
+
+                if(disabledLibraries.Count > 0)
+                {
+                    messageString += "Disabled libraries:\n";
+
+                    foreach (string str in disabledLibraries)
+                        messageString += Program.GetLibraryName(str) + "\n";
+
+                    messageString += "\n";
+                }
+
+                messageString += "The following mods depend on these libraries:\n";
+
+
+                foreach (string str in  modsWithDependencyProblems)
+                    messageString += Program.GetLibraryName(str) + "\n";
+
+                messageString += "\n";
+
+                messageString += "Your mods may not properly work without them. Consider installing or enabling them.";
+                MessageBox.Show(messageString, "Mod Library Dependency Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
 
         private void mi_LibrariesManager_Click(object sender, RoutedEventArgs e)
         {
@@ -410,7 +474,7 @@ namespace ShinRyuModManager
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] dt = (string[])e.Data.GetData(DataFormats.FileDrop);
-                foreach (string a in dt.Where(path => path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)))
+                foreach (string a in dt)
                 {
                     TryInstallModZip(a);
                 }

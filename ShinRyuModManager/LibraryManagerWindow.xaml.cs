@@ -1,4 +1,5 @@
-﻿using ShinRyuModManager.UserControls;
+﻿using CriPakTools;
+using ShinRyuModManager.UserControls;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,6 @@ namespace ShinRyuModManager
             PopulateLibraryList();
         }
 
-
         private List<LibMeta> DownloadLibraryData()
         {
             WebClient client = new WebClient();
@@ -28,8 +28,8 @@ namespace ShinRyuModManager
             string yamlString = File.ReadAllText("libs.yaml");
 
             // Save a copy of the manifest for offline use
-            string localManifestCopyPath = Path.Combine(GamePath.GetLibrariesPath(), Settings.LIBRARIES_INFO_REPO_FILE_PATH);
-            if (File.Exists(localManifestCopyPath) && !Util.IsFileBlocked(localManifestCopyPath))
+            string localManifestCopyPath = Program.GetLocalLibraryCopyPath();
+            if (!File.Exists(localManifestCopyPath) && !Util.IsFileBlocked(localManifestCopyPath))
             {
                 File.WriteAllText(localManifestCopyPath, yamlString);
             }

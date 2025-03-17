@@ -56,24 +56,26 @@ namespace ShinRyuModManager
 
         public static bool IsEmulated = false;
 
+        public static List<LibMeta> LibraryMetaCache = new List<LibMeta>();
+
 
         [STAThread]
         public static void Main(string[] args)
         {
             IntPtr ntDllModule = GetModuleHandle("ntdll");
-           
+
             //jason098: Detect linux emulation like this
-            if(ntDllModule != IntPtr.Zero)
+            if (ntDllModule != IntPtr.Zero)
             {
                 IntPtr wineVersionFunction = GetProcAddress(ntDllModule, "wine_get_version");
 
                 if (wineVersionFunction != IntPtr.Zero)
-                    IsEmulated = true; 
+                    IsEmulated = true;
             }
 
             //29.01.2025
             //Jhrino: If we don't do this, we break support for linux emulation through protontricks! Meaning it no longer works on steamdeck
-            if(!IsEmulated)
+            if (!IsEmulated)
             {
                 // Try to prevent DLL hijacking by limiting the DLL search path to System32. This should avoid the GUI from crashing due to mod injections.
                 // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
@@ -101,7 +103,8 @@ namespace ShinRyuModManager
 
                 if (Program.ShouldCheckForUpdates())
                 {
-                    new Thread(delegate () {
+                    new Thread(delegate ()
+                    {
                         CheckForUpdatesGUI();
                     }).Start();
                 }
@@ -549,7 +552,7 @@ namespace ShinRyuModManager
                     mods.Insert(0, "Parless");
                     Directory.CreateDirectory(PARLESS_MODS_PATH);
 
-                    MLO result =  await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
+                    MLO result = await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
 
                     if (GameModel.SupportsUBIK(GamePath.GetGame()))
                     {
@@ -691,10 +694,31 @@ namespace ShinRyuModManager
             return meta.Dependencies.Split(';');
         }
 
-       public static string GetLibraryPath(string guid)
+        public static string GetLibraryPath(string guid)
         {
             string libDir = Path.Combine(GamePath.GetLibrariesPath(), guid);
             return libDir;
+        }
+
+        public static string GetLocalLibraryCopyPath()
+        {
+            return Path.Combine(GamePath.GetLibrariesPath(), Settings.LIBRARIES_INFO_REPO_FILE_PATH);
+        }
+
+        //Read cached data at startup if it exists
+        public static void ReadCachedLocalLibraryData()
+        {
+            string path = GetLocalLibraryCopyPath();
+
+            if (!File.Exists(path))
+                return;
+
+            LibMeta.ReadLibMetaManifest(File.ReadAllText(path));
+        }
+
+        public static LibMeta GetLibMeta(string guid)
+        {
+            return LibraryMetaCache.FirstOrDefault(x => x.GUID.ToString() == guid);
         }
 
         public static bool DoesLibraryExist(string guid)
@@ -720,8 +744,10 @@ namespace ShinRyuModManager
 
         public static string GetLibraryName(string guid)
         {
-            if (!DoesLibraryExist(guid))
-                return guid;
+            var metaData = GetLibMeta(guid);
+
+            if (metaData != null)
+                return metaData.Name;
 
             string path = Path.Combine(GetLibraryPath(guid), Settings.LIBRARIES_LIBMETA_FILE_NAME);
 
@@ -868,6 +894,6 @@ namespace ShinRyuModManager
     public class Updater
     {
         public string Version { get; set; }
-        public string Download {  get; set; }
+        public string Download { get; set; }
     }
 }

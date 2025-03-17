@@ -113,6 +113,9 @@ namespace ShinRyuModManager
 
         internal static bool IsFileBlocked(string path)
         {
+            if (!File.Exists(path))
+                return false;
+
             try
             {
                 using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
