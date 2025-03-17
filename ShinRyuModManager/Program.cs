@@ -20,8 +20,7 @@ using Utils;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
 using static Utils.GamePath;
-using System.Security.Policy;
-using SharpVectors.Dom.Stylesheets;
+using System.IO.Compression;
 
 namespace ShinRyuModManager
 {
@@ -671,10 +670,15 @@ namespace ShinRyuModManager
             return mods;
         }
 
+        public static string GetModDirectory(string mod)
+        {
+            return Path.Combine(GetModsPath(), mod);
+        }
+
 
         public static string[] GetModDependencies(string mod)
         {
-            string modDir = Path.Combine(GetModsPath(), mod);
+            string modDir = GetModDirectory(mod);
 
             if (!Directory.Exists(modDir))
                 return new string[0];
@@ -759,6 +763,88 @@ namespace ShinRyuModManager
             }
 
             return guid;
+        }
+
+        public static void InstallLibrary(string guid)
+        {
+            var metaFile = GetLibMeta(guid);
+
+            if (metaFile == null || string.IsNullOrEmpty(metaFile.Download))
+                return;
+
+            string DownloadLibraryPackage(string fileName)
+            {
+                Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Settings.TEMP_DIRECTORY_NAME));
+
+                try
+                {
+                    string path = Path.Combine(Path.GetTempPath(), Settings.TEMP_DIRECTORY_NAME, fileName);
+                    using (var client = new WebClient())
+                    {
+                        client.DownloadFile(metaFile.Download, Path.Combine(Path.GetTempPath(), Settings.TEMP_DIRECTORY_NAME, fileName));
+                        return path;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    return "";
+                }
+            }
+
+            string packagePath = DownloadLibraryPackage($"{guid.ToString()}.zip");
+            if (packagePath != "")
+            {
+                using (FileStream zipToOpen = new FileStream(packagePath, FileMode.Open))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+                    {
+                        string destinationDir = Path.Combine(GamePath.GetLibrariesPath(), guid.ToString());
+                        Directory.CreateDirectory(destinationDir);
+                        archive.ExtractToDirectory(destinationDir, true);
+                    }
+                }
+            }
+
+        }
+
+        //Iterate on all enabled mods and try installing their dependencies
+        public static void InstallAllModDependencies()
+        {
+            List<ModInfo> t = ReadModListTxt(TXT);
+
+            foreach(var mod in t.Where(x => x.Enabled))
+            {
+                InstallModDependencies(mod.Name);
+            }
+        }
+
+        public static void InstallModDependencies(string mod)
+        {
+            string modDir = GetModDirectory(mod);
+
+            if (!Directory.Exists(modDir))
+                return;
+
+            string metaFile = Path.Combine(modDir, "mod-meta.yaml");
+
+            if (!File.Exists(metaFile))
+                return;
+
+            string yamlString = File.ReadAllText(metaFile, System.Text.Encoding.UTF8);
+            var deserializer = new DeserializerBuilder().Build();
+            var meta = deserializer.Deserialize<ModMeta>(yamlString);
+
+            if (string.IsNullOrEmpty(meta.Dependencies))
+                return;
+
+            string[] dependencies = meta.Dependencies.Split(';');
+
+            foreach(string dep in dependencies)
+                if(!DoesLibraryExist(dep))
+                {
+                    InstallLibrary(dep);
+                }
         }
 
         /// <summary>

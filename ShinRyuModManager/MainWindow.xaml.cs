@@ -39,7 +39,7 @@ namespace ShinRyuModManager
                 Directory.CreateDirectory(GamePath.LIBRARIES);
 
             modsFolderWatcher = new FileSystemWatcher("mods");
-            modsFolderWatcher.Created += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
+            modsFolderWatcher.Created += (o, args) => { Dispatcher.Invoke(() => Refresh()); Program.InstallAllModDependencies(); };
             modsFolderWatcher.Deleted += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
             modsFolderWatcher.Renamed += (o, args) => { Dispatcher.Invoke(() => Refresh()); };
             modsFolderWatcher.EnableRaisingEvents = true;
@@ -78,6 +78,8 @@ namespace ShinRyuModManager
                 return false;
 
             ArchiveUtils.ExtractArchive(path, "mods");
+
+            Program.InstallAllModDependencies();
 
             return true;
         }
