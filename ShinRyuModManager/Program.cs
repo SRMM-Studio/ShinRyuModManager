@@ -20,6 +20,8 @@ using Utils;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
 using static Utils.GamePath;
+using System.Security.Policy;
+using SharpVectors.Dom.Stylesheets;
 
 namespace ShinRyuModManager
 {
@@ -666,6 +668,72 @@ namespace ShinRyuModManager
             return mods;
         }
 
+
+        public static string[] GetModDependencies(string mod)
+        {
+            string modDir = Path.Combine(GetModsPath(), mod);
+
+            if (!Directory.Exists(modDir))
+                return new string[0];
+
+            string metaFile = Path.Combine(modDir, "mod-meta.yaml");
+
+            if (!File.Exists(metaFile))
+                return new string[0];
+
+            string yamlString = File.ReadAllText(metaFile, System.Text.Encoding.UTF8);
+            var deserializer = new DeserializerBuilder().Build();
+            var meta = deserializer.Deserialize<ModMeta>(yamlString);
+
+            if (string.IsNullOrEmpty(meta.Dependencies))
+                return new string[0];
+
+            return meta.Dependencies.Split(';');
+        }
+
+       public static string GetLibraryPath(string guid)
+        {
+            string libDir = Path.Combine(GamePath.GetLibrariesPath(), guid);
+            return libDir;
+        }
+
+        public static bool DoesLibraryExist(string guid)
+        {
+            string libDir = GetLibraryPath(guid);
+
+            if (!Directory.Exists(libDir))
+                return false;
+
+            return true;
+        }
+
+        public static bool IsLibraryEnabled(string guid)
+        {
+            if (!DoesLibraryExist(guid))
+                return false;
+
+            if (File.Exists(Path.Combine(GetLibraryPath(guid), ".disabled")))
+                return false;
+
+            return true;
+        }
+
+        public static string GetLibraryName(string guid)
+        {
+            if (!DoesLibraryExist(guid))
+                return guid;
+
+            string path = Path.Combine(GetLibraryPath(guid), Settings.LIBRARIES_LIBMETA_FILE_NAME);
+
+            if (File.Exists(path))
+            {
+                string yamlString = File.ReadAllText(path);
+                LibMeta meta = LibMeta.ReadLibMeta(yamlString);
+                return meta.Name;
+            }
+
+            return guid;
+        }
 
         /// <summary>
         /// Read the mod list from ModList.txt (current format).

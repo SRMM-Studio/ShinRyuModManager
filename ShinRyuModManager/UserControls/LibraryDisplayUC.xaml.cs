@@ -210,7 +210,7 @@ namespace ShinRyuModManager.UserControls
 
             // Write invisible file as flag for Parless
             string flagFilePath = Path.Combine(GamePath.GetLibrariesPath(), Meta.GUID.ToString(), ".disabled");
-            File.Create(flagFilePath);
+            File.Create(flagFilePath).Close();
             File.SetAttributes(flagFilePath, File.GetAttributes(flagFilePath) | FileAttributes.Hidden);
 
             UpdateButtonVisibility();
