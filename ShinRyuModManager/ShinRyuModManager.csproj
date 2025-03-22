@@ -16,7 +16,10 @@
     <None Remove="credits.txt" />
     <None Remove="Resources\Audio\JingleSuccess.wav" />
     <None Remove="Resources\changelog.md" />
+    <None Remove="Resources\Icons\PNG\Close.png" />
+    <None Remove="Resources\Icons\PNG\Edit.png" />
     <None Remove="Resources\Icons\PNG\Github_Light.png" />
+    <None Remove="Resources\Icons\PNG\Save.png" />
     <None Remove="Resources\Icons\SRMM_icon.ico" />
     <None Remove="Resources\Icons\SVG\ArrowDown.svg" />
     <None Remove="Resources\Icons\SVG\ArrowUp.svg" />
@@ -45,7 +48,10 @@
     <Resource Include="Resources\Icons\Legacy\toggle.png" />
     <Resource Include="Resources\Icons\Legacy\up.png" />
     <Resource Include="Resources\Icons\Legacy\down.png" />
+    <Resource Include="Resources\Icons\PNG\Close.png" />
+    <Resource Include="Resources\Icons\PNG\Edit.png" />
     <Resource Include="Resources\Icons\PNG\Github_Light.png" />
+    <Resource Include="Resources\Icons\PNG\Save.png" />
     <Resource Include="Resources\Icons\SVG\ArrowDown.svg" />
     <Resource Include="Resources\Icons\SVG\ArrowUp.svg" />
     <Resource Include="Resources\Icons\SVG\Check.svg" />

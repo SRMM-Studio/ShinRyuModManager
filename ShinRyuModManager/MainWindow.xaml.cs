@@ -275,42 +275,27 @@ namespace ShinRyuModManager
             ListView lv = sender as ListView;
             ModInfo selected = lv.SelectedItem as ModInfo;
             if (selected == null) return;
-            string modPath = Path.Combine(GamePath.GetModsPath(), selected.Name);
-            UpdateModMeta(selected.Name, modPath);
+            UpdateModMeta(selected.Name);
         }
 
 
-        private void UpdateModMeta(string modName, string modPath)
+        private void UpdateModMeta(string modName)
         {
-            string pathModMeta = Path.Combine(modPath, "mod-meta.yaml");
+            string modPath = Path.Combine(GamePath.GetModsPath(), modName);
             string patternModImage = "mod-image.*";
             List<string> matchingModImageFiles = Directory.EnumerateFiles(modPath, patternModImage).ToList();
             BitmapImage modImage = new BitmapImage(new Uri("pack://application:,,,/Resources/NoImage.png"));
 
-            try
-            {
-                ModMeta meta = ModMeta.GetPlaceholderModMeta(modName);
+            ModMeta meta = GetModMeta(modName);
 
-                if (File.Exists(pathModMeta))
-                {
-                    string yamlString = File.ReadAllText(pathModMeta, System.Text.Encoding.UTF8);
-                    var deserializer = new DeserializerBuilder().Build();
-                    meta = deserializer.Deserialize<ModMeta>(yamlString);
-                }
-
-                lbl_ModName.Text = meta.Name;
-                lbl_ModAuthor.Content = meta.Author;
-                lbl_ModVersion.Content = meta.Version;
-                sp_ModDescription.Children.Clear();
-                TextBlock tb = new TextBlock();
-                tb.TextWrapping = TextWrapping.Wrap;
-                tb.Text = meta.Description;
-                sp_ModDescription.Children.Add(tb);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error has occurred while trying to load mod-meta. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            lbl_ModName.Text = meta.Name;
+            lbl_ModAuthor.Content = meta.Author;
+            lbl_ModVersion.Content = meta.Version;
+            sp_ModDescription.Children.Clear();
+            TextBlock tb = new TextBlock();
+            tb.TextWrapping = TextWrapping.Wrap;
+            tb.Text = meta.Description;
+            sp_ModDescription.Children.Add(tb);
 
 
             if (matchingModImageFiles.Count > 0)
@@ -335,6 +320,32 @@ namespace ShinRyuModManager
 
             img_ModImage.Source = modImage;
         }
+
+
+        private ModMeta GetModMeta(string modName)
+        {
+            string modPath = Path.Combine(GamePath.GetModsPath(), modName);
+            string pathModMeta = Path.Combine(modPath, "mod-meta.yaml");
+
+            ModMeta meta = ModMeta.GetPlaceholderModMeta(modName);
+
+            try
+            {
+                if (File.Exists(pathModMeta))
+                {
+                    string yamlString = File.ReadAllText(pathModMeta, System.Text.Encoding.UTF8);
+                    var deserializer = new DeserializerBuilder().Build();
+                    meta = deserializer.Deserialize<ModMeta>(yamlString);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error has occurred while trying to load mod-meta. \nThe exception message is:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return meta;
+        }
+
 
         private void CheckModDependencies()
         {
@@ -484,6 +495,7 @@ namespace ShinRyuModManager
             }
         }
 
+
         private void RunGame_Click(object sender, RoutedEventArgs e)
         {
             if (GamePath.GetGameExe() is "Unsupported.exe")
@@ -501,6 +513,114 @@ namespace ShinRyuModManager
 
             Process.Start(GamePath.GetGameExe());
 
+        }
+
+
+        private void btn_MetaEditEnable_Click(object sender, RoutedEventArgs e)
+        {
+            if (ModListView.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("No mod selected.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            ModInfo selection = ModListView.SelectedItems.Cast<ModInfo>().First();
+            ModMeta meta = GetModMeta(selection.Name);
+
+            lbl_ModName.Visibility = Visibility.Collapsed;
+            lbl_ModNameEditable.Visibility = Visibility.Visible;
+            lbl_ModAuthor.Visibility = Visibility.Collapsed;
+            lbl_ModAuthorEditable.Visibility = Visibility.Visible;
+            lbl_ModVersion.Visibility = Visibility.Collapsed;
+            lbl_ModVersionEditable.Visibility = Visibility.Visible;
+
+            btn_MetaEditCancel.Visibility = Visibility.Visible;
+            btn_MetaEditSave.Visibility = Visibility.Visible;
+            btn_MetaEditEnable.Visibility = Visibility.Collapsed;
+
+            // Disable the mod selection
+            ModListView.IsEnabled = false;
+
+            // Populate editable boxes
+            lbl_ModNameEditable.Text = meta.Name;
+            lbl_ModAuthorEditable.Text = meta.Author;
+            lbl_ModVersionEditable.Text = meta.Version;
+
+            // Description edit box
+            sp_ModDescription.Children.Clear();
+            TextBox tb = new TextBox();
+            tb.TextWrapping = TextWrapping.Wrap;
+            tb.AcceptsReturn = true;
+            tb.Background = System.Windows.Media.Brushes.DimGray;
+            tb.Foreground = System.Windows.Media.Brushes.White;
+            tb.VerticalAlignment = VerticalAlignment.Stretch;
+            tb.HorizontalAlignment = HorizontalAlignment.Stretch;
+            tb.Text = meta.Description;
+            sp_ModDescription.Children.Add(tb);
+        }
+
+
+        private void btn_MetaEditCancel_Click(object sender, RoutedEventArgs e)
+        {
+            lbl_ModName.Visibility = Visibility.Visible;
+            lbl_ModNameEditable.Visibility = Visibility.Collapsed;
+            lbl_ModAuthor.Visibility = Visibility.Visible;
+            lbl_ModAuthorEditable.Visibility = Visibility.Collapsed;
+            lbl_ModVersion.Visibility = Visibility.Visible;
+            lbl_ModVersionEditable.Visibility = Visibility.Collapsed;
+
+            btn_MetaEditCancel.Visibility = Visibility.Collapsed;
+            btn_MetaEditSave.Visibility = Visibility.Collapsed;
+            btn_MetaEditEnable.Visibility = Visibility.Visible;
+
+            // Enable the mod selection
+            ModListView.IsEnabled = true;
+
+            ModInfo selection = ModListView.SelectedItems.Cast<ModInfo>().First();
+            UpdateModMeta(selection.Name);
+        }
+
+
+        private void btn_MetaEditSave_Click(object sender, RoutedEventArgs e)
+        {
+            ModInfo selection = ModListView.SelectedItems.Cast<ModInfo>().First();
+            ModMeta meta = GetModMeta(selection.Name);
+
+            meta.Name = lbl_ModNameEditable.Text;
+            meta.Author = lbl_ModAuthorEditable.Text;
+            meta.Version = lbl_ModVersionEditable.Text;
+            TextBox description = sp_ModDescription.Children[0] as TextBox;
+            meta.Description = description.Text;
+            // TODO library dependencies
+
+            // Save mod-meta.yaml
+            try
+            {
+                var serializer = new SerializerBuilder().WithDefaultScalarStyle(ScalarStyle.Plain).Build();
+                var yaml = serializer.Serialize(meta);
+                File.WriteAllText(Path.Combine(GamePath.GetModsPath(), selection.Name, "mod-meta.yaml"), yaml, System.Text.Encoding.UTF8);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred when trying to save the mod-meta.\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            lbl_ModName.Visibility = Visibility.Visible;
+            lbl_ModNameEditable.Visibility = Visibility.Collapsed;
+            lbl_ModAuthor.Visibility = Visibility.Visible;
+            lbl_ModAuthorEditable.Visibility = Visibility.Collapsed;
+            lbl_ModVersion.Visibility = Visibility.Visible;
+            lbl_ModVersionEditable.Visibility = Visibility.Collapsed;
+
+            btn_MetaEditCancel.Visibility = Visibility.Collapsed;
+            btn_MetaEditSave.Visibility = Visibility.Collapsed;
+            btn_MetaEditEnable.Visibility = Visibility.Visible;
+
+            // Enable the mod selection
+            ModListView.IsEnabled = true;
+
+            UpdateModMeta(selection.Name);
         }
     }
 }

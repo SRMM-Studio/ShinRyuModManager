@@ -77,6 +77,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.45*"/>
                 <ColumnDefinition Width="0.55*"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Label x:Name="lbl_SRMMVersion" Content="SRMM Version" HorizontalAlignment="Left" VerticalAlignment="Bottom" Foreground="White" Opacity="0.4"/>
@@ -145,7 +146,7 @@
                     </Grid>
                 </Grid>
 
-                
+
                 <Grid Grid.Column="1">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0, -70, 0, 0" Width="Auto" Height="Auto">
 
@@ -167,7 +168,7 @@
                         </Button>
                     </StackPanel>
                 </Grid>
-                
+
             </Grid>
 
             <Grid Grid.Column="1" Margin="20">
@@ -194,13 +195,16 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock x:Name="lbl_ModName" Grid.Row="0" Text="Mod Name" FontSize="26" Foreground="White" TextWrapping="WrapWithOverflow"/>
+                        <TextBox x:Name="lbl_ModNameEditable" Grid.Row="0" Text="Mod Name" FontSize="26" Background="DimGray" Foreground="White" TextWrapping="WrapWithOverflow" Margin="3" Visibility="Collapsed"/>
                         <StackPanel Grid.Row="1" Orientation="Horizontal">
                             <Label Content="Author:" FontSize="18" Foreground="LightGray"/>
                             <Label x:Name="lbl_ModAuthor" Content="Author Name" FontSize="18" Foreground="White"/>
+                            <TextBox x:Name="lbl_ModAuthorEditable" Text="Author Name" FontSize="18" Width="200" Background="DimGray" Foreground="White" Margin="3" Visibility="Collapsed"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Orientation="Horizontal">
                             <Label Content="Version:" FontSize="18" Foreground="LightGray"/>
                             <Label x:Name="lbl_ModVersion" Content="Version" FontSize="18" Foreground="White"/>
+                            <TextBox x:Name="lbl_ModVersionEditable" Text="Version" FontSize="18" Width="100" Background="DimGray" Foreground="White" Margin="3" Visibility="Collapsed"/>
                         </StackPanel>
                     </Grid>
 
@@ -216,6 +220,24 @@
                     </ScrollViewer>
                 </Grid>
             </Grid>
+            
+            <StackPanel Grid.Column="2" Margin="-10, 20, 5, 0">
+                <Button x:Name="btn_MetaEditEnable" Background="#FF252525" Foreground="White" Height="24" Width="24" ToolTip="Edit mod metadata" Click="btn_MetaEditEnable_Click">
+                    <Button.Content>
+                        <Image Source="/Resources/Icons/PNG/Edit.png" Height="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="btn_MetaEditCancel" Background="#FF252525" Foreground="White" Height="24" Width="24" Margin="0, 0, 0, 0" ToolTip="Cancel editing" Visibility="Collapsed" Click="btn_MetaEditCancel_Click">
+                    <Button.Content>
+                        <Image Source="/Resources/Icons/PNG/Close.png" Height="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="btn_MetaEditSave" Background="#FF252525" Foreground="White" Height="24" Width="24" Margin="0, 10, 0, 0" ToolTip="Save mod metadata" Visibility="Collapsed" Click="btn_MetaEditSave_Click">
+                    <Button.Content>
+                        <Image Source="/Resources/Icons/PNG/Save.png" Height="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>
