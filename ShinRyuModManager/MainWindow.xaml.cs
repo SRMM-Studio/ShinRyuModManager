@@ -362,12 +362,16 @@ namespace ShinRyuModManager
                 {
                     if (!Program.DoesLibraryExist(dependencyGuid))
                     {
-                        modsWithDependencyProblems.Add(enabledMod.Name);
+                        if(!modsWithDependencyProblems.Contains(enabledMod.Name))
+                            modsWithDependencyProblems.Add(enabledMod.Name);
+
                         missingLibraries.Add(dependencyGuid);
                     }
                     else if (!Program.IsLibraryEnabled(dependencyGuid))
                     {
-                        modsWithDependencyProblems.Add(enabledMod.Name);
+                        if (!modsWithDependencyProblems.Contains(enabledMod.Name))
+                            modsWithDependencyProblems.Add(enabledMod.Name);
+
                         disabledLibraries.Add(dependencyGuid);
                     }
                 }
@@ -400,7 +404,7 @@ namespace ShinRyuModManager
                 messageString += "The following mods depend on these libraries:\n";
 
 
-                foreach (string str in  modsWithDependencyProblems)
+                foreach (string str in modsWithDependencyProblems)
                     messageString += Program.GetLibraryName(str) + "\n";
 
                 messageString += "\n";

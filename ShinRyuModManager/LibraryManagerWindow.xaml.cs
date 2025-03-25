@@ -24,8 +24,8 @@ namespace ShinRyuModManager
         {
             WebClient client = new WebClient();
             //TODO UNCOMMENT THIS WHEN THE REPO IS READY. READING FROM LOCAL FILE IN THE MEANTIME
-            //string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.LIBRARIES_INFO_REPO_OWNER}/{Settings.LIBRARIES_INFO_REPO}/main/{Settings.LIBRARIES_INFO_REPO_FILE_PATH}");
-            string yamlString = File.ReadAllText("libs.yaml");
+            string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.LIBRARIES_INFO_REPO_OWNER}/{Settings.LIBRARIES_INFO_REPO}/main/{Settings.LIBRARIES_INFO_REPO_FILE_PATH}");
+            //string yamlString = File.ReadAllText(Program.GetLocalLibraryCopyPath());
 
             // Save a copy of the manifest for offline use
             string localManifestCopyPath = Program.GetLocalLibraryCopyPath();
