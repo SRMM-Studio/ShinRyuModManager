@@ -60,11 +60,11 @@ namespace ShinRyuModManager
 
             if (parDictionary.Count == 0)
             {
-                Console.WriteLine("No pars to repack\n");
+                Program.Log("No pars to repack\n");
             }
             else
             {
-                Console.WriteLine("Repacking pars...\n");
+                Program.Log("Repacking pars...\n");
 
                 foreach (KeyValuePair<string, List<string>> parModPair in parDictionary)
                 {
@@ -84,7 +84,7 @@ namespace ShinRyuModManager
                     parTasks.Remove(console);
                 }
 
-                Console.WriteLine($"Repacked {parDictionary.Count} par(s)!\n");
+                Program.Log($"Repacked {parDictionary.Count} par(s)!\n");
             }
         }
 
@@ -114,7 +114,7 @@ namespace ShinRyuModManager
             // Dictionary of fileInPar, ModName
             Dictionary<string, string> fileDict = new Dictionary<string, string>();
 
-            console.WriteLine($"Repacking {parPath + ".par"} ...");
+            Program.Log($"Repacking {parPath + ".par"} ...");
 
             // Populate fileDict with the files inside each mod
             foreach (string mod in mods)

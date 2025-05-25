@@ -201,5 +201,35 @@ namespace ShinRyuModManager
                 file.ExtractToFile(completeFileName, true);
             }
         }
+
+        public static Node ReadDirectory(string dirPath, string nodeName = "")
+        {
+            dirPath = Path.GetFullPath(dirPath);
+
+            if (string.IsNullOrEmpty(nodeName))
+            {
+                nodeName = Path.GetFileName(dirPath);
+            }
+
+            Node container = NodeFactory.CreateContainer(nodeName);
+            var directoryInfo = new DirectoryInfo(dirPath);
+            container.Tags["DirectoryInfo"] = directoryInfo;
+
+            var files = directoryInfo.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                Node fileNode = NodeFactory.FromFile(file.FullName, Yarhl.IO.FileOpenMode.Read);
+                container.Add(fileNode);
+            }
+
+            var directories = directoryInfo.GetDirectories();
+            foreach (DirectoryInfo directory in directories)
+            {
+                Node directoryNode = ReadDirectory(directory.FullName);
+                container.Add(directoryNode);
+            }
+
+            return container;
+        }
     }
 }

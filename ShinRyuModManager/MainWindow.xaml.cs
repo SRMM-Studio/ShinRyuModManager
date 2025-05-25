@@ -78,7 +78,6 @@ namespace ShinRyuModManager
                 return false;
 
             ArchiveUtils.ExtractArchive(path, "mods");
-
             Program.InstallAllModDependencies();
 
             return true;
@@ -170,8 +169,9 @@ namespace ShinRyuModManager
                         await Program.RunGeneration(Program.ConvertNewToOldModList(this.ModList.ToList()));
                         success = true;
                     }
-                    catch
+                    catch(Exception ex)
                     {
+                        Program.Log("Generation error!\n" + ex.ToString());
                         success = false;
                     }
 
@@ -409,7 +409,7 @@ namespace ShinRyuModManager
 
                 messageString += "\n";
 
-                messageString += "Your mods may not properly work without them. Consider installing or enabling them.";
+                messageString += "Your mods may not properly work without them. Consider installing or enabling them from the Libraries tab.";
                 MessageBox.Show(messageString, "Mod Library Dependency Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }

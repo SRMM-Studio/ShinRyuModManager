@@ -44,7 +44,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
             if (index != -1)
             {
                 // Call the base class AddFiles method
-                base.AddFiles(path, check);
+                base.AddFiles(path, check, GamePath.GetGame());
 
                 // Remove ".parless" from the path
                 path = path.Remove(index, 8);

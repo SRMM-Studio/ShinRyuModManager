@@ -15,7 +15,7 @@ namespace ShinRyuModManager.CPKRepatcher
             if (cpkDict == null || cpkDict.Count <= 0)
                 return;
 
-            Console.WriteLine("Repacking CPK's...");
+            Program.Log("Repacking CPK's...");
 
             string cpkPath = Path.Combine(GamePath.GetModsPath(), "Parless");
 

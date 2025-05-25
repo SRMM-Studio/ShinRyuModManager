@@ -47,7 +47,7 @@ namespace ShinRyuModManager.ModLoadOrder
                     }
                 }
 
-                Console.WriteLine($"Done reading {Constants.PARLESS_NAME}\n");
+                Program.Log($"Done reading {Constants.PARLESS_NAME}\n");
             }
 
             Mod[] modsObjects = new Mod[mods.Count];
@@ -57,7 +57,7 @@ namespace ShinRyuModManager.ModLoadOrder
             string subPathName;
             List<string> foldersNotFound;
             Dictionary<string, List<int>> cpkDictionary = new Dictionary<string, List<int>>();
-            Console.WriteLine("Reading mods...\n");
+            Program.Log("Reading mods...\n");
 
             // TODO: Make mod reading async
 
@@ -66,7 +66,7 @@ namespace ShinRyuModManager.ModLoadOrder
             {
                 mod = new Mod(mods[i]);
                 modPath = Path.Combine(GamePath.GetModsPath(), mods[i]);
-                mod.AddFiles(modPath, "");
+                mod.AddFiles(modPath, "", game);
 
                 mod.PrintInfo();
 
@@ -125,7 +125,7 @@ namespace ShinRyuModManager.ModLoadOrder
                 modsObjects[i] = mod;
             }
 
-            Console.WriteLine($"Added {mods.Count} mod(s) and {files.Count} file(s)!\n");
+            Program.Log($"Added {mods.Count} mod(s) and {files.Count} file(s)!\n");
 
             // Reverse the list because the last mod in the list should have the highest priority
             mods.Reverse();

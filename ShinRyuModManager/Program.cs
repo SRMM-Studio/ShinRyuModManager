@@ -58,9 +58,23 @@ namespace ShinRyuModManager
         public static List<LibMeta> LibraryMetaCache = new List<LibMeta>();
 
 
+        private static  StreamWriter _logger;
+
+        public static void Log(object message)
+        {
+            string messageStr = message.ToString();
+            Console.WriteLine(messageStr);
+            _logger.WriteLine(messageStr);
+        }
+
         [STAThread]
         public static void Main(string[] args)
         {
+            _logger = new StreamWriter("srmm_log.txt");
+            _logger.AutoFlush = true;
+
+            Log("Shin Ryu Mod Manager Start");
+
             IntPtr ntDllModule = GetModuleHandle("ntdll");
 
             //jason098: Detect linux emulation like this
@@ -152,9 +166,12 @@ namespace ShinRyuModManager
                 }
 
 
+                Log("Shin Ryu Mod Manager GUI Application Start");
+
                 MainWindow window = new MainWindow();
                 App app = new App();
                 app.Run(window);
+;
             }
             else
             {
@@ -172,6 +189,8 @@ namespace ShinRyuModManager
                 if (consoleEnabled)
                     AllocConsole();
 
+                Log("Shin Ryu Mod Manager CLI Mode Start");
+
                 MainCLI(args).Wait();
 
                 if (consoleEnabled)
@@ -182,6 +201,8 @@ namespace ShinRyuModManager
 
         internal static void CheckForUpdatesGUI(bool notifyResult = false)
         {
+            Log("Checking for updates...");
+
             string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             string updaterPath = Path.Combine(currentPath, Settings.UPDATER_EXECUTABLE_NAME);
             string updateFlagPath = Path.Combine(currentPath, Settings.UPDATE_FLAG_FILE_NAME);
@@ -539,7 +560,9 @@ namespace ShinRyuModManager
             // Remove previously repacked pars, to avoid unwanted side effects
             ParRepacker.RemoveOldRepackedPars();
 
-            if (GamePath.GetGame() != Game.Unsupported)
+            var game = GamePath.GetGame();
+
+            if (game != Game.Unsupported)
             {
                 if (mods?.Count > 0 || looseFilesEnabled)
                 {
@@ -551,14 +574,25 @@ namespace ShinRyuModManager
                     mods.Insert(0, "Parless");
                     Directory.CreateDirectory(PARLESS_MODS_PATH);
 
+                    Log("Generating MLO...");
+
+                    Stopwatch mloTimer = new Stopwatch();
+                    mloTimer.Start();
+
                     MLO result = await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
 
-                    if (GameModel.SupportsUBIK(GamePath.GetGame()))
+                    if (GameModel.SupportsUBIK(game))
                     {
                         GameModel.DoUBIKProcedure(result);
                     }
 
+                    if(game == Game.Yakuza5)
+                    {
+                        GameModel.DoY5HActProcedure(result);
+                    }
 
+                    mloTimer.Stop();
+                    Log("MLO Generation took: " + mloTimer.Elapsed.TotalSeconds + " seconds.");
 
                     return true;
                 }
@@ -811,6 +845,16 @@ namespace ShinRyuModManager
         //Iterate on all enabled mods and try installing their dependencies
         public static void InstallAllModDependencies()
         {
+            //Lets ensure we have latest library information as we check/install deps
+            try
+            {
+                LibMeta.Fetch();
+            }
+            catch
+            {
+                //What can i do Sometimes
+            }
+
             List<ModInfo> t = ReadModListTxt(TXT);
 
             foreach(var mod in t.Where(x => x.Enabled))

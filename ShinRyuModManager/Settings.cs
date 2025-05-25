@@ -21,7 +21,7 @@
 
         //LIBRARIES
         public const string LIBRARIES_INFO_REPO_OWNER = "SRMM-Studio";
-        public const string LIBRARIES_INFO_REPO = "srmm-distrib";
+        public const string LIBRARIES_INFO_REPO = "srmm-lib-info";
         public const string LIBRARIES_INFO_REPO_FILE_PATH = "libraries.yaml";
         public const string LIBRARIES_LIBMETA_FILE_NAME = "lib-meta.yaml";
     }

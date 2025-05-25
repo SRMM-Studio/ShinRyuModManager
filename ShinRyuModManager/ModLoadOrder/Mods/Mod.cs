@@ -73,7 +73,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
             this.console.Flush();
         }
 
-        public void AddFiles(string path, string check)
+        public void AddFiles(string path, string check, Game game)
         {
             bool needsRepack = false;
             string basename = GamePath.GetBasename(path);
@@ -94,10 +94,10 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         needsRepack = GamePath.ExistsInDataAsPar(path);
                         break;
                     case "prep":
-                        needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
+                        needsRepack = game < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
                         break;
                     case "light_anim":
-                        needsRepack = GamePath.GetGame() < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
+                        needsRepack = game < Game.Yakuza0 && GamePath.ExistsInDataAsPar(path);
                         break;
                     case "2d":
                         needsRepack = (basename.StartsWith("sprite") || basename.StartsWith("pj")) && GamePath.ExistsInDataAsParNested(path);
@@ -115,7 +115,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         needsRepack = !basename.StartsWith("pause") && GamePath.ExistsInDataAsPar(path);
                         break;
                     case "particle":
-                        if (GamePath.GetGame() >= Game.Yakuza6 && basename == "arc")
+                        if (game >= Game.Yakuza6 && basename == "arc")
                         {
                             check = "particle/arc";
                         }
@@ -127,7 +127,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         needsRepack = GamePath.ExistsInDataAsParNested(path);
                         break;
                     case "stage":
-                        needsRepack = GamePath.GetGame() == Game.eve && basename == "sct" && GamePath.ExistsInDataAsParNested(path);
+                        needsRepack = game == Game.eve && basename == "sct" && GamePath.ExistsInDataAsParNested(path);
                         break;
                     case "":
                         needsRepack = (basename == "ptc" && GamePath.ExistsInDataAsParNested(path))
@@ -154,7 +154,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                     case "se":
                     case "speech":
                         cpkDataPath = GamePath.RemoveModPath(path);
-                        if (GamePath.GetGame() == Game.Yakuza5)
+                        if (game == Game.Yakuza5)
                         {
                             this.CpkFolders.Add(cpkDataPath + ".cpk");
                             this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
@@ -173,7 +173,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                     case "moviesd":
                     case "moviesd_dlc":
                         cpkDataPath = GamePath.RemoveModPath(path);
-                        if (GamePath.GetGame() == Game.Judgment || GamePath.GetGame() == Game.LostJudgment)
+                        if (game == Game.Judgment || game == Game.LostJudgment)
                         {
                             this.CpkFolders.Add(cpkDataPath + ".par");
                             this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
@@ -189,14 +189,15 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         break;
                 }
 
-                // Additional game specific checks
-                switch (basename)
+
+                if(game >= Game.likeadragonpirates)
                 {
-                    // Pirates in Hawaii stores gmts inside folders based on the lowercase filename checksum.
-                    // For the modders' convenience, move any gmts in the folder root to the corresponding subdirectory.
-                    case "motion":
-                        {
-                            if (GamePath.GetGame() == Game.likeadragonpirates)
+                    // Additional game specific checks
+                    switch (basename)
+                    {
+                        // Pirates in Hawaii stores gmts inside folders based on the lowercase filename checksum.
+                        // For the modders' convenience, move any gmts in the folder root to the corresponding subdirectory.
+                        case "motion":
                             {
                                 string gmtFolderPath = Path.Combine(path, "gmt");
                                 if (!Directory.Exists(gmtFolderPath)) break;
@@ -212,9 +213,9 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                                         Directory.CreateDirectory(destinationDirectory);
                                     File.Copy(gmtPath, Path.Combine(destinationDirectory, Path.GetFileName(gmtPath)));
                                 }
+                                break;
                             }
-                            break;
-                        }
+                    }
                 }
             }
 
@@ -236,17 +237,19 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                     this.console.WriteLineIfVerbose($"Adding file: {p}");
                 }
 
+                var isParlessMod = this.GetType() == typeof(ParlessMod);
+
                 // Get files for all subdirectories
                 foreach (string folder in Directory.GetDirectories(path))
                 {
                     // Break an important rule in the concept of inheritance to make the program function correctly
-                    if (this.GetType() == typeof(ParlessMod))
+                    if (isParlessMod)
                     {
                         ((ParlessMod)this).AddFiles(folder, check);
                     }
                     else
                     {
-                        this.AddFiles(folder, check);
+                        this.AddFiles(folder, check, game);
                     }
                 }
             }

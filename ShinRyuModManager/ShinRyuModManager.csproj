@@ -82,6 +82,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Gibbed.Yakuza0.Pack">
+      <HintPath>Miscellaneous\GibbedPar\Gibbed.Yakuza0.Pack.dll</HintPath>
+    </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Yarhl">

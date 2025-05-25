@@ -1,10 +1,26 @@
-﻿> ### **%{color:gold} Version 4.5.4 %** ###
+﻿> ### **%{color:gold} Version 4.5.7 %** ###
+* Pack HActs in Yakuza 5 that did not exist in the base game (thanks Gibbed.Yakuza0)
+* Minor performance improvements
+* Basic logging into srmm_log.txt
+
+> ### **%{color:orange} Version 4.5.6 %** ###
+* Update Kiwami 2 code
+* This fixes some crashes on GOG version too
+* Remove unnecessary logs
+
+> ### **%{color:orange} Version 4.5.5 %** ###
+* Address "concerns" about library meta location
+* Fetch libraries when checking for mod dependencies
+
+> ### **%{color:orange} Version 4.5.4 %** ###
 * Can now install .rar and .7z mod files with "Install mod" button too
 * Add libraries feature (for script modders that aim to expand game functionality rather than make direct mods)
 * Mods can depend on libraries. These will be automatically installed and don't need to be bundled with the mod.
 * Examples of these are OgreCommand for Yakuza 3 & 4, and DELib for Yakuza 7 and 8 that makes Like A Brawler mods work
+
 > ### **%{color:orange} Version 4.5.3 %** ###
 * Fix broken support for Pirates in Hawaii after the game got updated to 1.10
+
 > ### **%{color:orange} Version 4.5.2 %** ###
 * Fix Simplified Chinese file redirection in Pirates in Hawaii
 
