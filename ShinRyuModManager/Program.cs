@@ -58,20 +58,29 @@ namespace ShinRyuModManager
         public static List<LibMeta> LibraryMetaCache = new List<LibMeta>();
 
 
-        private static  StreamWriter _logger;
+        private static StreamWriter _logger;
 
         public static void Log(object message)
         {
             string messageStr = message.ToString();
             Console.WriteLine(messageStr);
-            _logger.WriteLine(messageStr);
+
+            if(_logger != null)
+                _logger.WriteLine(messageStr);
         }
 
         [STAThread]
         public static void Main(string[] args)
         {
-            _logger = new StreamWriter("srmm_log.txt");
-            _logger.AutoFlush = true;
+            try
+            {
+                _logger = new StreamWriter("srmm_log.txt");
+                _logger.AutoFlush = true;
+            }
+            catch
+            {
+                _logger = null;
+            }
 
             Log("Shin Ryu Mod Manager Start");
 

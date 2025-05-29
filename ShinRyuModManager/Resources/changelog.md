@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.5.7 %** ###
+﻿> ### **%{color:gold} Version 4.5.8 %** ###
+* Fix MLO not being rebuilt sometimes
+
+> ### **%{color:orange} Version 4.5.7 %** ###
 * Pack HActs in Yakuza 5 that did not exist in the base game (thanks Gibbed.Yakuza0)
 * Minor performance improvements
 * Basic logging into srmm_log.txt
