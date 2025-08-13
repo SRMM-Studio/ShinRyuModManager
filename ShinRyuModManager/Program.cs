@@ -45,7 +45,7 @@ namespace ShinRyuModManager
 
         private static bool externalModsOnly = true;
         private static bool looseFilesEnabled = false;
-        private static bool cpkRepackingEnabled = false;
+        private static bool cpkRepackingEnabled = true;
         private static bool checkForUpdates = true;
         private static bool isSilent = false;
         private static bool migrated = false;
@@ -67,6 +67,8 @@ namespace ShinRyuModManager
 
             if(_logger != null)
                 _logger.WriteLine(messageStr);
+
+            Debug.WriteLine(messageStr);
         }
 
         [STAThread]
@@ -346,11 +348,6 @@ namespace ShinRyuModManager
             {
                 ini = iniParser.ReadFile(INI);
 
-                if (ini.TryGetKey("Debug.CPKRepackingTest", out string cpkRepatch))
-                {
-                    cpkRepackingEnabled = int.Parse(cpkRepatch) == 1;
-                }
-
                 if (ini.TryGetKey("Overrides.LooseFilesEnabled", out string looseFiles))
                 {
                     looseFilesEnabled = int.Parse(looseFiles) == 1;
@@ -595,9 +592,22 @@ namespace ShinRyuModManager
                         GameModel.DoUBIKProcedure(result);
                     }
 
-                    if(game == Game.Yakuza5)
+                    switch(game)
                     {
-                        GameModel.DoY5HActProcedure(result);
+                        case Game.Yakuza5:
+                            GameModel.DoY5HActProcedure(result);
+                            break;
+
+                        case Game.Yakuza0:
+                        case Game.YakuzaKiwami:
+                            GameModel.DoOEHActProcedure(result);
+                            break;
+                        case Game.YakuzaLikeADragon:
+                            GameModel.DoDEHActProcedure(result, "yazawa");
+                            break;
+                        case Game.likeadragongaiden:
+                            GameModel.DoDEHActProcedure(result, "aston");
+                            break;
                     }
 
                     mloTimer.Stop();

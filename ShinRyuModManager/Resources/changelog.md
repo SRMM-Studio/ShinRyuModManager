@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.5.8 %** ###
+﻿> ### **%{color:gold} Version 4.5.9 %** ###
+* Experimental CPK repacking for Yakuza 0 and Kiwami 1
+* Experimental repack hacts that don't exist on base game for Kiwami 0, Kiwami 1, Like a Dragon, LAD: Gaiden
+* Reset all file dates while repacking cpks (this might solve some infinite load problems)
+
+> ### **%{color:gold} Version 4.5.8 %** ###
 * Fix MLO not being rebuilt sometimes
 
 > ### **%{color:orange} Version 4.5.7 %** ###

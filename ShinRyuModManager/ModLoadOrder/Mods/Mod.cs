@@ -77,6 +77,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
         {
             bool needsRepack = false;
             string basename = GamePath.GetBasename(path);
+            string parentDir = new DirectoryInfo(path).Parent.Name;
 
             // We dont want to do all these checks for contents in the Parless mod folder.
             if (Name != "Parless")
@@ -84,6 +85,10 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                 // Check if this path does not need repacking
                 switch (check)
                 {
+
+                   // case "motion":
+                        //needsRepack = true;
+                      //  break;
                     case "chara":
                         needsRepack = GamePath.ExistsInDataAsPar(path);
                         break;
@@ -189,6 +194,33 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         break;
                 }
 
+                if (parentDir != basename)
+                {
+                    switch (parentDir)
+                    {
+                        case "motion":
+                            //if (game == Game.Yakuza5)
+                               // needsRepack = GamePath.ExistsInDataAsPar(path) && basename.ToLowerInvariant().Contains("Battle");
+                            break;
+                    }
+                }
+
+                if(game >= Game.Yakuza6)
+                {
+                    //Dragon Engine talks use pars directly for these
+                    if (path.Contains("talk_"))
+                    {
+                        if (char.IsDigit(basename[0]) || check == "cmn")
+                            needsRepack = true;
+                        else
+                        {
+                            string t000Cmn = Path.Combine(path, "cmn");
+
+                            if (Directory.Exists(t000Cmn))
+                                needsRepack = true;
+                        }
+                    }
+                }
 
                 if(game >= Game.likeadragonpirates)
                 {

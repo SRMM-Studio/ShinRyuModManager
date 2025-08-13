@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using ParLibrary.Converter;
 using Utils;
 using Yarhl.FileSystem;
+using ParLibrary;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace ShinRyuModManager
 {
@@ -212,6 +214,7 @@ namespace ShinRyuModManager
             }
 
             writerParameters.IncludeDots = par.Children[0].Name == ".";
+            writerParameters.ResetFileDates = true;
 
             containerNode.MoveChildrenTo(writerParameters.IncludeDots ? par.Children[0] : par, true);
             par.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
