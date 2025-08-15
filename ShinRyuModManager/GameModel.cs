@@ -48,6 +48,16 @@ namespace ShinRyuModManager
                         string hactName = file.Directory.Parent.Name;
                         string hactPath = file.Directory.Parent.FullName;
 
+                        string parPath = Path.Combine(file.Directory.Parent.Parent.FullName, hactName + ".par");
+
+                        //Legacy hact mods
+                        if (File.Exists(parPath))
+                            continue;
+
+                        //Legacy hact mods
+                        if (!Directory.Exists(Path.Combine(hactPath, "000")) || !Directory.Exists(Path.Combine(hactPath, "cmn")))
+                            continue;
+
                         if (hactDirs.Contains(hactPath))
                             continue;
 
@@ -106,8 +116,19 @@ namespace ShinRyuModManager
 
                     if (file.Directory.Parent.Parent.Name == "hact")
                     {
+
                         string hactName = file.Directory.Parent.Name;
                         string hactPath = file.Directory.Parent.FullName;
+
+                        string parPath = Path.Combine(file.Directory.Parent.Parent.FullName, hactName + ".par");
+
+                        //Legacy hact mods
+                        if (File.Exists(parPath))
+                            continue;
+
+                        //Legacy hact mods
+                        if (!Directory.Exists(Path.Combine(hactPath, "000")) || !Directory.Exists(Path.Combine(hactPath, "cmn")))
+                            continue;
 
                         if (hactDirs.Contains(hactPath))
                             continue;
@@ -177,6 +198,16 @@ namespace ShinRyuModManager
                     {
                         string hactName = file.Directory.Parent.Name;
                         string hactPath = file.Directory.Parent.FullName;
+
+                        string parPath = Path.Combine(file.Directory.Parent.Parent.FullName, hactName + ".par");
+
+                        //Legacy hact mods
+                        if (File.Exists(parPath))
+                            continue;
+
+                        //Legacy hact mods
+                        if (!Directory.Exists(Path.Combine(hactPath, "000")) || !Directory.Exists(Path.Combine(hactPath, "cmn")))
+                            continue;
 
                         if (hactDirs.Contains(hactPath))
                             continue;

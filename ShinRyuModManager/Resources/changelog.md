@@ -1,10 +1,13 @@
-﻿> ### **%{color:gold} Version 4.5.9 %** ###
+﻿> ### **%{color:gold} Version 4.6.0 %** ###
+* Fix broken support for mods using the legacy hact/heat action method in Y0/YK1
+
+> ### **%{color:orange} Version 4.5.9 %** ###
 * Experimental: CPK repacking for Yakuza 0 and Kiwami 1
-* Experimental: Repack hacts that don't exist on base game for Kiwami 0, Kiwami 1, Like a Dragon, LAD: Gaiden
-* Reset all file dates while repacking cpks (this might solve some infinite load problems)
+* Experimental: Repack hacts that don't exist on base game for 0, Kiwami 1, Like a Dragon, LAD: Gaiden
+* Reset all file dates while repacking pars (this might solve some infinite load problems)
 * Add exports: YP_GET_GAME_NAME, YP_IS_GOG, YP_IS_XBOX
 
-> ### **%{color:gold} Version 4.5.8 %** ###
+> ### **%{color:orange} Version 4.5.8 %** ###
 * Fix MLO not being rebuilt sometimes
 
 > ### **%{color:orange} Version 4.5.7 %** ###

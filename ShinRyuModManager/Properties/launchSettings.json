@@ -2,7 +2,7 @@
   "profiles": {
     "ShinRyuModManager": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\LikeADragonPiratesDemo\\runtime\\media"
+      "workingDirectory": "E:\\SteamLibrary\\steamapps\\common\\Yakuza 0\\media"
     }
   }
 }
