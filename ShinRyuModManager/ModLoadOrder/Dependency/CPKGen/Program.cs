@@ -40,24 +40,88 @@ namespace CriPakTools
 
             GC.Collect();
 
-            BinaryReader oldFile = new BinaryReader(File.OpenRead(inputCpk));
 
-            string[] files = Directory.GetFiles(replaceDir, "*.");
-            HashSet<string> filesNames = new HashSet<string>();
+            using (BufferedStream oldFile = new BufferedStream(File.OpenRead(inputCpk)))
+            {
+                string[] files = Directory.GetFiles(replaceDir, "*.");
+                HashSet<string> filesNames = new HashSet<string>();
 
-            foreach (string str in files.Select(x => Path.GetFileNameWithoutExtension(x)))
-                filesNames.Add(str);
+                foreach (string str in files.Select(x => Path.GetFileNameWithoutExtension(x)))
+                    filesNames.Add(str);
 
-            FileInfo fi = new FileInfo(inputCpk);
+                FileInfo fi = new FileInfo(inputCpk);
 
-            Stopwatch time = new Stopwatch();
-            time.Start();
+                Stopwatch time = new Stopwatch();
+                time.Start();
+
+                using (BinaryWriter newCPK = new BinaryWriter(new BufferedStream(File.OpenWrite(outputCpk))))
+                {
+                    List<FileEntry> entries = cpk.FileTable.OrderBy(x => x.FileOffset).ToList();
+
+                    foreach (var entry in entries)
+                    {
+                        if (entry.FileType != "CONTENT")
+                        {
+                            if (entry.FileType == "FILE")
+                            {
+                                if ((ulong)newCPK.BaseStream.Position < cpk.ContentOffset)
+                                {
+                                    ulong padLength = cpk.ContentOffset - (ulong)newCPK.BaseStream.Position;
+                                    newCPK.Write(new byte[padLength], 0, (int)padLength);
+                                }
+                            }
+
+                            if (entry.FileSize == null || entry.FileOffset == null || entry.FileName == null)
+                            {
+                                throw new NullReferenceException("Critical properties of the file entry are not initialized.");
+                            }
+
+                            if (!filesNames.Contains(entry.FileName.ToString()))
+                            {
+                                oldFile.Seek((long)entry.FileOffset, SeekOrigin.Begin);
+                                entry.FileOffset = (ulong)newCPK.BaseStream.Position;
+                                cpk.UpdateFileEntry(entry);
+
+                                byte[] chunk = ReadBytes(oldFile, int.Parse(entry.FileSize.ToString()));
+                                newCPK.Write(chunk, 0, chunk.Length);
+                            }
+                            else
+                            {
+                                byte[] newbie = File.ReadAllBytes(Path.Combine(replaceDir, entry.FileName.ToString()));
+                                entry.FileOffset = (ulong)newCPK.BaseStream.Position;
+                                entry.FileSize = Convert.ChangeType(newbie.Length, entry.FileSizeType);
+                                entry.ExtractSize = Convert.ChangeType(newbie.Length, entry.FileSizeType);
+                                cpk.UpdateFileEntry(entry);
+                                newCPK.Write(newbie, 0, newbie.Length);
+                            }
+
+                            if ((newCPK.BaseStream.Position % 0x800) > 0)
+                            {
+                                int padding = (int)(0x800 - (newCPK.BaseStream.Position % 0x800));
+                                newCPK.Write(new byte[padding], 0, padding);
+                            }
+                        }
+                        else
+                        {
+                            cpk.UpdateFileEntry(entry);
+                        }
+                    }
 
 
-            BinaryWriter newCPK = new BinaryWriter(new FileStream(outputCpk, FileMode.Create));
+                    cpk.WriteCPK(newCPK);
+                    cpk.WriteITOC(newCPK);
+                    cpk.WriteTOC(newCPK);
+                    cpk.WriteETOC(newCPK);
+                    cpk.WriteGTOC(newCPK);
 
-            List<FileEntry> entries = cpk.FileTable.OrderBy(x => x.FileOffset).ToList();
+                    newCPK.Close();
+                    oldFile.Close();
+                }
 
+                ShinRyuModManager.Program.Log("Writing " + new FileInfo(inputCpk).Name + " took " + time.Elapsed.TotalSeconds);
+            }
+
+            /*
             for (int i = 0; i < entries.Count; i++)
             {
                 if (entries[i].FileType != "CONTENT")
@@ -116,17 +180,20 @@ namespace CriPakTools
                     cpk.UpdateFileEntry(entries[i]);
                 }
             }
+            */
 
-            cpk.WriteCPK(newCPK);
-            cpk.WriteITOC(newCPK);
-            cpk.WriteTOC(newCPK);
-            cpk.WriteETOC(newCPK);
-            cpk.WriteGTOC(newCPK);
+           // Console.WriteLine("Done in " + time.Elapsed.TotalSeconds);
+        }
 
-            newCPK.Close();
-            oldFile.Close();
-
-            Console.WriteLine("Done in " + time.Elapsed.TotalSeconds);
+        static byte[] ReadBytes(BufferedStream stream, int count)
+        {
+            byte[] buffer = new byte[count];
+            int bytesRead = stream.Read(buffer, 0, count);
+            if (bytesRead != count)
+            {
+                throw new EndOfStreamException();
+            }
+            return buffer;
         }
     }
 }

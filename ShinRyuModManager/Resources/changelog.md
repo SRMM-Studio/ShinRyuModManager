@@ -1,4 +1,12 @@
-﻿> ### **%{color:gold} Version 4.6.0 %** ###
+﻿> ### **%{color:gold} Version 4.6.2 %** ###
+* Fix broken support for music mods in Yakuza 5
+* EXPERIMENTAL: Loose bgm.cpk sound loading (Example: MyMod/stream/system_title_bgm.hca)
+
+> ### **%{color:orange} Version 4.6.1 %** ###
+* Fix broken support for mods using the legacy talk hact method in Dragon Engine
+* Perhaps we should update our mods so i don't have to consider 5000 edge cases while expanding the manager (wink wink nudge nudge)
+
+> ### **%{color:orange} Version 4.6.0 %** ###
 * Fix broken support for mods using the legacy hact/heat action method in Y0/YK1
 
 > ### **%{color:orange} Version 4.5.9 %** ###

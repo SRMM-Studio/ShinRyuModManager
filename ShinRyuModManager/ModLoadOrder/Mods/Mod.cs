@@ -218,9 +218,10 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                             needsRepack = true;
                         else
                         {
-                            string t000Cmn = Path.Combine(path, "cmn");
+                            string tCmn = Path.Combine(path, "cmn");
+                            string t000 = Path.Combine(path, "000");
 
-                            if (Directory.Exists(t000Cmn))
+                            if (Directory.Exists(tCmn) && Directory.Exists(t000))
                                 needsRepack = true;
                         }
                     }

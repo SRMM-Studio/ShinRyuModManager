@@ -22,7 +22,7 @@ namespace ShinRyuModManager.CPKRepatcher
             if (!Directory.Exists(cpkPath))
                 Directory.CreateDirectory(cpkPath);
 
-            foreach(var kv in cpkDict)
+            foreach (var kv in cpkDict)
             {
                 string cpkDir = cpkPath + kv.Key;
                 string origCpk = GamePath.GetDataPath() + kv.Key + ".cpk";
@@ -30,13 +30,13 @@ namespace ShinRyuModManager.CPKRepatcher
                 if (!Directory.Exists(cpkDir))
                     Directory.CreateDirectory(cpkDir);
 
-                foreach(string mod in kv.Value)
+                foreach (string mod in kv.Value)
                 {
                     string modCpkDir = Path.Combine(GamePath.GetModsPath(), mod) + kv.Key;
                     string[] cpkFiles = Directory.GetFiles(modCpkDir, "*.");
 
-                    foreach(string str in cpkFiles)
-                        File.Copy(str, Path.Combine(cpkDir, Path.GetFileName(str)) , true);
+                    foreach (string str in cpkFiles)
+                        File.Copy(str, Path.Combine(cpkDir, Path.GetFileName(str)), true);
                 }
 
                 CriPakTools.Program.Modify(origCpk, cpkDir, new DirectoryInfo(cpkDir).FullName + ".cpk");
