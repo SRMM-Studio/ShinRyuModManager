@@ -1,4 +1,10 @@
-﻿> ### **%{color:gold} Version 4.6.2 %** ###
+﻿> ### **%{color:gold} Version 4.6.3 %** ###
+* Experimental: Repack hacts that don't exist on base game for all Dragon Engine games
+* Optimize hact repacking behavior for Yakuza 5
+* Early preparations for Kiwami 3
+* Some path fixes for hact rebuilding
+
+> ### **%{color:orange} Version 4.6.2 %** ###
 * Fix broken support for music mods in Yakuza 5
 * EXPERIMENTAL: Loose bgm.cpk sound loading (Example: MyMod/stream/system_title_bgm.hca)
 

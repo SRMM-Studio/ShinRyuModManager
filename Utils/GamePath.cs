@@ -169,6 +169,8 @@ namespace Utils
                 Game.likeadragonpirates => "Like a Dragon: Pirate Yakuza In Hawaii",
                 Game.VFREVOBETA => "Virtua Fighter 5 R.E.V.O. Beta",
                 Game.VFREVO => "Virtua Fighter 5 R.E.V.O.",
+                Game.StrangerThanHeaven => "Stranger Than Heaven",
+                Game.YakuzaKiwami3 => "Yakuza Kiwami 3",
                 _ => "<unknown>"
             };
         }

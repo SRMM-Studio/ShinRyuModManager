@@ -602,11 +602,29 @@ namespace ShinRyuModManager
                         case Game.YakuzaKiwami:
                             GameModel.DoOEHActProcedure(result);
                             break;
+                        case Game.YakuzaKiwami2:
+                            GameModel.DoDEHActProcedure(result, "lexus2");
+                            break;
+                        case Game.Judgment:
+                            GameModel.DoDEHActProcedure(result, "judge");
+                            break;
                         case Game.YakuzaLikeADragon:
                             GameModel.DoDEHActProcedure(result, "yazawa");
                             break;
                         case Game.likeadragongaiden:
                             GameModel.DoDEHActProcedure(result, "aston");
+                            break;
+                        case Game.LostJudgment:
+                            GameModel.DoDEHActProcedure(result, "coyote");
+                            break;
+                        case Game.likeadragon8:
+                            GameModel.DoDEHActProcedure(result, "elvis");
+                            break;
+                        case Game.likeadragonpirates:
+                            GameModel.DoDEHActProcedure(result, "spr");
+                            break;
+                        case Game.YakuzaKiwami3:
+                            GameModel.DoDEHActProcedure(result, "lexus3");
                             break;
                     }
 

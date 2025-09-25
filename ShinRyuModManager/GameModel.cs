@@ -35,8 +35,7 @@ namespace ShinRyuModManager
                 if (kv.Item1.Contains("/hact/") && !kv.Item1.EndsWith(".par"))
                 {
                     string mod = mlo.Mods[kv.Item2];
-
-                    string filePath = "mods/" + mod + "/" + kv.Item1;
+                    string filePath = Path.Combine("mods", mod, kv.Item1.Trim('/'));
 
                     FileInfo file = new FileInfo(filePath);
 
@@ -74,6 +73,8 @@ namespace ShinRyuModManager
             if (!hasHacts)
                 return;
 
+            Program.Log("Repacking hacts for Yakuza 5..");
+
             foreach (string hactDirPath in hactDirs)
             {
                 DirectoryInfo hactDir = new DirectoryInfo(hactDirPath);
@@ -88,8 +89,29 @@ namespace ShinRyuModManager
                     if (dir.Name == "ptc" && File.Exists(Path.Combine(hactDir.FullName, "ptc.par")))
                         continue;
 
-                    string outputPath = Path.Combine(parlessDir.FullName, dir.Name + ".par");
-                    Gibbed.Yakuza0.Pack.Program.Main(new string[] { dir.FullName }, outputPath);
+                    if(dir.Name != "ptc")
+                    {
+                        string outputFakeDir = Path.Combine(parlessDir.FullName, dir.Name);
+
+                        if (!Directory.Exists(outputFakeDir))
+                            Directory.CreateDirectory(outputFakeDir);
+
+                        string outputPath = Path.Combine(parlessDir.FullName, dir.Name + ".par");
+                        Gibbed.Yakuza0.Pack.Program.Main(new string[] { outputFakeDir }, outputPath);
+                        try
+                        {
+                            new DirectoryInfo(outputFakeDir).Delete(true);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        string outputPath = Path.Combine(parlessDir.FullName, dir.Name + ".par");
+                        Gibbed.Yakuza0.Pack.Program.Main(new string[] { dir.FullName }, outputPath);
+                    }
                 }
 
                 Gibbed.Yakuza0.Pack.Program.Main(new string[] { parlessDir.FullName }, Path.Combine(parlessDir.Parent.FullName, hactDir.Name + ".par"));
@@ -106,8 +128,7 @@ namespace ShinRyuModManager
                 if (kv.Item1.Contains("/hact/") && !kv.Item1.EndsWith(".par"))
                 {
                     string mod = mlo.Mods[kv.Item2];
-
-                    string filePath = "mods/" + mod + "/" + kv.Item1;
+                    string filePath = Path.Combine("mods", mod, kv.Item1.Trim('/'));
 
                     FileInfo file = new FileInfo(filePath);
 
@@ -140,6 +161,8 @@ namespace ShinRyuModManager
 
             if (!hasHacts)
                 return;
+
+            Program.Log("Repacking hacts for Yakuza 0/Kiwami 1...");
 
             foreach (string hactDirPath in hactDirs)
             {
@@ -187,7 +210,7 @@ namespace ShinRyuModManager
                 {
                     string mod = mlo.Mods[kv.Item2];
 
-                    string filePath = "mods/" + mod + "/" + kv.Item1;
+                    string filePath = Path.Combine("mods", mod, kv.Item1.Trim('/'));
 
                     FileInfo file = new FileInfo(filePath);
 

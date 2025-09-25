@@ -27,6 +27,7 @@ namespace Utils
         likeadragonpirates,
         VFREVOBETA,
         VFREVO,
-        century
+        YakuzaKiwami3,
+        StrangerThanHeaven
     }
 }
