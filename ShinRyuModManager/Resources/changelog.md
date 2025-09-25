@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.6.3 %** ###
+﻿> ### **%{color:gold} Version 4.6.4 %** ###
+* Fix se.cpk and repacked bgm.cpk mods being broken on Yakuza 0
+* Have i told you how much i hate CPK files
+
+
+> ### **%{color:orange} Version 4.6.3 %** ###
 * Experimental: Repack hacts that don't exist on base game for all Dragon Engine games
 * Optimize hact repacking behavior for Yakuza 5
 * Early preparations for Kiwami 3
