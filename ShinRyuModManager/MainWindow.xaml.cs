@@ -209,7 +209,7 @@ namespace ShinRyuModManager
 
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.DefaultExt = "*.zip";
-            openFileDialog.Filter = "Archive files (*.zip,*.rar,*.7z)|*.zip;*.rar|ZIP files (.zip)|*.zip|RAR files (.rar)|*.rar|7z files (.7z)|*.7z";
+            openFileDialog.Filter = "Archive files (*.zip,*.rar,*.7z)|*.zip;*.rar;*.7z|ZIP files (.zip)|*.zip|RAR files (.rar)|*.rar|7z files (.7z)|*.7z";
 
             if (!openFileDialog.ShowDialog().Value)
                 return;

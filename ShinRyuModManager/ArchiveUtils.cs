@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Markup;
 using SharpCompress;
 using SharpCompress.Archives;
@@ -35,9 +36,9 @@ namespace ShinRyuModManager
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                MessageBox.Show("Failed to install mod archive\n" + ex.ToString());
             }
 
 
