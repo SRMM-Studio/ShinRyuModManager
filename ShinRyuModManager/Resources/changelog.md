@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.6.4 %** ###
+﻿> ### **%{color:gold} Version 4.6.5 %** ###
+* USM support for Yakuza 0, Kiwami 1, and 5
+* Fix UBIKs for Gaiden
+* Unhardcode coliseum fighter limit for Yakuza 5
+
+> ### **%{color:orange} Version 4.6.4 %** ###
 * Fix se.cpk and repacked bgm.cpk mods being broken on Yakuza 0
 * Have i told you how much i hate CPK files
 

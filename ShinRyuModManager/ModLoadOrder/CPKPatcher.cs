@@ -25,7 +25,13 @@ namespace ShinRyuModManager.CPKRepatcher
             foreach (var kv in cpkDict)
             {
                 string cpkDir = cpkPath + kv.Key;
-                string origCpk = GamePath.GetDataPath() + kv.Key + ".cpk";
+
+                string origCpk = "";
+
+               if(!kv.Key.Contains(".cpk"))
+                    origCpk = GamePath.GetDataPath() + kv.Key + ".cpk";
+               else
+                    origCpk = GamePath.GetDataPath() + kv.Key;
 
                 if (!Directory.Exists(cpkDir))
                     Directory.CreateDirectory(cpkDir);
@@ -33,6 +39,7 @@ namespace ShinRyuModManager.CPKRepatcher
                 foreach (string mod in kv.Value)
                 {
                     string modCpkDir = Path.Combine(GamePath.GetModsPath(), mod) + kv.Key;
+                    modCpkDir = modCpkDir.Replace(".cpk", "");
                     string[] cpkFiles = Directory.GetFiles(modCpkDir, "*.");
 
                     foreach (string str in cpkFiles)

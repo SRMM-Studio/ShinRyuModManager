@@ -164,8 +164,9 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         cpkDataPath = GamePath.RemoveModPath(path);
                         if (game == Game.Yakuza5)
                         {
-                            this.CpkFolders.Add(cpkDataPath + ".cpk");
-                            this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
+                            this.RepackCPKs.Add(cpkDataPath + ".cpk");
+                            //this.CpkFolders.Add(cpkDataPath + ".cpk");
+                            //this.console.WriteLineIfVerbose($"Adding CPK folder: {cpkDataPath}");
                         }
                         else
                         {
