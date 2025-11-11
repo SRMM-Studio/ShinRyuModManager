@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.6.5 %** ###
+﻿> ### **%{color:gold} Version 4.6.6 %** ###
+* Fix modded motion pars freezing Yakuza 3 to Kiwami 1
+
+> ### **%{color:orange} Version 4.6.5 %** ###
 * USM support for Yakuza 0, Kiwami 1, and 5
 * Fix UBIKs for Gaiden
 * Unhardcode coliseum fighter limit for Yakuza 5
