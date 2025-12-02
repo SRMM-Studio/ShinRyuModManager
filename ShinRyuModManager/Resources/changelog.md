@@ -1,5 +1,6 @@
 ﻿> ### **%{color:gold} Version 4.6.7 %** ###
 * USM support for all Dragon Engine games
+* Fix 7z importing
 
 > ### **%{color:orange} Version 4.6.6 %** ###
 * Fix modded motion pars freezing Yakuza 3 to Kiwami 1
