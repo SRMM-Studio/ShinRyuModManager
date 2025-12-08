@@ -158,6 +158,7 @@ namespace Utils
                 Game.Yakuza4 => "Yakuza 4 Remastered",
                 Game.Yakuza5 => "Yakuza 5 Remastered",
                 Game.Yakuza0 => "Yakuza 0",
+                Game.yakuza0_dc => "Yakuza 0: Director's Cut",
                 Game.YakuzaKiwami => "Yakuza Kiwami",
                 Game.Yakuza6 => "Yakuza 6",
                 Game.YakuzaKiwami2 => "Yakuza Kiwami 2",

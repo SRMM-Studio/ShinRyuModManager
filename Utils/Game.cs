@@ -13,6 +13,7 @@ namespace Utils
 
         // Old Engine
         Yakuza0,
+        yakuza0_dc,
         YakuzaKiwami,
 
         // Dragon Engine

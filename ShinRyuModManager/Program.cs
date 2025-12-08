@@ -598,6 +598,10 @@ namespace ShinRyuModManager
                             GameModel.DoY5HActProcedure(result);
                             break;
 
+                        case Game.yakuza0_dc:
+                            GameModel.DoOEHActProcedure(result);
+                            GameModel.DoY0DCLegacyModelSupport(result);
+                            break;
                         case Game.Yakuza0:
                         case Game.YakuzaKiwami:
                             GameModel.DoOEHActProcedure(result);

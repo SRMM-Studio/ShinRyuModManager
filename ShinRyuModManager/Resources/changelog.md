@@ -1,4 +1,10 @@
-﻿> ### **%{color:gold} Version 4.6.7 %** ###
+﻿> ### **%{color:gold} Version 4.6.8 %** ###
+* Yakuza 0: Director's Cut support
+* Best of luck to those of you looking into updating their mods
+* Fix USM support for Infinite Wealth
+
+
+> ### **%{color:orange} Version 4.6.7 %** ###
 * USM support for all Dragon Engine games
 * Fix 7z importing
 

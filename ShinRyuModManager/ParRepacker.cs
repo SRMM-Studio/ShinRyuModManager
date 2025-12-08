@@ -95,6 +95,12 @@ namespace ShinRyuModManager
             parPath = parPath.TrimStart(Path.DirectorySeparatorChar);
             string parPathReal = GamePath.GetRootParPath(parPath + ".par");
 
+            if (string.IsNullOrEmpty(parPathReal))
+            {
+                Program.Log("ParRepacker: ParPathReal null for " + parPath + " - skipping");
+                return console;
+            }
+
             string pathToPar = Path.Combine(GamePath.GetDataPath(), parPathReal);
             string pathToModPar = Path.Combine(GamePath.GetModsPath(), "Parless", parPath + ".par");
 

@@ -1,5 +1,6 @@
 ﻿using ParLibrary;
 using ParLibrary.Converter;
+using ShinRyuModManager.ModLoadOrder.Mods;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -115,6 +116,32 @@ namespace ShinRyuModManager
                 }
 
                 Gibbed.Yakuza0.Pack.Program.Main(new string[] { parlessDir.FullName }, Path.Combine(parlessDir.Parent.FullName, hactDir.Name + ".par"));
+            }
+        }
+
+        public static void DoY0DCLegacyModelSupport(MLO mlo)
+        {
+            string modsDir = GamePath.GetModsPath();
+
+            DirectoryInfo parlessDir = new DirectoryInfo(Path.Combine(modsDir, "Parless"));
+
+            if (!parlessDir.Exists)
+                parlessDir.Create();
+
+            foreach (string modName in mlo.Mods)
+            {
+                string modDir = Path.Combine(modsDir, modName);
+
+                if (!Directory.Exists(modDir))
+                    continue;
+
+                string legacyCharaDir = Path.Combine(modDir, "chara", "w64");
+                string newCharaDir = Path.Combine(parlessDir.FullName, "chara", "ngen");
+
+                if (Directory.Exists(legacyCharaDir))
+                {
+                    Util.CopyDirectory(legacyCharaDir, newCharaDir);
+                }
             }
         }
 

@@ -231,5 +231,23 @@ namespace ShinRyuModManager
 
             return container;
         }
+
+        public static void CopyDirectory(string sourceDir, string destDir)
+        {
+            Directory.CreateDirectory(destDir);
+
+            foreach (var file in Directory.GetFiles(sourceDir))
+            {
+                string destFile = Path.Combine(destDir, Path.GetFileName(file));
+                File.Copy(file, destFile, true);
+            }
+
+            foreach (var dir in Directory.GetDirectories(sourceDir))
+            {
+                string subDirName = Path.GetFileName(dir);
+                string destSubDir = Path.Combine(destDir, subDirName);
+                CopyDirectory(dir, destSubDir);
+            }
+        }
     }
 }
