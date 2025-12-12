@@ -1,4 +1,11 @@
-﻿> ### **%{color:gold} Version 4.6.9 %** ###
+﻿> ### **%{color:gold} Version 4.7.1 %** ###
+* Fix a critical crash bug involving pre-rendered cutscenes in Kiwami Remastered
+* Entity support for Kiwami 2 Remastered
+
+> ### **%{color:orange} Version 4.7.0 %** ###
+* Temporarily remove motion.par loading on Directors Cut because its crashing some people
+
+> ### **%{color:orange} Version 4.6.9 %** ###
 * Yakuza Kiwami Remastered and Yakuza Kiwami 2 Remastered support
 * Improve old model mod support for Yakuza 0 Director's Cut
 
