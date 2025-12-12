@@ -1,8 +1,11 @@
-﻿> ### **%{color:gold} Version 4.6.8 %** ###
+﻿> ### **%{color:gold} Version 4.6.9 %** ###
+* Yakuza Kiwami Remastered and Yakuza Kiwami 2 Remastered support
+* Improve old model mod support for Yakuza 0 Director's Cut
+
+> ### **%{color:gold} Version 4.6.8 %** ###
 * Yakuza 0: Director's Cut support
 * Best of luck to those of you looking into updating their mods
 * Fix USM support for Infinite Wealth
-
 
 > ### **%{color:orange} Version 4.6.7 %** ###
 * USM support for all Dragon Engine games

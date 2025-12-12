@@ -600,14 +600,22 @@ namespace ShinRyuModManager
 
                         case Game.yakuza0_dc:
                             GameModel.DoOEHActProcedure(result);
-                            GameModel.DoY0DCLegacyModelSupport(result);
+                            GameModel.DoY0DCLegacyModelUpgrade(result);
                             break;
                         case Game.Yakuza0:
                         case Game.YakuzaKiwami:
                             GameModel.DoOEHActProcedure(result);
                             break;
+                        case Game.yakuzakiwami_r:
+                            GameModel.DoOEHActProcedure(result);
+                            GameModel.DoY0DCLegacyModelUpgrade(result);
+                            break;
                         case Game.YakuzaKiwami2:
                             GameModel.DoDEHActProcedure(result, "lexus2");
+                            break;
+                        case Game.yakuzakiwami2_r:
+                            GameModel.DoDEHActProcedure(result, "lexus2");
+                            GameModel.DoYK2RemasterLegacyDBUpgrade(result);
                             break;
                         case Game.Judgment:
                             GameModel.DoDEHActProcedure(result, "judge");
@@ -631,6 +639,9 @@ namespace ShinRyuModManager
                             GameModel.DoDEHActProcedure(result, "lexus3");
                             break;
                     }
+
+                    Log("Writing MLO...");
+                    result.WriteMLO(Path.Combine(GamePath.GetGamePath(), Constants.MLO));
 
                     mloTimer.Stop();
                     Log("MLO Generation took: " + mloTimer.Elapsed.TotalSeconds + " seconds.");

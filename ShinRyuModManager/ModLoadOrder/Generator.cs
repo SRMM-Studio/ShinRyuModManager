@@ -134,7 +134,6 @@ namespace ShinRyuModManager.ModLoadOrder
 
             // Generate MLO
             MLO mlo = new MLO(modIndices, mods, files, loose.ParlessFolders, cpkDictionary);
-            mlo.WriteMLO(Path.Combine(GamePath.GetGamePath(), Constants.MLO));
 
             Console.WriteLine(" DONE!\n");
 

@@ -15,10 +15,12 @@ namespace Utils
         Yakuza0,
         yakuza0_dc,
         YakuzaKiwami,
+        yakuzakiwami_r,
 
         // Dragon Engine
         Yakuza6,
         YakuzaKiwami2,
+        yakuzakiwami2_r,
         YakuzaLikeADragon,
         Judgment,
         LostJudgment,

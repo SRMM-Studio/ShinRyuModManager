@@ -152,7 +152,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                 switch (basename)
                 {
                     case "bgm":
-                        if (game <= Game.YakuzaKiwami)
+                        if (game <= Game.yakuzakiwami_r)
                         {
                             cpkDataPath = GamePath.RemoveModPath(path);
                             this.RepackCPKs.Add(cpkDataPath);
@@ -170,7 +170,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                         }
                         else
                         {
-                            if (game <= Game.YakuzaKiwami)
+                            if (game <= Game.yakuzakiwami_r)
                                 this.RepackCPKs.Add(cpkDataPath + ".cpk");
                         }
 
