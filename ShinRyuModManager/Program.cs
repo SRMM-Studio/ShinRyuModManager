@@ -600,7 +600,7 @@ namespace ShinRyuModManager
 
                         case Game.yakuza0_dc:
                             GameModel.DoOEHActProcedure(result);
-                            GameModel.DoY0DCLegacyModelUpgrade(result);
+                            GameModel.DoY0DCLegacyModsUpgrade(result);
                             break;
                         case Game.Yakuza0:
                         case Game.YakuzaKiwami:
@@ -608,7 +608,7 @@ namespace ShinRyuModManager
                             break;
                         case Game.yakuzakiwami_r:
                             GameModel.DoOEHActProcedure(result);
-                            GameModel.DoY0DCLegacyModelUpgrade(result);
+                            GameModel.DoY0DCLegacyModsUpgrade(result);
                             break;
                         case Game.YakuzaKiwami2:
                             GameModel.DoDEHActProcedure(result, "lexus2");

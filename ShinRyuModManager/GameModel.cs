@@ -119,7 +119,8 @@ namespace ShinRyuModManager
             }
         }
 
-        public static void DoY0DCLegacyModelUpgrade(MLO mlo)
+        //One time upgrade of old mods
+        public static void DoY0DCLegacyModsUpgrade(MLO mlo)
         {
             string modsDir = GamePath.GetModsPath();
 
@@ -135,24 +136,62 @@ namespace ShinRyuModManager
                 if (!Directory.Exists(modDir))
                     continue;
 
+                //Maybe its better to check for folders that have "w64" in them
+                //But im not gonna do that yet because mmaybe there is a weird edge case...
                 string legacyCharaDir = Path.Combine(modDir, "chara", "w64");
+                string legacyStageDir = Path.Combine(modDir, "stage", "w64");
+                string legacyReactorDir = Path.Combine(modDir, "reactorpar", "reactor_w64");
 
-                if (!Directory.Exists(legacyCharaDir))
-                    continue;
-
-                string newCharaDir = Path.Combine(modDir, "chara", "ngen");
-
-                for (int i = 0; i < mlo.Files.Count; i++)
+                if (Directory.Exists(legacyCharaDir))
                 {
-                    var file = mlo.Files[i];
+                    string newCharaDir = Path.Combine(modDir, "chara", "ngen");
 
-                    if (file.Item1.Contains("chara/w64"))
-                        file.Item1 = file.Item1.Replace("chara/w64", "chara/ngen");
+                    for (int i = 0; i < mlo.Files.Count; i++)
+                    {
+                        var file = mlo.Files[i];
 
-                    mlo.Files[i] = file;
+                        if (file.Item1.Contains("chara/w64"))
+                            file.Item1 = file.Item1.Replace("chara/w64", "chara/ngen");
+
+                        mlo.Files[i] = file;
+                    }
+
+                    Directory.Move(legacyCharaDir, newCharaDir);
                 }
 
-                Directory.Move(legacyCharaDir, newCharaDir);
+                if (Directory.Exists(legacyReactorDir))
+                {
+                    string newReactorDir = Path.Combine(modDir, "reactorpar", "reactor_ngen");
+
+                    for (int i = 0; i < mlo.Files.Count; i++)
+                    {
+                        var file = mlo.Files[i];
+
+                        if (file.Item1.Contains("reactor_w64/"))
+                            file.Item1 = file.Item1.Replace("reactor_w64", "reactor_ngen/");
+
+                        mlo.Files[i] = file;
+                    }
+
+                    Directory.Move(legacyReactorDir, newReactorDir);
+                }
+
+                if (Directory.Exists(legacyStageDir))
+                {
+                    string newReactorDir = Path.Combine(modDir, "stage", "ngen");
+
+                    for (int i = 0; i < mlo.Files.Count; i++)
+                    {
+                        var file = mlo.Files[i];
+
+                        if (file.Item1.Contains("stage/w64"))
+                            file.Item1 = file.Item1.Replace("stage/w64", "stage/ngen");
+
+                        mlo.Files[i] = file;
+                    }
+
+                    Directory.Move(legacyReactorDir, newReactorDir);
+                }
             }
         }
 

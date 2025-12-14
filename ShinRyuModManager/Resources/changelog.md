@@ -1,4 +1,12 @@
-﻿> ### **%{color:gold} Version 4.7.1 %** ###
+﻿> ### **%{color:gold} Version 4.7.3 %** ###
+* Better support old mods using stage and reactor files in 0 Director's Cut and Kiwami Remastered
+* Redirect 2d/ui_common to 2dpar/ui_common in 0 Director's Cut and Kiwami Remastered
+
+> ### **%{color:orange} Version 4.7.2 %** ###
+* Fix a critical crash bug when using the English dub in 0 Director's Cut
+* Hopefully this is the end of crashes for many...
+
+> ### **%{color:orange} Version 4.7.1 %** ###
 * Fix a critical crash bug involving pre-rendered cutscenes in Kiwami Remastered
 * Entity support for Kiwami 2 Remastered
 
