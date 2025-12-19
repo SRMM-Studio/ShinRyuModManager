@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.7.3 %** ###
+﻿> ### **%{color:gold} Version 4.7.4 %** ###
+* Redirect sound_en and sound_zh to soundpar/sound_en and zh in 0 Director's Cut
+
+> ### **%{color:orange} Version 4.7.3 %** ###
 * Better support old mods using stage and reactor files in 0 Director's Cut and Kiwami Remastered
 * Redirect 2d/ui_common to 2dpar/ui_common in 0 Director's Cut and Kiwami Remastered
 
