@@ -635,8 +635,8 @@ namespace ShinRyuModManager
                         case Game.likeadragonpirates:
                             GameModel.DoDEHActProcedure(result, "spr");
                             break;
-                        case Game.YakuzaKiwami3:
-                            GameModel.DoDEHActProcedure(result, "lexus3");
+                        case Game.yakuzakiwami3:
+                            GameModel.DoDEHActProcedure(result, "bis");
                             break;
                     }
 

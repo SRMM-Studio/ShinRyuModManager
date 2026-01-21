@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.7.4 %** ###
+﻿> ### **%{color:gold} Version 4.7.5 %** ###
+* Yakuza Kiwami 3 support
+
+> ### **%{color:orange} Version 4.7.4 %** ###
 * Redirect sound_en and sound_zh to soundpar/sound_en and zh in 0 Director's Cut
 
 > ### **%{color:orange} Version 4.7.3 %** ###

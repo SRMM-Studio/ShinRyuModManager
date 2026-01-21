@@ -30,7 +30,7 @@ namespace Utils
         likeadragonpirates,
         VFREVOBETA,
         VFREVO,
-        YakuzaKiwami3,
+        yakuzakiwami3,
         StrangerThanHeaven
     }
 }
