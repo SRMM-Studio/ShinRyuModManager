@@ -244,8 +244,13 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                                 {
                                     // Copy any gmts to the appropriate hash folder in Parless
                                     if (!p.EndsWith(".gmt", StringComparison.InvariantCultureIgnoreCase)) continue;
-                                    string gmtPath = Path.Combine(gmtFolderPath, Path.GetFileName(p));
-                                    string checksum = ((Func<string, string>)(s => (System.Text.Encoding.UTF8.GetBytes(s).Sum(b => b) % 256).ToString("x2").PadLeft(4, '0')))(Path.GetFileNameWithoutExtension(p).ToLowerInvariant());
+
+                                    string fileName = Path.GetFileName(p);
+                                    string fileName2 = Path.GetFileNameWithoutExtension(p);
+                                    string gmtHashName = fileName2.Length <= 30 ? fileName2 : fileName2.Substring(0, 30);
+
+                                    string gmtPath = Path.Combine(gmtFolderPath, fileName);
+                                    string checksum = ((Func<string, string>)(s => (System.Text.Encoding.UTF8.GetBytes(gmtHashName).Sum(b => b) % 256).ToString("x2").PadLeft(4, '0')))(Path.GetFileNameWithoutExtension(p).ToLowerInvariant());
                                     string destinationDirectory = Path.Combine(baseParlessPath, checksum);
                                     if (!Directory.Exists(destinationDirectory))
                                         Directory.CreateDirectory(destinationDirectory);
