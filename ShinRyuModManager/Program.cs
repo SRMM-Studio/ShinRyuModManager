@@ -636,7 +636,8 @@ namespace ShinRyuModManager
                             GameModel.DoDEHActProcedure(result, "spr");
                             break;
                         case Game.yakuzakiwami3:
-                            GameModel.DoDEHActProcedure(result, "bis");
+                            GameModel.DoYK3HActProcedure(result, "bis");
+                            GameModel.DoTalkProcedureYK3(result, "bis");
                             break;
                     }
 

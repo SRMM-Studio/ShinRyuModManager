@@ -210,7 +210,8 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                     }
                 }
 
-                if(game >= Game.Yakuza6)
+                //not required in kiwami 3, wont work anyway will freeze the game
+                if(game >= Game.Yakuza6 && game < Game.yakuzakiwami3)
                 {
                     //Dragon Engine talks use pars directly for these
                     if (path.Contains("talk_"))

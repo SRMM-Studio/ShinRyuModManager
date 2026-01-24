@@ -90,7 +90,7 @@ namespace ShinRyuModManager
                     if (dir.Name == "ptc" && File.Exists(Path.Combine(hactDir.FullName, "ptc.par")))
                         continue;
 
-                    if(dir.Name != "ptc")
+                    if (dir.Name != "ptc")
                     {
                         string outputFakeDir = Path.Combine(parlessDir.FullName, dir.Name);
 
@@ -220,9 +220,9 @@ namespace ShinRyuModManager
                 bool haveOldDb = Directory.Exists(legacyDBDir);
                 bool haveOldPuid = Directory.Exists(legacyPUIDDir);
 
-                if(haveOldDb || haveOldPuid)
+                if (haveOldDb || haveOldPuid)
                 {
-                    for(int i = 0; i < mlo.Files.Count; i++)
+                    for (int i = 0; i < mlo.Files.Count; i++)
                     {
                         var file = mlo.Files[i];
 
@@ -232,7 +232,7 @@ namespace ShinRyuModManager
                                 file.Item1 = file.Item1.Replace("/db", "/db.lexus2");
                         }
 
-                        if(haveOldPuid)
+                        if (haveOldPuid)
                         {
                             if (file.Item1.Contains("/puid") && !file.Item1.Contains("/puid.lexus2"))
                                 file.Item1 = file.Item1.Replace("/puid", "/puid.lexus2");
@@ -311,8 +311,8 @@ namespace ShinRyuModManager
                         continue;
 
                     string outputFakeDir = Path.Combine(parlessDir.FullName, dir.Name);
-                   
-                    if(!Directory.Exists(outputFakeDir))
+
+                    if (!Directory.Exists(outputFakeDir))
                         Directory.CreateDirectory(outputFakeDir);
 
                     string outputPath = Path.Combine(parlessDir.FullName, dir.Name + ".par");
@@ -460,6 +460,117 @@ namespace ShinRyuModManager
             }
 
             Par.Dispose();
+        }
+
+        public static void DoYK3HActProcedure(MLO mlo, string codename)
+        {
+            string dataPath = GamePath.GetDataPath();
+            string hactDir = new DirectoryInfo(dataPath).GetDirectories().FirstOrDefault(x => x.Name.StartsWith("hact_")).FullName;
+
+            if (string.IsNullOrEmpty(hactDir))
+                return;
+
+            bool haveTalk = mlo.Files.Any(x => x.Item1.Contains("/hact_"));
+
+            if (!haveTalk)
+                return;
+
+            string rootHActDir = Path.Combine(GamePath.GetModsPath(), "Parless", "hact_" + codename);
+
+            if (!Directory.Exists(rootHActDir))
+                Directory.CreateDirectory(rootHActDir);
+
+            //This is really bad but it will have to do:
+            //Get the smallest hact in the hact dir
+            //Use that as a dummy file.
+            //Our created pars inf load the game for some reason.
+            var smallestHAct = new DirectoryInfo(hactDir)
+                .GetFiles("*.par", SearchOption.TopDirectoryOnly)
+                .OrderBy(f => f.Length)
+                .FirstOrDefault();
+
+            string modsDir = GamePath.GetModsPath();
+
+            foreach (string mod in mlo.Mods)
+            {
+                string modPath = Path.Combine(modsDir, mod);
+                var hActDirPath = Directory.GetDirectories(modPath).FirstOrDefault(x => x.Contains("hact_"));
+
+                if (hActDirPath == null)
+                    continue;
+
+                var hActDir = new DirectoryInfo(hActDirPath);
+
+                foreach(var dir in hActDir.GetDirectories())
+                {
+                    DirectoryInfo dummyParDir = new DirectoryInfo(Path.Combine(rootHActDir));
+
+                    if (!dummyParDir.Exists)
+                        dummyParDir.Create();
+
+                    FileInfo dummyParPath = new FileInfo(Path.Combine(dummyParDir.FullName, dir.Name + ".par"));
+                    File.Copy(smallestHAct.FullName, dummyParPath.FullName, true);
+                }
+            }
+        }
+
+        public static void DoTalkProcedureYK3(MLO mlo, string codename)
+        {
+            string dataPath = GamePath.GetDataPath();
+            string hactDir = new DirectoryInfo(dataPath).GetDirectories().FirstOrDefault(x => x.Name.StartsWith("hact_")).FullName;
+
+            if (string.IsNullOrEmpty(hactDir))
+                return;
+
+            bool haveTalk = mlo.Files.Any(x => x.Item1.Contains("/talk_"));
+
+            if (!haveTalk)
+                return;
+
+            string rootTalkDir = Path.Combine(GamePath.GetModsPath(), "Parless", "talk_" + codename);
+
+            if(!Directory.Exists(rootTalkDir))
+                Directory.CreateDirectory(rootTalkDir);
+
+            //This is really bad but it will have to do:
+            //Get the smallest hact in the hact dir
+            //Use that as a dummy file.
+            //Our created pars inf load the game for some reason.
+            var smallestHAct = new DirectoryInfo(hactDir)
+                .GetFiles("*.par", SearchOption.TopDirectoryOnly)
+                .OrderBy(f => f.Length)
+                .FirstOrDefault();
+
+            string modsDir = GamePath.GetModsPath();
+
+            foreach (string mod in mlo.Mods)
+            {
+                string modPath = Path.Combine(modsDir, mod);
+                var talkDirs = Directory.GetDirectories(modPath).Where(x => x.Contains("talk_"));
+
+                foreach (string modTalkDir in talkDirs)
+                {
+                    var talksDirs = new DirectoryInfo(modTalkDir).GetDirectories();
+
+                    DirectoryInfo talkDirInf = new DirectoryInfo(modTalkDir);
+
+                    foreach (var talkCategory in talksDirs)
+                    {
+                        foreach (var talkDir in talkCategory.GetDirectories())
+                        {
+                            DirectoryInfo dummyParDir = new DirectoryInfo(Path.Combine(rootTalkDir, talkCategory.Name));
+
+                            if(!dummyParDir.Exists)
+                                dummyParDir.Create();
+
+                            FileInfo dummyParPath = new FileInfo(Path.Combine(dummyParDir.FullName, talkDir.Name + ".par"));
+                            File.Copy(smallestHAct.FullName, dummyParPath.FullName, true);
+                        }   
+
+                    }
+
+                }
+            }
         }
 
     }
