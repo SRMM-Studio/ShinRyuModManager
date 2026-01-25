@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.7.6 %** ###
+﻿> ### **%{color:gold} Version 4.7.7 %** ###
+* Improve hashing for PYIH and above
+
+> ### **%{color:gold} Version 4.7.6 %** ###
 * Fix hashing for PYIH and above
 * Experimental: New Talk and HAct repack method for Kiwami 3 (old one freezed the game 100%)
 

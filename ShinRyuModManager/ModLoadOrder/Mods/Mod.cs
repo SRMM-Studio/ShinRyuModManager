@@ -247,11 +247,13 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                                     if (!p.EndsWith(".gmt", StringComparison.InvariantCultureIgnoreCase)) continue;
 
                                     string fileName = Path.GetFileName(p);
-                                    string fileName2 = Path.GetFileNameWithoutExtension(p);
-                                    string gmtHashName = fileName2.Length <= 30 ? fileName2 : fileName2.Substring(0, 30);
+                                    string fileName2 = Path.GetFileNameWithoutExtension(p).ToLowerInvariant();
+
+                                    PXDHash hash = new PXDHash();
+                                    hash.Set(fileName2);
 
                                     string gmtPath = Path.Combine(gmtFolderPath, fileName);
-                                    string checksum = ((Func<string, string>)(s => (System.Text.Encoding.UTF8.GetBytes(gmtHashName).Sum(b => b) % 256).ToString("x2").PadLeft(4, '0')))(Path.GetFileNameWithoutExtension(p).ToLowerInvariant());
+                                    string checksum = "00" + hash.Checksum.ToString("x4").Substring(2, 2);
                                     string destinationDirectory = Path.Combine(baseParlessPath, checksum);
                                     if (!Directory.Exists(destinationDirectory))
                                         Directory.CreateDirectory(destinationDirectory);

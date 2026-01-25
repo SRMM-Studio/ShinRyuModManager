@@ -464,15 +464,15 @@ namespace ShinRyuModManager
 
         public static void DoYK3HActProcedure(MLO mlo, string codename)
         {
+            bool haveHAct = mlo.Files.Any(x => x.Item1.Contains("/hact_"));
+
+            if (!haveHAct)
+                return;
+
             string dataPath = GamePath.GetDataPath();
             string hactDir = new DirectoryInfo(dataPath).GetDirectories().FirstOrDefault(x => x.Name.StartsWith("hact_")).FullName;
 
             if (string.IsNullOrEmpty(hactDir))
-                return;
-
-            bool haveTalk = mlo.Files.Any(x => x.Item1.Contains("/hact_"));
-
-            if (!haveTalk)
                 return;
 
             string rootHActDir = Path.Combine(GamePath.GetModsPath(), "Parless", "hact_" + codename);
@@ -516,16 +516,18 @@ namespace ShinRyuModManager
 
         public static void DoTalkProcedureYK3(MLO mlo, string codename)
         {
-            string dataPath = GamePath.GetDataPath();
-            string hactDir = new DirectoryInfo(dataPath).GetDirectories().FirstOrDefault(x => x.Name.StartsWith("hact_")).FullName;
-
-            if (string.IsNullOrEmpty(hactDir))
-                return;
-
             bool haveTalk = mlo.Files.Any(x => x.Item1.Contains("/talk_"));
 
             if (!haveTalk)
                 return;
+
+            var dataDir = new DirectoryInfo(GamePath.GetDataPath());
+            var hactDirInf = dataDir.GetDirectories().FirstOrDefault(x => x.Name.StartsWith("hact_"));
+
+            if (hactDirInf == null)
+                return;
+
+            string hactDir = dataDir.GetDirectories().FirstOrDefault(x => x.Name.StartsWith("hact_")).FullName;
 
             string rootTalkDir = Path.Combine(GamePath.GetModsPath(), "Parless", "talk_" + codename);
 
