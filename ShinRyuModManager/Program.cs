@@ -442,8 +442,9 @@ namespace ShinRyuModManager
 
                 Console.WriteLine(" DONE!\n");
             }
-            else if (game >= Game.Judgment && game != Game.likeadragongaiden)
+            else if (game >= Game.YakuzaKiwami2 && game != Game.likeadragongaiden)
             {
+                //
                 // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
                 if (File.Exists(DINPUT8DLL))
                 {

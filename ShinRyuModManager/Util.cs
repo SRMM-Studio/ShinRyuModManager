@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ParLibrary.Converter;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -248,6 +249,32 @@ namespace ShinRyuModManager
                 string destSubDir = Path.Combine(destDir, subDirName);
                 CopyDirectory(dir, destSubDir);
             }
+        }
+
+        /// <summary>
+        /// Create a simple par with ParLib
+        /// </summary>
+        /// <param name="inputPath"></param>
+        /// <param name="outputPath"></param>
+        public static void CreateParFromDirectory(string inputPath, string outputPath)
+        {
+            var parameters = new ParArchiveWriterParameters
+            {
+                CompressorVersion = 0,
+                OutputPath = outputPath,
+                IncludeDots = true,
+                ResetFileDates = true
+            };
+
+            string nodeName = new DirectoryInfo(inputPath).Name;
+            Node node = ReadDirectory(inputPath, nodeName);
+            node.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
+            NodeContainerFormat containerNode = node.GetFormatAs<NodeContainerFormat>();
+
+            var par = node.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(parameters);
+            par.Dispose();
+            node.Dispose();
+            containerNode.Root.Dispose();
         }
     }
 }

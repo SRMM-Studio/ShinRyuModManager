@@ -1,11 +1,17 @@
-﻿> ### **%{color:gold} Version 4.7.7 %** ###
+﻿> ### **%{color:gold} Version 4.7.8 %** ###
+* Improve talk repacking for Kiwami 3
+* Use winmm.dll instead of dinput8.dll for Kiwami 2 and above
+* This solves problems with GOG version of the games
+* Fix UBIK for all games
+
+> ### **%{color:orange} Version 4.7.7 %** ###
 * Improve hashing for PYIH and above
 
-> ### **%{color:gold} Version 4.7.6 %** ###
+> ### **%{color:orange} Version 4.7.6 %** ###
 * Fix hashing for PYIH and above
 * Experimental: New Talk and HAct repack method for Kiwami 3 (old one freezed the game 100%)
 
-> ### **%{color:gold} Version 4.7.5 %** ###
+> ### **%{color:orange} Version 4.7.5 %** ###
 * Yakuza Kiwami 3 support
 
 > ### **%{color:orange} Version 4.7.4 %** ###

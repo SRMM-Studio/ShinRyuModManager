@@ -501,7 +501,7 @@ namespace ShinRyuModManager
 
                 var hActDir = new DirectoryInfo(hActDirPath);
 
-                foreach(var dir in hActDir.GetDirectories())
+                foreach (var dir in hActDir.GetDirectories())
                 {
                     DirectoryInfo dummyParDir = new DirectoryInfo(Path.Combine(rootHActDir));
 
@@ -531,18 +531,13 @@ namespace ShinRyuModManager
 
             string rootTalkDir = Path.Combine(GamePath.GetModsPath(), "Parless", "talk_" + codename);
 
-            if(!Directory.Exists(rootTalkDir))
+            if (!Directory.Exists(rootTalkDir))
                 Directory.CreateDirectory(rootTalkDir);
 
             //This is really bad but it will have to do:
             //Get the smallest hact in the hact dir
             //Use that as a dummy file.
             //Our created pars inf load the game for some reason.
-            var smallestHAct = new DirectoryInfo(hactDir)
-                .GetFiles("*.par", SearchOption.TopDirectoryOnly)
-                .OrderBy(f => f.Length)
-                .FirstOrDefault();
-
             string modsDir = GamePath.GetModsPath();
 
             foreach (string mod in mlo.Mods)
@@ -558,16 +553,34 @@ namespace ShinRyuModManager
 
                     foreach (var talkCategory in talksDirs)
                     {
+                        DirectoryInfo dummyParDir = new DirectoryInfo(Path.Combine(rootTalkDir, talkCategory.Name));
+
+                        if (!dummyParDir.Exists)
+                            dummyParDir.Create();
+
                         foreach (var talkDir in talkCategory.GetDirectories())
                         {
-                            DirectoryInfo dummyParDir = new DirectoryInfo(Path.Combine(rootTalkDir, talkCategory.Name));
+                            string talkPath = Path.Combine(dummyParDir.FullName, talkDir.Name);
 
-                            if(!dummyParDir.Exists)
-                                dummyParDir.Create();
+                            if(!Directory.Exists(talkPath))
+                                Directory.CreateDirectory(talkPath);
 
-                            FileInfo dummyParPath = new FileInfo(Path.Combine(dummyParDir.FullName, talkDir.Name + ".par"));
-                            File.Copy(smallestHAct.FullName, dummyParPath.FullName, true);
-                        }   
+                            if (!Directory.Exists(Path.Combine(talkDir.FullName, "000")) || !Directory.Exists(Path.Combine(talkDir.FullName, "cmn")))
+                                continue;
+
+                            foreach (var dir in talkDir.GetDirectories())
+                            {
+                                string outputPath = Path.Combine(talkPath, dir.Name + ".par");
+                                Util.CreateParFromDirectory(dir.FullName, outputPath);
+                                //Gibbed.Yakuza0.Pack.Program.Main(new string[] { dir.FullName }, outputPath);
+                            }
+
+                            Util.CreateParFromDirectory(talkPath, talkPath + ".par");
+                            //Gibbed.Yakuza0.Pack.Program.Main(new string[] { talkPath }, talkPath + ".par");
+
+
+                            new DirectoryInfo(talkPath).Delete(true);
+                        }
 
                     }
 
