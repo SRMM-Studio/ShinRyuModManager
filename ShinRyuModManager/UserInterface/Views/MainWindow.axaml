@@ -116,13 +116,6 @@
                 <MenuItem Name="ModMetaSampleImage" Header="{x:Static lang:MainWindow.Menu_ModMetaSampleImage}" 
                           Click="ModMetaSampleImage_OnClick" />
             </MenuItem>
-            <MenuItem Header="{x:Static lang:MainWindow.Menu_Help}">
-                <MenuItem Name="About" Header="{x:Static lang:MainWindow.Menu_About}" 
-                          Click="About_OnClick" />
-                <MenuItem Name="ChangeLog" Header="{x:Static lang:MainWindow.Menu_Changelog}" 
-                          Click="ChangeLog_OnClick" />
-                <!--<MenuItem Name="CheckUpdates" Header="{x:Static lang:MainWindow.Menu_CheckUpdates}" />-->
-            </MenuItem>
             <MenuItem Header="{x:Static lang:MainWindow.Menu_Profiles}">
                 <MenuItem Name="Profile1" Header="{x:Static lang:MainWindow.Menu_Profile1}"
                           Command="{Binding UpdateProfileCommand}"
@@ -148,6 +141,13 @@
                 <MenuItem Name="Profile8" Header="{x:Static lang:MainWindow.Menu_Profile8}"
                           Command="{Binding UpdateProfileCommand}"
                           CommandParameter="{x:Static mods:Profile.Profile8}" />
+            </MenuItem>
+            <MenuItem Header="{x:Static lang:MainWindow.Menu_Help}">
+                <MenuItem Name="About" Header="{x:Static lang:MainWindow.Menu_About}" 
+                          Click="About_OnClick" />
+                <MenuItem Name="ChangeLog" Header="{x:Static lang:MainWindow.Menu_Changelog}" 
+                          Click="ChangeLog_OnClick" />
+                <!--<MenuItem Name="CheckUpdates" Header="{x:Static lang:MainWindow.Menu_CheckUpdates}" />-->
             </MenuItem>
         </Menu>
         
