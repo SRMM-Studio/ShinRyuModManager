@@ -1,0 +1,10 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "RyuUpdater": {
+      "commandName": "Project",
+      "commandLineArgs": "<SRMM PID> <ZipFilePath> <TempDir> <SRMMFileName>",
+      "workingDirectory": "" // Path to folder containing exe
+    }
+  }
+}

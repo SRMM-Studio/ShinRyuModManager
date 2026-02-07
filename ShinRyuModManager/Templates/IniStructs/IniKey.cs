@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
+﻿namespace ShinRyuModManager.Templates;
 
-namespace ShinRyuModManager.Templates
+public readonly struct IniKey
 {
-    public struct IniKey
-    {
-        public string Name { get; set; }
-
-        public List<string> Comments { get; set; }
-
-        public int DefaultValue { get; set; }
-    }
+    public string Name { get; init; }
+    
+    public List<string> Comments { get; init; }
+    
+    public int DefaultValue { get; init; }
 }

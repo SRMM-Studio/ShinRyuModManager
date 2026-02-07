@@ -1,0 +1,351 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        xmlns:svg="using:Avalonia.Svg.Skia"
+        xmlns:mods="using:ShinRyuModManager.ModLoadOrder.Mods"
+        xmlns:lang="using:ShinRyuModManager.Language.Views"
+        mc:Ignorable="d" d:DesignWidth="950" d:DesignHeight="600"
+        x:Class="ShinRyuModManager.UserInterface.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
+        Title="{Binding TitleText}" 
+        Height="600" 
+        Width="950" 
+        Background="#373535" 
+        Foreground="White"
+        CanResize="False"
+        Loaded="Window_OnLoaded">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Background" Value="#4B4B4B"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        
+        <Style Selector="Button.MetaEdit">
+            <Setter Property="Background" Value="#252525" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Width" Value="24" />
+        </Style>
+        
+        <Style Selector="Button.MetaEdit Image">
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        
+        <Style Selector="Grid.Controls">
+            <Setter Property="Margin" Value="20, 0, 20, 40" />
+        </Style>
+        
+        <Style Selector="Grid.Controls Button">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="MinWidth" Value="95" />
+            <Setter Property="MaxWidth" Value="105" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        
+        <Style Selector="Label.AppVersion">
+            <Setter Property="Opacity" Value="0.4" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+        </Style>
+        
+        <Style Selector="Label.PreviewIndicator">
+            <Setter Property="Opacity" Value="0.4" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Canvas.Bottom" Value="0" />
+            <Setter Property="Canvas.Right" Value="0" />
+        </Style>
+        
+        <Style Selector="StackPanel Button">
+            <Setter Property="Background" Value="#4B4B4B" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Opacity" Value="0.8" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Width" Value="44" />
+        </Style>
+        
+        <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        
+        <Style Selector="DataGridCell:current /template/ Rectangle#CurrencyVisual">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        
+        <Style Selector="TextBox.Editable">
+            <Setter Property="Background" Value="DimGray" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Margin" Value="3" />
+        </Style>
+    </Window.Styles>
+    
+    <!-- App -->
+    <Grid>
+        <Grid.RowDefinitions>
+            Auto
+            1*
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="{x:Static lang:MainWindow.Menu_Manage}">
+                <MenuItem Name="ModInstallMenuItem" Header="{x:Static lang:MainWindow.Menu_InstallMod}" 
+                          Click="ModInstall_OnClick" />
+                <!--<MenuItem Header="{x:Static lang:MainWindow.Menu_UninstallMod}" />-->
+            </MenuItem>
+            <MenuItem Header="{x:Static lang:MainWindow.Menu_Libraries}" Click="MenuItem_OnClick" />
+            <MenuItem Header="{x:Static lang:MainWindow.Menu_ModMeta}">
+                <MenuItem Name="ModMetaSampleYaml" Header="{x:Static lang:MainWindow.Menu_ModMetaSampleYaml}" 
+                          Click="ModMetaSampleYaml_OnClick" />
+                <MenuItem Name="ModMetaSampleImage" Header="{x:Static lang:MainWindow.Menu_ModMetaSampleImage}" 
+                          Click="ModMetaSampleImage_OnClick" />
+            </MenuItem>
+            <MenuItem Header="{x:Static lang:MainWindow.Menu_Help}">
+                <MenuItem Name="About" Header="{x:Static lang:MainWindow.Menu_About}" 
+                          Click="About_OnClick" />
+                <MenuItem Name="ChangeLog" Header="{x:Static lang:MainWindow.Menu_Changelog}" 
+                          Click="ChangeLog_OnClick" />
+                <!--<MenuItem Name="CheckUpdates" Header="{x:Static lang:MainWindow.Menu_CheckUpdates}" />-->
+            </MenuItem>
+            <MenuItem Header="{x:Static lang:MainWindow.Menu_Profiles}">
+                <MenuItem Name="Profile1" Header="{x:Static lang:MainWindow.Menu_Profile1}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile1}" />
+                <MenuItem Name="Profile2" Header="{x:Static lang:MainWindow.Menu_Profile2}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile2}" />
+                <MenuItem Name="Profile3" Header="{x:Static lang:MainWindow.Menu_Profile3}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile3}" />
+                <MenuItem Name="Profile4" Header="{x:Static lang:MainWindow.Menu_Profile4}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile4}" />
+                <MenuItem Name="Profile5" Header="{x:Static lang:MainWindow.Menu_Profile5}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile5}" />
+                <MenuItem Name="Profile6" Header="{x:Static lang:MainWindow.Menu_Profile6}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile6}" />
+                <MenuItem Name="Profile7" Header="{x:Static lang:MainWindow.Menu_Profile7}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile7}" />
+                <MenuItem Name="Profile8" Header="{x:Static lang:MainWindow.Menu_Profile8}"
+                          Command="{Binding UpdateProfileCommand}"
+                          CommandParameter="{x:Static mods:Profile.Profile8}" />
+            </MenuItem>
+        </Menu>
+        
+        <!-- Background Image -->
+        <Image Grid.Row="1" Source="../Assets/SRMMLogo1BG.png" Opacity="0.05" Stretch="Uniform" />
+        
+        <!-- Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                0.45*
+                0.55*
+                Auto
+            </Grid.ColumnDefinitions>
+            
+            <!-- App Version -->
+            <Label Grid.Column="0" Classes="AppVersion" Content="{Binding AppVersionText}" />
+            
+            <!-- Preview Overlay -->
+            <!--<Canvas Grid.Column="2">
+                <Label Classes="PreviewIndicator" Content="Preview" />
+            </Canvas>-->
+            
+            <!-- Mod List and Controls -->
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    0.80*
+                    0.20*
+                </Grid.ColumnDefinitions>
+                
+                <!-- Mod List -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        0.10*
+                        0.75*
+                        0.15*
+                    </Grid.RowDefinitions>
+                    
+                    <!-- MLO Text -->
+                    <TextBlock Grid.Row="0" Margin="20" Text="{x:Static lang:MainWindow.ModList_Title}"
+                               ToolTip.Tip="{x:Static lang:MainWindow.ModList_Tooltip}" Foreground="LightGray" />
+                    
+                    <!-- Mod List DataGrid -->
+                    <ThemeVariantScope Grid.Row="1" RequestedThemeVariant="Light">
+                        <DataGrid Name="ModListView" Margin="20, 0, 20, 20" Background="#FF4B4B4B" 
+                                  Width="318" ItemsSource="{Binding ModList}" 
+                                  SelectionChanged="ModList_OnSelectionChanged">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="{x:Static lang:MainWindow.ModList_Enabled}" 
+                                                        CanUserSort="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="mods:ModInfo">
+                                            <CheckBox IsChecked="{Binding Enabled}" 
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                
+                                <DataGridTextColumn Header="{x:Static lang:MainWindow.ModList_ModName}" Width="*" 
+                                                    Binding="{Binding Name}" CanUserSort="False" 
+                                                    IsReadOnly="True" Foreground="White" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ThemeVariantScope>
+                    
+                    <!-- General Application Controls -->
+                    <Grid Grid.Row="2" Grid.Column="0" Classes="Controls">
+                        <Grid.ColumnDefinitions>
+                            *
+                            *
+                            *
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button Name="ModInstall" Grid.Column="0" Content="{x:Static lang:MainWindow.Btn_Install}"
+                                HorizontalAlignment="Left" Click="ModInstall_OnClick" />
+                        <Button Name="ModListViewRefresh" Grid.Column="1" Content="{x:Static lang:MainWindow.Btn_Refresh}" 
+                                HorizontalAlignment="Center" Click="ModListViewRefresh_OnClick" />
+                        <Button Name="LaunchGame" Grid.Column="2" Content="{x:Static lang:MainWindow.Btn_Run}" 
+                                HorizontalAlignment="Right" Click="LaunchGame_OnClick" 
+                                ToolTip.Tip="{x:Static lang:MainWindow.Btn_Run_Tooltip}" />
+                    </Grid>
+                </Grid>
+                
+                <!-- Mod List Controls -->
+                <Grid Grid.Column="1">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0, -70, 0, 0">
+                        <Button Name="ModToggle" Click="ModToggle_OnClick" 
+                                ToolTip.Tip="{x:Static lang:MainWindow.ModToggle_Tooltip}">
+                            <Image Source="{svg:SvgImage ../Assets/Icons/SVG/Toggle.svg}" />
+                        </Button>
+                        <Button Name="ModUp" Click="ModUp_OnClick" 
+                                ToolTip.Tip="{x:Static lang:MainWindow.ModUp_Tooltip}">
+                            <Image Source="{svg:SvgImage ../Assets/Icons/SVG/ArrowUp.svg}" />
+                        </Button>
+                        <Button Name="ModDown" Click="ModDown_OnClick" 
+                                ToolTip.Tip="{x:Static lang:MainWindow.ModDown_Tooltip}">
+                            <Image Source="{svg:SvgImage ../Assets/Icons/SVG/ArrowDown.svg}" />
+                        </Button>
+                        <Button Name="ModSave" Margin="5, 55, 5, 5" Click="ModSave_OnClick"
+                                ToolTip.Tip="{x:Static lang:MainWindow.ModSave_Tooltip}">
+                            <Image Source="{svg:SvgImage ../Assets/Icons/SVG/Check.svg}" />
+                        </Button>
+                        <Button Name="ModClose" Click="ModClose_OnClick"
+                                ToolTip.Tip="{x:Static lang:MainWindow.ModClose_Tooltip}">
+                            <Image Source="{svg:SvgImage ../Assets/Icons/SVG/X.svg}" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+            
+            <!-- Mod Details -->
+            <Grid Grid.Column="1" Margin="20">
+                <Grid.RowDefinitions>
+                    0.30*
+                    0.70*
+                </Grid.RowDefinitions>
+                
+                <!-- Mod Image/Name/Author/Version -->
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        0.35*
+                        0.65*
+                    </Grid.ColumnDefinitions>
+                    
+                    <Border Grid.Column="0" BorderThickness="2" BorderBrush="#32808080" Background="#32808080" 
+                            Height="155" Width="155" HorizontalAlignment="Left">
+                        <Image Name="ModImage" RenderOptions.BitmapInterpolationMode="HighQuality" 
+                               Source="../Assets/NoImage.png" Height="151" Width="151" HorizontalAlignment="Center" />
+                    </Border>
+                    
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            0.50*
+                            0.25*
+                            0.25*
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Name="ModName" Grid.Row="0" Text="{Binding ModName}" 
+                                   FontSize="26" Foreground="White" TextWrapping="WrapWithOverflow" />
+                        <TextBox Name="ModNameEditable" Grid.Row="0" Text="{Binding ModName}" 
+                                 Classes="Editable" FontSize="26" Width="298" IsVisible="False" />
+                        
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <Label Content="Author: " FontSize="18" Foreground="LightGray" />
+                            <Label Name="ModAuthor" Content="{Binding ModAuthor}" 
+                                   FontSize="18" Foreground="White" />
+                            <TextBox Name="ModAuthorEditable" Text="{Binding ModAuthor}" 
+                                     Classes="Editable" FontSize="18" Width="225" IsVisible="False" />
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <Label Content="Version:" FontSize="18" Foreground="LightGray" />
+                            <Label Name="ModVersion" Content="{Binding ModVersion}" 
+                                   FontSize="18" Foreground="White" />
+                            <TextBox Name="ModVersionEditable" Text="{Binding ModVersion}" 
+                                     Classes="Editable" FontSize="18" Width="225" IsVisible="False" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+                
+                <!-- Mod Description -->
+                <Grid Grid.Row="1" Margin="0, 20">
+                    <Rectangle Fill="#808080" Opacity="0.2"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="10">
+                            <TextBlock Name="ModDescription" TextWrapping="Wrap" Foreground="White" 
+                                       Text="{Binding ModDescription}" />
+                            <TextBox Name="ModDescriptionEditable" Classes="Editable" TextWrapping="Wrap" 
+                                     AcceptsReturn="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                                     Height="300" Text="{Binding ModDescription}" IsVisible="False" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+            
+            <!-- Meta Edit Controls -->
+            <StackPanel Grid.Column="2">
+                <Button Name="MetaEditEnable" Classes="MetaEdit" 
+                        ToolTip.Tip="{x:Static lang:MainWindow.MetaEditEnable_Tooltip}" Click="MetaEditEnable_OnClick">
+                    <Button.Content>
+                        <Image Source="../Assets/Icons/PNG/Edit.png" />
+                    </Button.Content>
+                </Button>
+                
+                <Button Name="MetaEditCancel" Classes="MetaEdit" 
+                        ToolTip.Tip="{x:Static lang:MainWindow.MetaEditCancel_Tooltip}" IsVisible="False" Click="MetaEditCancel_OnClick" >
+                    <Button.Content>
+                        <Image Source="../Assets/Icons/PNG/Close.png" />
+                    </Button.Content>
+                </Button>
+                
+                <Button Name="MetaEditSave" Classes="MetaEdit" 
+                        ToolTip.Tip="{x:Static lang:MainWindow.MetaEditSave_Tooltip}" IsVisible="False" Click="MetaEditSave_OnClick" >
+                    <Button.Content>
+                        <Image Source="../Assets/Icons/PNG/Save.png" />
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+
+</Window>

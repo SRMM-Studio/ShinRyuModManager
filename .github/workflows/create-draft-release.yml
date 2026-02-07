@@ -1,0 +1,160 @@
+name: Prepare for Release
+on:
+  workflow_dispatch: 
+    inputs:
+      tag:
+        description: "Tag for the release (example: 1.2.3)"
+        required: true
+        default: "1.0.0"
+      updater_version:
+        description: "Version for RyuUpdater (example: 1.2.3)"
+        required: true
+        default: "1.0.0"
+
+env:
+  PR_NAME: 'ShinRyuModManager ${{ github.event.inputs.tag }}'
+  PR_TAG: ${{ github.event.inputs.tag }}
+  PR_UPDATER_VERSION: ${{ github.event.inputs.updater_version }}
+      
+jobs:
+  build-parless:
+    runs-on: windows-latest
+    permissions: 
+      contents: write
+      
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          repository: SRMM-Studio/YakuzaParless
+          path: external/parless
+          submodules: recursive
+
+      - name: Install Premake 5
+        uses: abel0b/setup-premake@b80dc6f70e8ab159fb854bdadbeb1a53cfc28723 # v2.4
+        with:
+          version: "5.0.0-beta2"
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+      
+      - name: Generate VS Project
+        working-directory: external/parless
+        run: premake5 vs2022
+        
+      - name: Build Parless
+        working-directory: external/parless/build
+        run: msbuild YakuzaParless.sln /p:Configuration=Release /p:Platform=Win64
+        
+      - name: Upload Parless Artifact
+        uses: actions/upload-artifact@v6
+        with: 
+          name: 'ParlessArtifact'
+          path: external\parless\build\bin\Win64\Release\YakuzaParless.asi
+          if-no-files-found: 'error'
+          retention-days: 1
+          compression-level: 0
+          overwrite: true
+  
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    needs: build-parless
+    
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        
+      - name: Checkout AppCast Repo
+        uses: actions/checkout@v6
+        with:
+          repository: 'TheTrueColonel/SRMM-AppCast'
+          token: '${{ secrets.SRMM_APPCAST_TOKEN }}'
+          path: AppcastRepo
+          
+      - name: Download Parless Artifact
+        uses: actions/download-artifact@v7
+        with: 
+          path: '${{ runner.temp }}/external'
+          
+      - name: Download dinput and winmm
+        run: |
+          curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/dinput8.dll -o $RUNNER_TEMP/external/dinput8.dll
+          curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/winmm.lj -o $RUNNER_TEMP/external/winmm.lj
+      
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+          
+      - name: Install Netsparkle Tool
+        run: dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator
+
+      - name: Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+        
+      - name: Create Draft Release
+        id: create_release
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20
+        with:
+          tag: "v${{ env.PR_TAG }}"
+          name: ${{ env.PR_NAME }}
+          draft: true
+          generateReleaseNotesPreviousTag: true
+        
+      - name: Run Scripts
+        run: |
+          ./Scripts/build.sh
+          ./Scripts/package.sh -s $PR_TAG -u $PR_UPDATER_VERSION
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+          
+      - name: Upload SRMM Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
+        run: |
+          for file in ${{ github.workspace }}/dist/srmm/out/*; do
+            name=$(basename "$file")
+            mime=$(file --brief --mime-type "$file")
+            echo "Uploading $name ($mime)"
+            curl \
+              -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -H "Content-Type: $mime" \
+              --data-binary @"$file" \
+              --no-progress-meter \
+              "${UPLOAD_URL%%\{*}?name=$name" > /dev/null
+          done
+  
+      - name: Commit Appcasts and Updater
+        run: |
+          cd ${{ github.workspace }}/AppcastRepo
+          branch="update-appcasts-${{ github.run_number }}"
+          git checkout -b "${branch}"
+          
+          git add .
+          git commit -m "Update Appcasts and Updater for SRMM version $PR_TAG and Updater version $PR_UPDATER_VERSION"
+          git push origin "${branch}"
+        env:
+          GIT_AUTHOR_NAME: github-actions
+          GIT_AUTHOR_EMAIL: github-actions@github.com
+          GIT_COMMITTER_NAME: github-actions
+          GIT_COMMITTER_EMAIL: github-actions@github.com
+          
+      - name: Create Pull Request
+        run: |
+          cd ${{ github.workspace }}/AppcastRepo
+          branch="update-appcasts-${{ github.run_number }}"
+          
+          gh pr create \
+            --title "Update Appcasts and Updater" \
+            --body "Automated update for SRMM version $PR_TAG and Updater version $PR_UPDATER_VERSION" \
+            --head "${branch}" \
+            --base main
+        env:
+          GITHUB_TOKEN: ${{ secrets.SRMM_APPCAST_TOKEN }}

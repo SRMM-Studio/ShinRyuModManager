@@ -1,95 +1,98 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netframework4.8</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWPF>true</UseWPF>
-    <StartupObject>ShinRyuModManager.Program</StartupObject>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <ApplicationIcon>Resources\Icons\SRMM_icon.ico</ApplicationIcon>
-    <AssemblyName>ShinRyuModManager</AssemblyName>
-    <Platforms>AnyCPU;x64</Platforms>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFrameworks>net10.0;net10.0-windows</TargetFrameworks>
+        <RootNamespace>ShinRyuModManager</RootNamespace>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>x64</Platforms>
+        <IsPackable>false</IsPackable>
+        <ApplicationIcon>UserInterface\Assets\Icons\SRMM_icon.ico</ApplicationIcon>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        
+        <!-- Versioning -->
+        <AssemblyVersion>5.0.0</AssemblyVersion>
+        <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+        <AssemblyTitle>ShinRyuModManager</AssemblyTitle>
+        <Company>SRMM Studio</Company>
+        <Product>ShinRyuModManager</Product>
+        <Copyright>2026 SRMM Studio</Copyright>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+        <AssemblyName>ShinRyuModManager</AssemblyName>
+        <PackageId>ShinRyuModManager</PackageId>
+        <Authors>ShinRyuModManager</Authors>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <VersionSuffix>debug</VersionSuffix>
+        <DebugType>embedded</DebugType>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <VersionSuffix>$(BuildSuffix)</VersionSuffix>
+        <DebugType>embedded</DebugType>
+        <!--<PublishTrimmed Condition="'$(SelfContained)' == 'true'">true</PublishTrimmed>-->
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="credits.txt" />
-    <None Remove="Resources\Audio\JingleSuccess.wav" />
-    <None Remove="Resources\changelog.md" />
-    <None Remove="Resources\Icons\PNG\Close.png" />
-    <None Remove="Resources\Icons\PNG\Edit.png" />
-    <None Remove="Resources\Icons\PNG\Github_Light.png" />
-    <None Remove="Resources\Icons\PNG\Save.png" />
-    <None Remove="Resources\Icons\SRMM_icon.ico" />
-    <None Remove="Resources\Icons\SVG\ArrowDown.svg" />
-    <None Remove="Resources\Icons\SVG\ArrowUp.svg" />
-    <None Remove="Resources\Icons\SVG\Check.svg" />
-    <None Remove="Resources\Icons\SVG\Toggle.svg" />
-    <None Remove="Resources\Icons\SVG\X.svg" />
-    <None Remove="Resources\Icons\toggle.png" />
-    <None Remove="Resources\NoImage.png" />
-    <None Remove="Resources\SRMMLogo1BG.png" />
-    <None Remove="Resources\SRMMLogo250.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CpkTools\CpkTools.csproj" />
+        <ProjectReference Include="..\ParLibrary\ParLibrary.csproj" />
+        <ProjectReference Include="..\Utils\Utils.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\RyuAssemblyInfo.cs" Link="Properties\RyuAssemblyInfo.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.8" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.8" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.8" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.8" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+        <PackageReference Include="ClassIsland.Markdown.Avalonia" Version="11.0.3.4" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="3.0.4" />
+        <PackageReference Include="Serilog" Version="4.3.0" />
+        <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+        <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
+        <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="SharpCompress" Version="0.41.0" />
+        <PackageReference Include="Skia.Controls.Avalonia" Version="11.3.6.2" />
+        <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="11.3.6.2" />
+        <PackageReference Include="YamlDotNet" Version="16.3.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Resources\Icons\Legacy\rmm_icon_2.ico" />
-    <Content Include="Resources\Icons\SRMM_icon.ico" />
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="Gibbed.Yakuza0.Pack">
+            <HintPath>Miscellaneous\GibbedPar\Gibbed.Yakuza0.Pack.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <AvaloniaResource Include="UserInterface\Assets\**" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Resources\Audio\JingleSuccess.wav" />
-    <Resource Include="Resources\changelog.md" />
-    <Resource Include="Resources\credits.txt" />
-    <Resource Include="Resources\Icons\Legacy\toggle.png" />
-    <Resource Include="Resources\Icons\Legacy\up.png" />
-    <Resource Include="Resources\Icons\Legacy\down.png" />
-    <Resource Include="Resources\Icons\PNG\Close.png" />
-    <Resource Include="Resources\Icons\PNG\Edit.png" />
-    <Resource Include="Resources\Icons\PNG\Github_Light.png" />
-    <Resource Include="Resources\Icons\PNG\Save.png" />
-    <Resource Include="Resources\Icons\SVG\ArrowDown.svg" />
-    <Resource Include="Resources\Icons\SVG\ArrowUp.svg" />
-    <Resource Include="Resources\Icons\SVG\Check.svg" />
-    <Resource Include="Resources\Icons\SVG\Toggle.svg" />
-    <Resource Include="Resources\Icons\SVG\X.svg" />
-    <Resource Include="Resources\NoImage.png" />
-    <Resource Include="Resources\SRMMLogo1BG.png" />
-    <Resource Include="Resources\SRMMLogo250.png" />
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Language\**\*.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>%(Filename).Designer.cs</LastGenOutput>
+        </EmbeddedResource>
 
-  <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="5.7.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="ini-parser" Version="2.5.2" />
-    <PackageReference Include="MdXaml" Version="1.26.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.3.6" />
-    <PackageReference Include="SharpCompress" Version="0.41.0" />
-    <PackageReference Include="SharpVectors" Version="1.8.2" />
-    <PackageReference Include="YamlDotNet" Version="13.7.1" />
-  </ItemGroup>
+        <Compile Update="Language\**\*.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>%(Filename).resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ParManager\ParLibrary\ParLibrary.csproj" />
-    <ProjectReference Include="..\Utils\Utils.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Gibbed.Yakuza0.Pack">
-      <HintPath>Miscellaneous\GibbedPar\Gibbed.Yakuza0.Pack.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="Yarhl">
-      <HintPath>..\Dependencies\Yarhl.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup Condition="'$(SelfContained)' == 'false'">
+      <None Update="BuildAssets\README" Link="README" CopyToOutputDirectory="Always" />
+    </ItemGroup>
 
 </Project>

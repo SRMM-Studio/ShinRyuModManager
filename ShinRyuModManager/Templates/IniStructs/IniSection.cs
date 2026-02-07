@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
+﻿namespace ShinRyuModManager.Templates;
 
-namespace ShinRyuModManager.Templates
+public readonly struct IniSection
 {
-    public struct IniSection
-    {
-        public string Name { get; set; }
-
-        public List<string> Comments { get; set; }
-
-        public List<IniKey> Keys { get; set; }
-    }
+    public string Name { get; init; }
+    
+    public List<string> Comments { get; init; }
+    
+    public List<IniKey> Keys { get; init; }
 }
