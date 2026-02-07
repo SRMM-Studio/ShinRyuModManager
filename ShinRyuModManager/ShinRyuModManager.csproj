@@ -39,7 +39,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CpkTools\CpkTools.csproj" />
-        <ProjectReference Include="..\ParLibrary\ParLibrary.csproj" />
+        <ProjectReference Include="..\ParManager\ParLibrary\ParLibrary.csproj" />
         <ProjectReference Include="..\Utils\Utils.csproj" />
     </ItemGroup>
 
@@ -54,7 +54,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="ini-parser-netstandard" Version="2.5.3" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
+        <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="3.0.4" />
         <PackageReference Include="Serilog" Version="4.3.0" />
         <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
@@ -71,6 +71,9 @@
     <ItemGroup>
         <Reference Include="Gibbed.Yakuza0.Pack">
             <HintPath>Miscellaneous\GibbedPar\Gibbed.Yakuza0.Pack.dll</HintPath>
+        </Reference>
+        <Reference Include="Yarhl">
+          <HintPath>..\ParManager\Dependencies\Yarhl.dll</HintPath>
         </Reference>
     </ItemGroup>
     

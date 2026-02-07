@@ -166,6 +166,6 @@ public static class Utils
         node.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
         
         using var containerNode = node.GetFormatAs<NodeContainerFormat>();
-        using var par = node.TransformWith(typeof(ParArchiveWriter), parameters);
+        using var par = node.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(parameters);
     }
 }

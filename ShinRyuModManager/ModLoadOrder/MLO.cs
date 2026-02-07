@@ -120,19 +120,19 @@ public class MLO
         }
         
         // Write file size
-        writer.Stream.Seek(0xC);
+        writer.Stream.Seek(0xC, SeekOrigin.Begin);
         writer.WriteOfType((uint)writer.Stream.Length);
         
         // Write file start position
-        writer.Stream.Seek(0x18);
+        writer.Stream.Seek(0x18, SeekOrigin.Begin);
         writer.WriteOfType((uint)fileStartPos);
         
         // Write parless folders start position
-        writer.Stream.Seek(0x20);
+        writer.Stream.Seek(0x20, SeekOrigin.Begin);
         writer.WriteOfType((uint)parlessStartPos);
         
         // Write cpk folders start position
-        writer.Stream.Seek(0x28);
+        writer.Stream.Seek(0x28, SeekOrigin.Begin);
         writer.WriteOfType((uint)cpkFolderStartPos);
     }
 }

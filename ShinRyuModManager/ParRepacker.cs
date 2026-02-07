@@ -173,7 +173,7 @@ public static class ParRepacker
         var containerNode = node.GetFormatAs<NodeContainerFormat>();
         var par = NodeFactory.FromFile(pathToPar, FileOpenMode.Read);
         
-        par.TransformWith(typeof(ParArchiveReader), readerParams);
+        par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(readerParams);
         
         Node searchResult = null;
         
@@ -202,7 +202,7 @@ public static class ParRepacker
         writerParams.IncludeDots = false;
         
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(pathToModPar))!);
-        par.TransformWith(typeof(ParArchiveWriter), writerParams);
+        par.TransformWith<ParArchiveWriter, ParArchiveWriterParameters>(writerParams);
         
         par.Dispose();
         searchResult?.Dispose();
