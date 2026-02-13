@@ -1,4 +1,12 @@
-﻿> ### **%{color:gold} Version 4.7.8 %** ###
+﻿> ### **%{color:gold} Version 4.8.0 %** ###
+* Fix dinput8.dll being removed if winmm.dll (not winmm.lj) exists
+* A very small portion of advanced SRMM users might need both DLLs
+* Fix overwriting error with animations in Pirates and up
+
+> ### **%{color:orange} Version 4.7.9 %** ###
+* Fix redirection for "esl" and "ese" language types in Kiwami 3
+
+> ### **%{color:orange} Version 4.7.8 %** ###
 * Improve talk repacking for Kiwami 3
 * Use winmm.dll instead of dinput8.dll for Kiwami 2 and above
 * This solves problems with GOG version of the games

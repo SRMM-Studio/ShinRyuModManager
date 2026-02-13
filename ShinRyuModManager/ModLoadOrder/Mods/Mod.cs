@@ -257,7 +257,7 @@ namespace ShinRyuModManager.ModLoadOrder.Mods
                                     string destinationDirectory = Path.Combine(baseParlessPath, checksum);
                                     if (!Directory.Exists(destinationDirectory))
                                         Directory.CreateDirectory(destinationDirectory);
-                                    File.Copy(gmtPath, Path.Combine(destinationDirectory, Path.GetFileName(gmtPath)));
+                                    File.Copy(gmtPath, Path.Combine(destinationDirectory, Path.GetFileName(gmtPath)), true);
                                 }
                                 break;
                             }
