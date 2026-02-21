@@ -8,6 +8,7 @@ IS_PREVIEW=false
 while getopts "p" flag; do
     case "${flag}" in
       p) IS_PREVIEW=true ;;
+      *) ;; # Do nothing
     esac
 done
 
@@ -62,7 +63,7 @@ for TARGET in "${!TARGET_ARGS[@]}"; do
   # Reads the target's arguments and split them into an array
   IFS=";" read -r -a arr <<< "${TARGET_ARGS[${TARGET}]}"
   
-  echo "Buidling SRMM ${TARGET}..."
+  echo "Building SRMM ${TARGET}..."
   
   dotnet publish "${SRMM_PROJECT}" \
     -c "Release" \
@@ -83,7 +84,7 @@ for TARGET in "${!TARGET_ARGS[@]}"; do
       cp "${SRC}" "${OUT_DIR}/${FILE}"
       echo "  Copied: ${FILE}"
     else
-      echo "  Warning: Missing file in realease: ${FILE}"
+      echo "  Warning: Missing file in release: ${FILE}"
     fi
   done
 done
@@ -96,7 +97,7 @@ for TARGET in "${!UPDATER_TARGET_ARGS[@]}"; do
   # Reads the target's arguments and split them into an array
   IFS=";" read -r -a arr <<< "${TARGET_ARGS[${TARGET}]}"
   
-  echo "Buidling RyuUpdater ${TARGET}..."
+  echo "Building RyuUpdater ${TARGET}..."
   
   dotnet publish "${UPDATER_PROJECT}" \
     -c "Release" \
