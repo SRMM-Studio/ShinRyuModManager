@@ -235,55 +235,6 @@ public static class Program
         
         Log.Information("Active Profile: {Profile}", profile?.GetDescription() ?? ActiveProfile.GetDescription());
         
-        if (File.Exists(Constants.DINPUT8DLL) && File.Exists(Constants.WINMMLJ))
-        {
-            // TODO: Maybe move this to a separate "Game patches" file
-            // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
-            if (GamePath.CurrentGame == Game.Eve && File.Exists(Constants.DINPUT8DLL))
-            {
-                if (File.Exists(Constants.VERSIONDLL))
-                {
-                    Log.Warning($"Game specific patch: Deleting {Constants.DINPUT8DLL} because {Constants.VERSIONDLL} exists...");
-                    
-                    // Remove dinput8.dll
-                    File.Delete(Constants.DINPUT8DLL);
-                }
-                else
-                {
-                    Log.Warning($"Game specific patch: Renaming {Constants.DINPUT8DLL} to {Constants.VERSIONDLL}...");
-                    
-                    // Rename dinput8.dll to version.dll to prevent the game from crashing
-                    File.Move(Constants.DINPUT8DLL, Constants.VERSIONDLL);
-                }
-            }
-            else if (GamePath.CurrentGame is >= Game.YakuzaKiwami2 and not Game.LikeADragonGaiden)
-            {
-                // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
-                if (File.Exists(Constants.DINPUT8DLL))
-                {
-                    Log.Warning($"Game specific patch: Deleting {Constants.DINPUT8DLL} because it causes crashes with Judgment games...");
-                    
-                    // Remove dinput8.dll
-                    File.Delete(Constants.DINPUT8DLL);
-                }
-                
-                if (!File.Exists(Constants.WINMMDLL))
-                {
-                    if (File.Exists(Constants.WINMMLJ))
-                    {
-                        Log.Warning($"Game specific patch: Enabling {Constants.WINMMDLL} by renaming {Constants.WINMMLJ} to fix Judgment games crashes...");
-                        
-                        // Rename dinput8.dll to version.dll to prevent the game from crashing
-                        File.Move(Constants.WINMMLJ, Constants.WINMMDLL);
-                    }
-                    else
-                    {
-                        Log.Error($"WARNING: {Constants.WINMMLJ} was not found. Judgment games will NOT load mods without this file. Please redownload Shin Ryu Mod Manager.");
-                    }
-                }
-            }
-        }
-        
         // Read ini (again) to check if we should try importing the old load order file
         _iniData = IniParser.ReadFile(Constants.INI);
         
@@ -487,7 +438,7 @@ public static class Program
         // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
         if (MissingDll())
         {
-            Log.Warning($"Warning: \"{Constants.DINPUT8DLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file");
+            Log.Warning($"Warning: \"{Constants.VERSIONDLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file");
         }
         
         // Check if the ASI is not in the directory
@@ -532,7 +483,7 @@ public static class Program
     
     internal static bool MissingDll()
     {
-        return !(File.Exists(Constants.DINPUT8DLL) || File.Exists(Constants.VERSIONDLL) || File.Exists(Constants.WINMMDLL));
+        return !File.Exists(Constants.VERSIONDLL);
     }
     
     internal static bool MissingAsi()

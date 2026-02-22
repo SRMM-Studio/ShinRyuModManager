@@ -22,8 +22,7 @@ TEMP_DIR="$RUNNER_TEMP"
 FRAMEWORK="net10.0"
 
 FILES_TO_COPY=(
-  "dinput8.dll"
-  "winmm.lj"
+  "version.dll"
   "YakuzaParless.asi"
 )
 

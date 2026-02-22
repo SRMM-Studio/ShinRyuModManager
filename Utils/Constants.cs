@@ -9,10 +9,7 @@ public static class Constants
     public const string MOD_LIST = "ModList.ml";
     public const string MLO = "YakuzaParless.mlo";
     public const string ASI = "YakuzaParless.asi";
-    public const string DINPUT8DLL = "dinput8.dll";
     public const string VERSIONDLL = "version.dll";
-    public const string WINMMDLL = "winmm.dll";
-    public const string WINMMLJ = "winmm.lj";
     public const string PARLESS_NAME = ".parless paths";
     public const string EXTERNAL_MODS = "_externalMods";
     public const string VORTEX_MANAGED_FILE = "__folder_managed_by_vortex";

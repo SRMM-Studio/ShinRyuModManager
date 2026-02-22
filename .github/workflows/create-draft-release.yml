@@ -82,8 +82,7 @@ jobs:
           
       - name: Download dinput and winmm
         run: |
-          curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/dinput8.dll -o $RUNNER_TEMP/external/dinput8.dll
-          curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/winmm.lj -o $RUNNER_TEMP/external/winmm.lj
+          curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/version.dll -o $RUNNER_TEMP/external/version.dll
       
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v5

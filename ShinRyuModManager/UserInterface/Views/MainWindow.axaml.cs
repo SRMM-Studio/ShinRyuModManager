@@ -97,7 +97,7 @@ public partial class MainWindow : Window
         {
             if (Program.MissingDll())
             {
-                _ = await MessageBoxWindow.Show(this, "Warning", $"{Constants.DINPUT8DLL} is missing from this directory. Mods will NOT be applied without this file.");
+                _ = await MessageBoxWindow.Show(this, "Warning", $"{Constants.VERSIONDLL} is missing from this directory. Mods will NOT be applied without this file.");
             }
             
             if (Program.MissingAsi())
