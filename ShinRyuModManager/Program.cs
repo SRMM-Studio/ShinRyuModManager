@@ -1,1028 +1,642 @@
-﻿using ShinRyuModManager.ModLoadOrder;
-using ShinRyuModManager.ModLoadOrder.Mods;
-using ShinRyuModManager.Templates;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using IniParser.Model;
-using IniParser;
-using Utils;
-using YamlDotNet.Serialization;
-using static Utils.Constants;
-using static Utils.GamePath;
+﻿using System.Diagnostics;
 using System.IO.Compression;
+using Avalonia;
+using Avalonia.Svg.Skia;
+using CpkTools.Model;
+using IniParser;
+using IniParser.Model;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Formatting.Json;
+using ShinRyuModManager.Extensions;
+using ShinRyuModManager.Helpers;
+using ShinRyuModManager.ModLoadOrder;
+using ShinRyuModManager.ModLoadOrder.Mods;
+using ShinRyuModManager.ModLoadOrder.Mods.Serialization;
+using ShinRyuModManager.Templates;
+using ShinRyuModManager.UserInterface;
+using Utils;
+using Constants = Utils.Constants;
 
-namespace ShinRyuModManager
+namespace ShinRyuModManager;
+
+public static class Program
 {
-    public static class Program
+    private static bool _externalModsOnly = true;
+    private static bool _looseFilesEnabled;
+    private static bool _cpkRepackingEnabled = true;
+    private static bool _checkForUpdates = true;
+    private static bool _isSilent;
+    private static IniData _iniData;
+    
+    private static readonly FileIniDataParser IniParser = new()
     {
-        private const string Kernel32Dll = "kernel32.dll";
-
-        [DllImport(Kernel32Dll)]
-        private static extern bool AllocConsole();
-
-        [DllImport(Kernel32Dll)]
-        private static extern bool FreeConsole();
-        [DllImport(Kernel32Dll, CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern IntPtr GetModuleHandle([MarshalAs(UnmanagedType.LPWStr)] string lpModuleName);
-
-        [DllImport(Kernel32Dll, CharSet = CharSet.Ansi, ExactSpelling = true, SetLastError = true)]
-        static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
-
-        [DllImport(Kernel32Dll, SetLastError = true)]
-        private static extern bool SetDefaultDllDirectories(int directoryFlags);
-
-
-        private static bool externalModsOnly = true;
-        private static bool looseFilesEnabled = false;
-        private static bool cpkRepackingEnabled = true;
-        private static bool checkForUpdates = true;
-        private static bool isSilent = false;
-        private static bool migrated = false;
-
-        public static bool RebuildMLO = true;
-        public static bool IsRebuildMLOSupported = true;
-
-        public static bool IsEmulated = false;
-
-        public static List<LibMeta> LibraryMetaCache = new List<LibMeta>();
-
-
-        private static StreamWriter _logger;
-
-        public static void Log(object message)
+        Parser =
         {
-            string messageStr = message.ToString();
-            Console.WriteLine(messageStr);
-
-            if(_logger != null)
-                _logger.WriteLine(messageStr);
-
-            Debug.WriteLine(messageStr);
-        }
-
-        [STAThread]
-        public static void Main(string[] args)
-        {
-            try
+            Configuration =
             {
-                _logger = new StreamWriter("srmm_log.txt");
-                _logger.AutoFlush = true;
-            }
-            catch
-            {
-                _logger = null;
-            }
-
-            Log("Shin Ryu Mod Manager Start");
-
-            IntPtr ntDllModule = GetModuleHandle("ntdll");
-
-            //jason098: Detect linux emulation like this
-            if (ntDllModule != IntPtr.Zero)
-            {
-                IntPtr wineVersionFunction = GetProcAddress(ntDllModule, "wine_get_version");
-
-                if (wineVersionFunction != IntPtr.Zero)
-                    IsEmulated = true;
-            }
-
-            //29.01.2025
-            //Jhrino: If we don't do this, we break support for linux emulation through protontricks! Meaning it no longer works on steamdeck
-            if (!IsEmulated)
-            {
-                // Try to prevent DLL hijacking by limiting the DLL search path to System32. This should avoid the GUI from crashing due to mod injections.
-                // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
-                if (!SetDefaultDllDirectories(0x00000800)) // 0x00000800 corresponds to %windows%\system32
-                {
-                    Console.WriteLine($"Failed to set DLL search path.\nError: {Marshal.GetLastWin32Error()}");
-                }
-            }
-
-            // Check if left ctrl is pressed to open in CLI (legacy) mode
-            if (args.Length == 0 && !Keyboard.IsKeyDown(Key.LeftCtrl))
-            {
-                // Read the mod list (and execute other RMM stuff)
-                List<ModInfo> mods = PreRun();
-
-                // This should be called only after PreRun() to make sure the ini value was loaded
-                if (Program.ShouldBeExternalOnly())
-                {
-                    MessageBox.Show(
-                        "External mods folder detected. Please run Shin Ryu Mod Manager in CLI mode " +
-                        "(use --cli parameter) and use the external mod manager instead.",
-                        "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                if (Program.ShouldCheckForUpdates())
-                {
-                    new Thread(delegate ()
-                    {
-                        CheckForUpdatesGUI();
-                    }).Start();
-                }
-
-                if (Program.ShowWarnings())
-                {
-                    // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
-                    if (Program.MissingDLL())
-                    {
-                        MessageBox.Show(
-                            VERSIONDLL + " is missing from this directory. Mods will NOT be applied without this file.",
-                            "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-
-                    // Check if the ASI is not in the directory
-                    if (Program.MissingASI())
-                    {
-                        MessageBox.Show(
-                            ASI + " is missing from this directory. Mods will NOT be applied without this file.",
-                            "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-
-                    // Calculate the checksum for the game's exe to inform the user if their version might be unsupported
-                    if (Program.InvalidGameExe())
-                    {
-                        MessageBox.Show(
-                            "Game version is unrecognized. Please use the latest Steam version of the game. " +
-                            "The mod list will still be saved.\nMods may still work depending on the version.",
-                            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-
-                // Seasonal Event
-                if (DateTime.Now.ToString("dd/MM/yy", CultureInfo.InvariantCulture) == "01/04/24")
-                {
-                    if (!Util.CheckFlag(Settings.EVENT_FOOLS24_FLAG_FILE_NAME))
-                    {
-                        Miscellaneous.Fools24.Fools24Window fools24Window = new Miscellaneous.Fools24.Fools24Window();
-                        fools24Window.ShowDialog();
-                        Util.CreateFlag(Settings.EVENT_FOOLS24_FLAG_FILE_NAME);
-                    }
-                }
-                else
-                {
-                    Util.DeleteFlag(Settings.EVENT_FOOLS24_FLAG_FILE_NAME);
-                }
-
-
-                Log("Shin Ryu Mod Manager GUI Application Start");
-
-                MainWindow window = new MainWindow();
-                App app = new App();
-                app.Run(window);
-;
-            }
-            else
-            {
-                bool consoleEnabled = true;
-
-                foreach (string a in args)
-                {
-                    if (a == "-s" || a == "--silent")
-                    {
-                        consoleEnabled = false;
-                        break;
-                    }
-                }
-
-                if (consoleEnabled)
-                    AllocConsole();
-
-                Log("Shin Ryu Mod Manager CLI Mode Start");
-
-                MainCLI(args).Wait();
-
-                if (consoleEnabled)
-                    FreeConsole();
+                AssigmentSpacer = string.Empty
             }
         }
-
-
-        internal static void CheckForUpdatesGUI(bool notifyResult = false)
+    };
+    
+    // Mod List file information
+    public static byte CurrentModListVersion { get => 2; }
+    
+    public static Profile ActiveProfile { get; set; } = Profile.Profile1;
+    
+    public static bool RebuildMlo { get; private set; } = true;
+    public static bool IsRebuildMloSupported { get; private set; } = true;
+    public static LogEventLevel LogLevel { get; private set; } = LogEventLevel.Information;
+    public static List<LibMeta> LibraryMetaCache { get; set; } = [];
+    
+    [STAThread]
+    private static void Main(string[] args)
+    {
+        Directory.CreateDirectory(Constants.LOGS_BASE_PATH);
+        
+        var defaultLogsPath = Path.Combine(Constants.LOGS_BASE_PATH, "srmm_logs.log");
+        var errorLogsPath = Path.Combine(Constants.LOGS_BASE_PATH, "srmm_errors.log");
+        
+        LoadConfig();
+        
+        // Create global logger
+        Log.Logger = new LoggerConfiguration()
+                     .MinimumLevel.ControlledBy(new LoggingLevelSwitch(LogLevel))
+                     .Enrich.WithExceptionDetails()
+                     // Log to SRMM logs file
+                     .WriteTo.Logger(l => l
+                                          .Filter.ByIncludingOnly(e => e.Exception == null)
+                                          .WriteTo.Async(a => a.File(defaultLogsPath, rollingInterval: RollingInterval.Day))
+                                          .WriteTo.Async(a => a.Console()))
+                     // Logs exceptions separately
+                     .WriteTo.Logger(l => l
+                                          .Filter.ByIncludingOnly(e => e.Exception != null)
+                                          .WriteTo.Async(a => a.File(new JsonFormatter(renderMessage: true), errorLogsPath, rollingInterval: RollingInterval.Day)))
+                     .CreateLogger();
+        
+        if (!OperatingSystem.IsWindows())
         {
-            Log("Checking for updates...");
-
-            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string updaterPath = Path.Combine(currentPath, Settings.UPDATER_EXECUTABLE_NAME);
-            string updateFlagPath = Path.Combine(currentPath, Settings.UPDATE_FLAG_FILE_NAME);
-            bool updaterResult = false;
-
-            if (File.Exists(updaterPath))
-            {
-                var versionInfo = FileVersionInfo.GetVersionInfo(updaterPath);
-                string version = versionInfo.FileVersion;
-                updaterResult = UpdateUpdater(updaterPath, version);
-            }
-            else //Updater not present. Download latest
-            {
-                updaterResult = UpdateUpdater(updaterPath);
-            }
-
-            if (updaterResult)
-            {
-                Process proc = new Process();
-                proc.StartInfo.FileName = updaterPath;
-                proc.StartInfo.Arguments = $"-v {Util.GetAppVersion()} -c";
-                proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                proc.Start();
-                proc.WaitForExit();
-            }
-
-            if (File.Exists(updateFlagPath))
-            {
-                string updateVersion = File.ReadAllText(updateFlagPath);
-                File.Delete(updateFlagPath);
-                MessageBoxResult result = MessageBox.Show($"Shin Ryu Mod Manager version {updateVersion} is available for download.\nWould you like to update now?", "Update Available", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                if (result == MessageBoxResult.Yes)
-                {
-                    Process proc = new Process();
-                    proc.StartInfo.FileName = updaterPath;
-                    proc.StartInfo.Arguments = $"-v {Util.GetAppVersion()}";
-                    proc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-                    proc.Start();
-                    Environment.Exit(0x55504454); //UPDT
-                }
-                else if (result == MessageBoxResult.No)
-                {
-                    return;
-                }
-            }
-            else if (notifyResult)
-            {
-                MessageBox.Show("No SRMM updates available.", "No updates", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+            IsRebuildMloSupported = false;
         }
-
-
-        private static bool UpdateUpdater(string updaterPath, string currentVersion = "0.0.0")
+        
+        // Check if there are any args, if so, run in CLI mode
+        // Unfortunately, no one way to detect left Ctrl while being cross-platform
+        if (args.Length == 0)
         {
-            try
-            {
-                WebClient client = new WebClient();
-                string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.UPDATE_INFO_REPO_OWNER}/{Settings.UPDATE_INFO_REPO}/main/{Settings.UPDATE_INFO_FILE_PATH}");
-
-                var deserializer = new DeserializerBuilder().Build();
-                var yamlObject = deserializer.Deserialize<Updater>(yamlString);
-
-                bool isHigher = Util.CompareVersionIsHigher(yamlObject.Version, currentVersion);
-                if (isHigher)
-                {
-                    client.DownloadFile(yamlObject.Download, updaterPath);
-                    MessageBox.Show($"RyuUpdater has been updated to version {yamlObject.Version}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-
-                client.Dispose();
-                return true;
-            }
-            catch (WebException)
-            {
-                MessageBox.Show("Could not fetch update data.\nThis could be a problem with your internet connection or GitHub.\nPlease try again later.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
+            Log.Information("Shin Ryu Mod Manager GUI Application Start");
+            
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
-
-
-        public static async Task MainCLI(string[] args)
+        else
         {
-            Console.WriteLine($"Shin Ryu Mod Manager v{AssemblyVersion.GetVersion()}");
-            Console.WriteLine($"By SRMM Studio (a continuation of SutandoTsukai181's work)\n");
-
-            // Parse arguments
-            List<string> list = new List<string>(args);
-
-            if (list.Contains("-h") || list.Contains("--help"))
-            {
-                Console.WriteLine("Usage: run without arguments to generate mod load order.");
-                Console.WriteLine("       run with \"-s\" or \"--silent\" flag to prevent checking for updates and remove prompts.");
-                Console.WriteLine("       run with \"-r\" or \"--run\" flag to run the game after the program finishes.");
-                Console.WriteLine("       run with \"-h\" or \"--help\" flag to show this message and exit.");
-
-                return;
-            }
-
-            if (list.Contains("-s") || list.Contains("--silent"))
-            {
-                isSilent = true;
-            }
-
-            await RunGeneration(ConvertNewToOldModList(PreRun())).ConfigureAwait(true);
-            await PostRun().ConfigureAwait(true);
-
-            if (list.Contains("-r") || list.Contains("--run"))
-            {
-                // Run game
-                if (File.Exists(GetGameExe()))
-                {
-                    Console.WriteLine($"Launching \"{GetGameExe()}\"...");
-                    Process.Start(GetGameExe());
-                }
-                else
-                {
-                    Console.WriteLine($"Warning: Could not run game because \"{GetGameExe()}\" does not exist.");
-                }
-            }
-        }
-
-
-        public static List<ModInfo> PreRun()
-        {
-            var iniParser = new FileIniDataParser();
-            iniParser.Parser.Configuration.AssigmentSpacer = string.Empty;
-
-            Game game = GamePath.GetGame();
-
-            IniData ini;
-            if (File.Exists(INI))
-            {
-                ini = iniParser.ReadFile(INI);
-
-                if (ini.TryGetKey("Overrides.LooseFilesEnabled", out string looseFiles))
-                {
-                    looseFilesEnabled = int.Parse(looseFiles) == 1;
-                }
-
-                if (ini.TryGetKey("RyuModManager.Verbose", out string verbose))
-                {
-                    ConsoleOutput.Verbose = int.Parse(verbose) == 1;
-                }
-
-                if (ini.TryGetKey("RyuModManager.CheckForUpdates", out string check))
-                {
-                    checkForUpdates = int.Parse(check) == 1;
-                }
-
-                if (ini.TryGetKey("RyuModManager.ShowWarnings", out string showWarnings))
-                {
-                    ConsoleOutput.ShowWarnings = int.Parse(showWarnings) == 1;
-                }
-
-                if (ini.TryGetKey("RyuModManager.LoadExternalModsOnly", out string extMods))
-                {
-                    externalModsOnly = int.Parse(extMods) == 1;
-                }
-
-                if (ini.TryGetKey("Overrides.RebuildMLO", out string rebuildMLO))
-                {
-                    RebuildMLO = int.Parse(rebuildMLO) == 1;
-                }
-
-                if (!ini.TryGetKey("Parless.IniVersion", out string iniVersion) || int.Parse(iniVersion) < ParlessIni.CurrentVersion)
-                {
-                    // Update if ini version is old (or does not exist)
-                    Console.Write(INI + " is outdated. Updating ini to the latest version... ");
-
-                    if (int.Parse(iniVersion) <= 3)
-                    {
-                        // Force enable RebuildMLO option
-                        ini.Sections["Overrides"]["RebuildMLO"] = "1";
-                        RebuildMLO = true;
-                    }
-
-                    iniParser.WriteFile(INI, IniTemplate.UpdateIni(ini));
-                    Console.WriteLine("DONE!\n");
-                }
-            }
-            else
-            {
-                // Create ini if it does not exist
-                Console.Write(INI + " was not found. Creating default ini... ");
-                iniParser.WriteFile(INI, IniTemplate.NewIni());
-                Console.WriteLine("DONE!\n");
-            }
-
-            if (game != Game.Unsupported && !Directory.Exists(MODS))
-            {
-                if (!Directory.Exists(MODS))
-                {
-                    // Create mods folder if it does not exist
-                    Console.Write($"\"{MODS}\" folder was not found. Creating empty folder... ");
-                    Directory.CreateDirectory(MODS);
-                    Console.WriteLine("DONE!\n");
-                }
-
-                if (!Directory.Exists(LIBRARIES))
-                {
-                    // Create libraries folder if it does not exist
-                    Console.Write($"\"{LIBRARIES}\" folder was not found. Creating empty folder... ");
-                    Directory.CreateDirectory(LIBRARIES);
-                    Console.WriteLine("DONE!\n");
-                }
-            }
-
-            // Read ini (again) to check if we should try importing the old load order file
-            ini = iniParser.ReadFile(INI);
-
-            if (game == Game.Judgment || game == Game.LostJudgment || game == Game.likeadragonpirates)
-            {
-                // Disable RebuildMLO when using an external mod manager
-                if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
-                {
-                    Console.Write($"Game specific patch: Disabling RebuildMLO for some games when using an external mod manager...");
-
-                    ini.Sections["Overrides"]["RebuildMLO"] = "0";
-                    iniParser.WriteFile(INI, ini);
-
-                    Console.WriteLine(" DONE!\n");
-                }
-            }
-
-            List<ModInfo> mods = new List<ModInfo>();
-
-            if (ShouldBeExternalOnly())
-            {
-                // Only load the files inside the external mods path, and ignore the load order in the txt
-                mods.Add(new ModInfo(EXTERNAL_MODS));
-            }
-            else
-            {
-                bool defaultEnabled = true;
-
-                if (File.Exists(TXT_OLD) && ini.GetKey("SavedSettings.ModListImported") == null)
-                {
-                    // Scanned mods should be disabled, because that's how they were with the old txt format
-                    defaultEnabled = false;
-
-                    // Set a flag so we can delete the old file after we actually save the mod list
-                    migrated = true;
-
-                    // Migrate old format to new
-                    Console.Write("Old format load order file (" + TXT_OLD + ") was found. Importing to the new format...");
-                    mods.AddRange(ConvertOldToNewModList(ReadModLoadOrderTxt(TXT_OLD)).Where(n => !mods.Any(m => EqualModNames(m.Name, n.Name))));
-                    Console.WriteLine(" DONE!\n");
-                }
-                else if (File.Exists(TXT))
-                {
-                    mods.AddRange(ReadModListTxt(TXT).Where(n => !mods.Any(m => EqualModNames(m.Name, n.Name))));
-                }
-                else
-                {
-                    Console.WriteLine(TXT + " was not found. Will load all existing mods.\n");
-                }
-
-                if (Directory.Exists(MODS))
-                {
-                    // Add all scanned mods that have not been added to the load order yet
-                    Console.Write("Scanning for mods...");
-                    mods.AddRange(ScanMods().Where(n => !mods.Any(m => EqualModNames(m.Name, n))).Select(m => new ModInfo(m, defaultEnabled)));
-                    Console.WriteLine(" DONE!\n");
-                }
-            }
-
-            if (GamePath.IsXbox(Path.Combine(GetGamePath())))
-            {
-                if (ini.TryGetKey("Overrides.RebuildMLO", out string _))
-                {
-                    Console.Write($"Game specific patch: Disabling RebuildMLO for Xbox games...");
-
-                    ini.Sections["Overrides"]["RebuildMLO"] = "0";
-                    iniParser.WriteFile(INI, ini);
-
-                    Console.WriteLine(" DONE!\n");
-                }
-            }
-
-            return mods;
-        }
-
-
-        public static async Task<bool> RunGeneration(List<string> mods)
-        {
-            if (File.Exists(Utils.Constants.MLO))
-            {
-                Console.Write("Removing old MLO...");
-
-                // Remove existing MLO file to avoid it being used if a new MLO won't be generated
-                File.Delete(Utils.Constants.MLO);
-
-                Console.WriteLine(" DONE!\n");
-            }
-
-            // Remove previously repacked pars, to avoid unwanted side effects
-            ParRepacker.RemoveOldRepackedPars();
-
-            var game = GamePath.GetGame();
-
-            if (game != Game.Unsupported)
-            {
-                if (mods?.Count > 0 || looseFilesEnabled)
-                {
-                    // Create Parless mod as highest priority
-                    if (mods.Contains("Parless"))
-                    {
-                        mods.Remove("Parless");
-                    }
-                    mods.Insert(0, "Parless");
-                    Directory.CreateDirectory(PARLESS_MODS_PATH);
-
-                    Log("Generating MLO...");
-
-                    Stopwatch mloTimer = new Stopwatch();
-                    mloTimer.Start();
-
-                    MLO result = await Generator.GenerateModLoadOrder(mods, looseFilesEnabled, cpkRepackingEnabled).ConfigureAwait(false);
-
-                    if (GameModel.SupportsUBIK(game))
-                    {
-                        GameModel.DoUBIKProcedure(result);
-                    }
-
-                    switch(game)
-                    {
-                        case Game.Yakuza5:
-                            GameModel.DoY5HActProcedure(result);
-                            break;
-
-                        case Game.yakuza0_dc:
-                            GameModel.DoOEHActProcedure(result);
-                            GameModel.DoY0DCLegacyModsUpgrade(result);
-                            break;
-                        case Game.Yakuza0:
-                        case Game.YakuzaKiwami:
-                            GameModel.DoOEHActProcedure(result);
-                            break;
-                        case Game.yakuzakiwami_r:
-                            GameModel.DoOEHActProcedure(result);
-                            GameModel.DoY0DCLegacyModsUpgrade(result);
-                            break;
-                        case Game.YakuzaKiwami2:
-                            GameModel.DoDEHActProcedure(result, "lexus2");
-                            break;
-                        case Game.yakuzakiwami2_r:
-                            GameModel.DoDEHActProcedure(result, "lexus2");
-                            GameModel.DoYK2RemasterLegacyDBUpgrade(result);
-                            break;
-                        case Game.Judgment:
-                            GameModel.DoDEHActProcedure(result, "judge");
-                            break;
-                        case Game.YakuzaLikeADragon:
-                            GameModel.DoDEHActProcedure(result, "yazawa");
-                            break;
-                        case Game.likeadragongaiden:
-                            GameModel.DoDEHActProcedure(result, "aston");
-                            break;
-                        case Game.LostJudgment:
-                            GameModel.DoDEHActProcedure(result, "coyote");
-                            break;
-                        case Game.likeadragon8:
-                            GameModel.DoDEHActProcedure(result, "elvis");
-                            break;
-                        case Game.likeadragonpirates:
-                            GameModel.DoDEHActProcedure(result, "spr");
-                            break;
-                        case Game.yakuzakiwami3:
-                            GameModel.DoYK3HActProcedure(result, "bis");
-                            GameModel.DoTalkProcedureYK3(result, "bis");
-                            break;
-                    }
-
-                    Log("Writing MLO...");
-                    result.WriteMLO(Path.Combine(GamePath.GetGamePath(), Constants.MLO));
-
-                    mloTimer.Stop();
-                    Log("MLO Generation took: " + mloTimer.Elapsed.TotalSeconds + " seconds.");
-
-                    return true;
-                }
-
-                Console.WriteLine("Aborting: No mods were found, and .parless paths are disabled\n");
-            }
-            else
-            {
-                Console.WriteLine("Aborting: No supported game was found in this directory\n");
-            }
-
-            return false;
-        }
-
-
-        public static async Task PostRun()
-        {
-            // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
-            if (MissingDLL())
-            {
-                Console.WriteLine($"Warning: \"{VERSIONDLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file\n");
-            }
-
-            // Check if the ASI is not in the directory
-            if (MissingASI())
-            {
-                Console.WriteLine($"Warning: \"{ASI}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file\n");
-            }
-
-            // Calculate the checksum for the game's exe to inform the user if their version might be unsupported
-            if (ConsoleOutput.ShowWarnings && InvalidGameExe())
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Warning: Game version is unrecognized. Please use the latest Steam version of the game.");
-                Console.WriteLine($"Shin Ryu Mod Manager will still generate the load order, but the game might CRASH or not function properly\n");
-                Console.ResetColor();
-            }
-
-            if (!isSilent)
-            {
-                Console.WriteLine("Program finished. Press any key to exit...");
-                Console.ReadKey();
-            }
-        }
-
-
-        public static bool ShowWarnings()
-        {
-            return ConsoleOutput.ShowWarnings;
-        }
-
-
-        public static bool MissingDLL()
-        {
-            return !File.Exists(VERSIONDLL);
-        }
-
-
-        public static bool MissingASI()
-        {
-            return !File.Exists(ASI);
-        }
-
-
-        public static bool InvalidGameExe()
-        {
-            return false;
-
-            /*
-            string path = Path.Combine(GetGamePath(), GetGameExe());
-            return GetGame() == Game.Unsupported || !GameHash.ValidateFile(path, GetGame());
-            */
-        }
-
-
-        /// <summary>
-        /// Read the load order from ModLoadOrder.txt (old format).
-        /// </summary>
-        /// <param name="txt">expected to be "ModLoadOrder.txt".</param>
-        /// <returns>list of strings containing mod names according to the load order in the file.</returns>
-        public static List<string> ReadModLoadOrderTxt(string txt)
-        {
-            List<string> mods = new List<string>();
-
-            if (!File.Exists(txt))
-            {
-                return mods;
-            }
-
-            StreamReader file = new StreamReader(new FileInfo(txt).FullName);
-
-            string line;
-            while ((line = file.ReadLine()) != null)
-            {
-                if (!line.StartsWith(";"))
-                {
-                    line = line.Split(new char[] { ';' }, 1)[0];
-
-                    // Only add existing mods that are not duplicates
-                    if (line.Length > 0 && Directory.Exists(Path.Combine(MODS, line)) && !mods.Contains(line))
-                    {
-                        mods.Add(line);
-                    }
-                }
-            }
-
-            file.Close();
-
-            return mods;
-        }
-
-        public static string GetModDirectory(string mod)
-        {
-            return Path.Combine(GetModsPath(), mod);
-        }
-
-
-        public static string[] GetModDependencies(string mod)
-        {
-            string modDir = GetModDirectory(mod);
-
-            if (!Directory.Exists(modDir))
-                return new string[0];
-
-            string metaFile = Path.Combine(modDir, "mod-meta.yaml");
-
-            if (!File.Exists(metaFile))
-                return new string[0];
-
-            string yamlString = File.ReadAllText(metaFile, System.Text.Encoding.UTF8);
-            var deserializer = new DeserializerBuilder().Build();
-            var meta = deserializer.Deserialize<ModMeta>(yamlString);
-
-            if (string.IsNullOrEmpty(meta.Dependencies))
-                return new string[0];
-
-            return meta.Dependencies.Split(';');
-        }
-
-        public static string GetLibraryPath(string guid)
-        {
-            string libDir = Path.Combine(GamePath.GetLibrariesPath(), guid);
-            return libDir;
-        }
-
-        public static string GetLocalLibraryCopyPath()
-        {
-            return Path.Combine(GamePath.GetLibrariesPath(), Settings.LIBRARIES_INFO_REPO_FILE_PATH);
-        }
-
-        //Read cached data at startup if it exists
-        public static void ReadCachedLocalLibraryData()
-        {
-            string path = GetLocalLibraryCopyPath();
-
-            if (!File.Exists(path))
-                return;
-
-            LibMeta.ReadLibMetaManifest(File.ReadAllText(path));
-        }
-
-        public static LibMeta GetLibMeta(string guid)
-        {
-            return LibraryMetaCache.FirstOrDefault(x => x.GUID.ToString() == guid);
-        }
-
-        public static bool DoesLibraryExist(string guid)
-        {
-            string libDir = GetLibraryPath(guid);
-
-            if (!Directory.Exists(libDir))
-                return false;
-
-            return true;
-        }
-
-        public static bool IsLibraryEnabled(string guid)
-        {
-            if (!DoesLibraryExist(guid))
-                return false;
-
-            if (File.Exists(Path.Combine(GetLibraryPath(guid), ".disabled")))
-                return false;
-
-            return true;
-        }
-
-        public static string GetLibraryName(string guid)
-        {
-            var metaData = GetLibMeta(guid);
-
-            if (metaData != null)
-                return metaData.Name;
-
-            string path = Path.Combine(GetLibraryPath(guid), Settings.LIBRARIES_LIBMETA_FILE_NAME);
-
-            if (File.Exists(path))
-            {
-                string yamlString = File.ReadAllText(path);
-                LibMeta meta = LibMeta.ReadLibMeta(yamlString);
-                return meta.Name;
-            }
-
-            return guid;
-        }
-
-        public static void InstallLibrary(string guid)
-        {
-            var metaFile = GetLibMeta(guid);
-
-            if (metaFile == null || string.IsNullOrEmpty(metaFile.Download))
-                return;
-
-            string DownloadLibraryPackage(string fileName)
-            {
-                Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Settings.TEMP_DIRECTORY_NAME));
-
-                try
-                {
-                    string path = Path.Combine(Path.GetTempPath(), Settings.TEMP_DIRECTORY_NAME, fileName);
-                    using (var client = new WebClient())
-                    {
-                        client.DownloadFile(metaFile.Download, Path.Combine(Path.GetTempPath(), Settings.TEMP_DIRECTORY_NAME, fileName));
-                        return path;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                    return "";
-                }
-            }
-
-            string packagePath = DownloadLibraryPackage($"{guid.ToString()}.zip");
-            if (packagePath != "")
-            {
-                using (FileStream zipToOpen = new FileStream(packagePath, FileMode.Open))
-                {
-                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
-                    {
-                        string destinationDir = Path.Combine(GamePath.GetLibrariesPath(), guid.ToString());
-                        Directory.CreateDirectory(destinationDir);
-                        archive.ExtractToDirectory(destinationDir, true);
-                    }
-                }
-            }
-
-        }
-
-        //Iterate on all enabled mods and try installing their dependencies
-        public static void InstallAllModDependencies()
-        {
-            //Lets ensure we have latest library information as we check/install deps
-            try
-            {
-                LibMeta.Fetch();
-            }
-            catch
-            {
-                //What can i do Sometimes
-            }
-
-            List<ModInfo> t = ReadModListTxt(TXT);
-
-            foreach(var mod in t.Where(x => x.Enabled))
-            {
-                InstallModDependencies(mod.Name);
-            }
-        }
-
-        public static void InstallModDependencies(string mod)
-        {
-            string modDir = GetModDirectory(mod);
-
-            if (!Directory.Exists(modDir))
-                return;
-
-            string metaFile = Path.Combine(modDir, "mod-meta.yaml");
-
-            if (!File.Exists(metaFile))
-                return;
-
-            string yamlString = File.ReadAllText(metaFile, System.Text.Encoding.UTF8);
-            var deserializer = new DeserializerBuilder().Build();
-            var meta = deserializer.Deserialize<ModMeta>(yamlString);
-
-            if (string.IsNullOrEmpty(meta.Dependencies))
-                return;
-
-            string[] dependencies = meta.Dependencies.Split(';');
-
-            foreach(string dep in dependencies)
-                if(!DoesLibraryExist(dep))
-                {
-                    InstallLibrary(dep);
-                }
-        }
-
-        /// <summary>
-        /// Read the mod list from ModList.txt (current format).
-        /// </summary>
-        /// <param name="txt">expected to be "ModList.txt".</param>
-        /// <returns>list of ModInfo for each mod in the file.</returns>
-        public static List<ModInfo> ReadModListTxt(string txt)
-        {
-            List<ModInfo> mods = new List<ModInfo>();
-
-            if (!File.Exists(txt))
-            {
-                return mods;
-            }
-
-            StreamReader file = new StreamReader(new FileInfo(txt).FullName);
-
-            string line = file.ReadLine();
-
-            if (line != null)
-            {
-                foreach (string mod in line.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    if (mod.StartsWith("<") || mod.StartsWith(">"))
-                    {
-                        ModInfo info = new ModInfo(mod.Substring(1), mod[0] == '<');
-
-                        if (ModInfo.IsValid(info) && !mods.Contains(info))
-                        {
-                            mods.Add(info);
-                        }
-                    }
-                }
-            }
-
-            file.Close();
-
-            return mods;
-        }
-
-
-        public static bool SaveModList(List<ModInfo> mods)
-        {
-            bool result = WriteModListTxt(mods);
-
-            if (migrated)
-            {
-                try
-                {
-                    File.Delete(TXT_OLD);
-
-                    var iniParser = new FileIniDataParser();
-                    iniParser.Parser.Configuration.AssigmentSpacer = string.Empty;
-
-                    IniData ini = iniParser.ReadFile(INI);
-                    ini.Sections.AddSection("SavedSettings");
-                    ini["SavedSettings"].AddKey("ModListImported", "true");
-                    iniParser.WriteFile(INI, ini);
-                }
-                catch
-                {
-                    Console.WriteLine("Could not delete " + TXT_OLD + ". This file should be deleted manually.");
-                }
-            }
-
-            return result;
-        }
-
-
-        private static bool WriteModListTxt(List<ModInfo> mods)
-        {
-            // No need to write the file if it's going to be empty
-            if (mods?.Count > 0)
-            {
-                string content = "";
-
-                foreach (ModInfo m in mods)
-                {
-                    content += "|" + (m.Enabled ? "<" : ">") + m.Name;
-                }
-
-                File.WriteAllText(TXT, content.Substring(1));
-
-                return true;
-            }
-
-            return false;
-        }
-
-
-        public static List<ModInfo> ConvertOldToNewModList(List<string> mods)
-        {
-            return mods.Select(m => new ModInfo(m)).ToList();
-        }
-
-
-        public static List<string> ConvertNewToOldModList(List<ModInfo> mods)
-        {
-            return mods.Where(m => m.Enabled).Select(m => m.Name).ToList();
-        }
-
-
-        public static bool ShouldBeExternalOnly()
-        {
-            return externalModsOnly && Directory.Exists(GetExternalModsPath());
-        }
-
-
-        public static bool ShouldCheckForUpdates()
-        {
-            return checkForUpdates;
-        }
-
-
-        private static List<string> ScanMods()
-        {
-            return Directory.GetDirectories(GetModsPath())
-                .Select(d => Path.GetFileName(d.TrimEnd(new char[] { Path.DirectorySeparatorChar })))
-                .Where(m => (m != "Parless") && (m != EXTERNAL_MODS))
-                .ToList();
-        }
-
-
-        private static bool EqualModNames(string m, string n)
-        {
-            return string.Compare(m, n, StringComparison.InvariantCultureIgnoreCase) == 0;
+            Log.Information("Shin Ryu Mod Manager CLI Mode Start");
+            
+            MainCli(args).GetAwaiter().GetResult();
         }
     }
-
-
-
-    public class Updater
+    
+    private static AppBuilder BuildAvaloniaApp()
     {
-        public string Version { get; set; }
-        public string Download { get; set; }
+        GC.KeepAlive(typeof(SvgImageExtension).Assembly);
+        GC.KeepAlive(typeof(Svg.Skia.SKSvg).Assembly);
+        
+        return AppBuilder.Configure<App>()
+                         .UsePlatformDetect()
+                         .WithInterFont()
+                         .LogToTrace();
+    }
+    
+    private static async Task MainCli(string[] args)
+    {
+        Log.Information("Shin Ryu Mod Manager v{Version}", AssemblyVersion.GetVersion());
+        
+        // Parse arguments
+        var list = new List<string>(args);
+        
+        if (list.Contains("-h") || list.Contains("--help"))
+        {
+            Log.Information("""
+                            Usage: run without arguments to generate mod load order.
+                              -s, --silent     prevent checking for updates and remove prompts.
+                              -h, --help       show this message and exit.
+                              -r, --run        run the game after the program finishes.
+                            """);
+            
+            return;
+        }
+        
+        if (list.Contains("-s") || list.Contains("--silent"))
+        {
+            _isSilent = true;
+        }
+        
+        await RunGeneration(PreRun().Where(x => x.Enabled).ToList());
+        
+        PostRun();
+        
+        await Log.CloseAndFlushAsync();
+        
+        if (list.Contains("-r") || list.Contains("--run"))
+        {
+            var gameLaunchPath = GamePath.GetGameLaunchPath();
+            
+            if (!string.IsNullOrEmpty(gameLaunchPath))
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    Process.Start(new ProcessStartInfo(gameLaunchPath)
+                    {
+                        UseShellExecute = true
+                    });
+                }
+                else if (OperatingSystem.IsLinux())
+                {
+                    Process.Start("xdg-open", gameLaunchPath);
+                }
+            }
+            else
+            {
+                Log.Error("The game can't be launched. Please launch manually.");
+            }
+        }
+    }
+    
+    private static void LoadConfig()
+    {
+        if (File.Exists(Constants.INI))
+        {
+            _iniData = IniParser.ReadFile(Constants.INI);
+            
+            if (_iniData.TryGetKey("Overrides.LooseFilesEnabled", out var looseFiles))
+            {
+                _looseFilesEnabled = int.Parse(looseFiles) == 1;
+            }
+            
+            if (_iniData.TryGetKey("RyuModManager.Verbose", out var verbose) && int.Parse(verbose) == 1)
+            {
+                LogLevel = LogEventLevel.Verbose;
+            }
+            
+            if (_iniData.TryGetKey("RyuModManager.CheckForUpdates", out var check))
+            {
+                _checkForUpdates = int.Parse(check) == 1;
+            }
+            
+            if (_iniData.TryGetKey("RyuModManager.ShowWarnings", out var showWarnings))
+            {
+                //ConsoleOutput.ShowWarnings = int.Parse(showWarnings) == 1;
+            }
+            
+            if (_iniData.TryGetKey("RyuModManager.LoadExternalModsOnly", out var extMods))
+            {
+                _externalModsOnly = int.Parse(extMods) == 1;
+            }
+            
+            if (_iniData.TryGetKey("Overrides.RebuildMLO", out var rebuildMlo))
+            {
+                RebuildMlo = int.Parse(rebuildMlo) == 1;
+            }
+            
+            if (!_iniData.TryGetKey("Parless.IniVersion", out var iniVersion) ||
+                int.Parse(iniVersion) < ParlessIni.CURRENT_VERSION)
+            {
+                // Update if ini version is old (or does not exist)
+                Log.Information($"{Constants.INI} is outdated. Updating ini to the latest version... ");
+                
+                if (int.Parse(iniVersion) <= 3)
+                {
+                    // Force enable RebuildMLO option
+                    _iniData.Sections["Overrides"]["RebuildMLO"] = "1";
+                    RebuildMlo = true;
+                }
+                
+                IniParser.WriteFile(Constants.INI, IniTemplate.UpdateIni(_iniData));
+                Log.Information($"Updated {Constants.INI}");
+            }
+        }
+        else
+        {
+            // Create ini if it does not exist
+            Log.Information($"{Constants.INI} was not found. Creating default ini...");
+            IniParser.WriteFile(Constants.INI, IniTemplate.NewIni());
+        }
+    }
+    
+    internal static List<ModInfo> PreRun(Profile? profile = null)
+    {
+        if (GamePath.CurrentGame != Game.Unsupported)
+        {
+            Directory.CreateDirectory(GamePath.MODS);
+            Directory.CreateDirectory(GamePath.LIBRARIES);
+        }
+        
+        Log.Information("Active Profile: {Profile}", profile?.GetDescription() ?? ActiveProfile.GetDescription());
+        
+        // Read ini (again) to check if we should try importing the old load order file
+        _iniData = IniParser.ReadFile(Constants.INI);
+        
+        if (GamePath.CurrentGame is Game.Judgment or Game.LostJudgment or Game.LikeADragonPirates
+            && _iniData.TryGetKey("Overrides.RebuildMLO", out _))
+        {
+            // Disable RebuildMLO when using an external mod manager
+            Log.Warning("Game specific patch: Disabling RebuildMLO for some games when using an external mod manager...");
+            
+            _iniData.Sections["Overrides"]["RebuildMLO"] = "0";
+            IniParser.WriteFile(Constants.INI, _iniData);
+            RebuildMlo = false;
+        }
+        
+        var mods = new List<ModInfo>();
+        
+        if (ShouldBeExternalOnly())
+        {
+            // Only load the files inside the external mods path, and ignore the load order in the txt
+            mods.Add(new ModInfo(Constants.EXTERNAL_MODS, 0));
+        }
+        else
+        {
+            if (File.Exists(Constants.TXT_OLD))
+            {
+                mods.AddRange(ModListSerializer.Read(Constants.TXT_OLD, profile));
+                
+                File.Move(Constants.TXT_OLD, $"{Constants.TXT_OLD}.bak", true);
+            }
+            else if (File.Exists(Constants.TXT))
+            {
+                mods.AddRange(ModListSerializer.Read(Constants.TXT, profile));
+                
+                File.Move(Constants.TXT, $"{Constants.TXT}.bak", true);
+            }
+            else if (File.Exists(Constants.MOD_LIST))
+            {
+                mods.AddRange(ModListSerializer.Read(Constants.MOD_LIST, profile));
+            }
+            else
+            {
+                Log.Information($"{Constants.MOD_LIST} was not found. Will load all existing mods.\n");
+            }
+            
+            if (Directory.Exists(GamePath.ModsPath))
+            {
+                // Add all scanned mods that have not been added to the load order yet
+                Log.Information("Scanning for mods...");
+                
+                foreach (var newMod in ScanMods().Where(newMod => !mods.Contains(newMod)))
+                {
+                    mods.Add(newMod);
+                }
+                
+                Log.Information("Found {ModsCount} mods.", mods.Count);
+            }
+            
+            Log.Information("Enabled Mods:");
+            
+            foreach (var mod in mods.Where(x => x.Enabled))
+            {
+                Log.Information("    {ModName}", mod.Name);
+            }
+        }
+        
+        if (!GamePath.IsXbox(Path.Combine(GamePath.FullGamePath)) || !_iniData.TryGetKey("Overrides.RebuildMLO", out _))
+            return mods;
+        
+        Log.Warning("Game specific patch: Disabling RebuildMLO for Xbox games...");
+        
+        _iniData.Sections["Overrides"]["RebuildMLO"] = "0";
+        IniParser.WriteFile(Constants.INI, _iniData);
+        RebuildMlo = false;
+        
+        return mods;
+    }
+    
+    internal static async Task RunGeneration(List<ModInfo> mods)
+    {
+        if (File.Exists(Constants.MLO))
+        {
+            Log.Information("Removing old MLO...");
+            
+            // Remove existing MLO file to avoid it being used if a new MLO won't be generated
+            File.Delete(Constants.MLO);
+        }
+        
+        // Remove previously repacked pars, to avoid unwanted side effects
+        ParRepacker.RemoveOldRepackedPars();
+        
+        if (GamePath.CurrentGame == Game.Unsupported)
+        {
+            Log.Warning("Aborting: No supported game was found in this directory");
+            
+            return;
+        }
+        
+        if (!mods.IsNullOrEmpty() || _looseFilesEnabled)
+        {
+            // Create Parless mod as highest priority
+            var parlessEntry = mods.FirstOrDefault(x => string.Equals(x.Name, "Parless", StringComparison.InvariantCultureIgnoreCase));
+            
+            if (parlessEntry != null)
+            {
+                mods.Remove(parlessEntry);
+                mods.Insert(0, parlessEntry);
+            }
+            else
+            {
+                mods.Insert(0, new ModInfo("Parless", 0));
+            }
+            
+            Directory.CreateDirectory(Constants.PARLESS_MODS_PATH);
+            
+            Log.Information("Generating MLO...");
+            
+            var sw = Stopwatch.StartNew();
+            
+            var result = await Generator.GenerateModeLoadOrder(mods, _looseFilesEnabled, _cpkRepackingEnabled);
+            
+            if (GameModel.SupportsUBIK(GamePath.CurrentGame))
+            {
+                GameModel.DoUBIKProcedure(result);
+            }
+            
+            switch (GamePath.CurrentGame)
+            {
+                case Game.Yakuza5:
+                    GameModel.DoY5HActProcedure(result);
+                    
+                    break;
+                
+                case Game.Yakuza0:
+                case Game.YakuzaKiwami:
+                    GameModel.DoOEHActProcedure(result);
+                    
+                    break;
+                
+                case Game.Yakuza0_DC:
+                case Game.YakuzaKiwami_R:
+                    GameModel.DoOEHActProcedure(result);
+                    GameModel.DoY0DCLegacyModsUpgrade(result);
+                    
+                    break;
+                
+                case Game.YakuzaKiwami2:
+                    GameModel.DoDEHActProcedure(result, "lexus2");
+                    
+                    break;
+                
+                case Game.YakuzaKiwami2_R:
+                    GameModel.DoDEHActProcedure(result, "lexus2");
+                    GameModel.DoYK2RemasterLegacyDBUpgrade(result);
+                    
+                    break;
+                
+                case Game.Judgment:
+                    GameModel.DoDEHActProcedure(result, "judge");
+                    
+                    break;
+                
+                case Game.YakuzaLikeADragon:
+                    GameModel.DoDEHActProcedure(result, "yazawa");
+                    
+                    break;
+                
+                case Game.LikeADragonGaiden:
+                    GameModel.DoDEHActProcedure(result, "aston");
+                    
+                    break;
+                
+                case Game.LostJudgment:
+                    GameModel.DoDEHActProcedure(result, "coyote");
+                    
+                    break;
+                
+                case Game.LikeADragon8:
+                    GameModel.DoDEHActProcedure(result, "elvis");
+                    
+                    break;
+                
+                case Game.LikeADragonPirates:
+                    GameModel.DoDEHActProcedure(result, "spr");
+                    
+                    break;
+                
+                case Game.YakuzaKiwami3:
+                    GameModel.DoYK3HActProcedure(result, "bis");
+                    GameModel.DoTalkProcedureYK3(result, "bis");
+                    
+                    break;
+            }
+            
+            sw.Stop();
+            Log.Information("MLO Generation took: {ElapsedTotalSeconds} seconds", sw.Elapsed.TotalSeconds);
+        }
+    }
+    
+    private static void PostRun()
+    {
+        // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
+        if (MissingDll())
+        {
+            Log.Warning($"Warning: \"{Constants.VERSIONDLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file");
+        }
+        
+        // Check if the ASI is not in the directory
+        if (MissingAsi())
+        {
+            Log.Warning($"Warning: \"{Constants.ASI}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file");
+        }
+        
+        if (!_isSilent)
+        {
+            Log.Information("Program finished. Press any key to exit...");
+            Console.ReadKey();
+        }
+    }
+    
+    internal static bool ShouldBeExternalOnly()
+    {
+        return _externalModsOnly && Directory.Exists(GamePath.ExternalModsPath);
+    }
+    
+    private static List<ModInfo> ScanMods(ProfileMask activeProfiles = ProfileMask.All)
+    {
+        var mods = new List<ModInfo>();
+        
+        foreach (var dir in Directory.EnumerateDirectories(GamePath.ModsPath))
+        {
+            var modPath = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
+            
+            if (string.Equals(modPath, "Parless") || string.Equals(modPath, Constants.EXTERNAL_MODS))
+                continue;
+            
+            var entry = new ModInfo(modPath, activeProfiles);
+            
+            if (mods.Contains(entry))
+                continue;
+            
+            mods.Add(entry);
+        }
+        
+        return mods;
+    }
+    
+    internal static bool MissingDll()
+    {
+        return !File.Exists(Constants.VERSIONDLL);
+    }
+    
+    internal static bool MissingAsi()
+    {
+        return !File.Exists(Constants.ASI);
+    }
+    
+    internal static void SaveModList(List<ModInfo> mods)
+    {
+        ModListSerializer.Write(Constants.MOD_LIST, mods);
+    }
+    
+    public static string[] GetModDependencies(string mod)
+    {
+        var modDir = GamePath.GetModDirectory(mod);
+        var metaFile = Path.Combine(modDir, "mod-meta.yaml");
+        
+        if (!Directory.Exists(modDir) || !File.Exists(metaFile))
+            return [];
+        
+        var meta = YamlHelpers.DeserializeYamlFromPath<ModMeta>(metaFile);
+        
+        if (string.IsNullOrEmpty(meta.Dependencies))
+            return [];
+        
+        return meta.Dependencies.Split(';');
+    }
+    
+    //Read cached data at startup if it exists
+    public static void ReadCachedLocalLibraryData()
+    {
+        var path = GamePath.LocalLibrariesPath;
+        
+        if (!File.Exists(path))
+            return;
+        
+        LibMeta.ReadLibMetaManifest(File.ReadAllText(path));
+    }
+    
+    public static LibMeta GetLibMeta(string guid)
+    {
+        return LibraryMetaCache.FirstOrDefault(x => x.GUID.ToString() == guid);
+    }
+    
+    public static bool DoesLibraryExist(string guid)
+    {
+        var libDir = GamePath.GetLibraryPath(guid);
+        
+        return Directory.Exists(libDir);
+    }
+    
+    public static bool IsLibraryEnabled(string guid)
+    {
+        if (!DoesLibraryExist(guid))
+            return false;
+        
+        return !File.Exists(Path.Combine(GamePath.GetLibraryPath(guid), ".disabled"));
+    }
+    
+    public static string GetLibraryName(string guid)
+    {
+        var metaData = GetLibMeta(guid);
+        
+        if (metaData != null)
+            return metaData.Name;
+        
+        var path = Path.Combine(GamePath.GetLibraryPath(guid), Constants.LIBRARIES_LIBMETA_FILE_NAME);
+        
+        if (!File.Exists(path))
+            return guid;
+        
+        var yamlString = File.ReadAllText(path);
+        var meta = LibMeta.ReadLibMeta(yamlString);
+        
+        return meta.Name;
+    }
+    
+    public static async Task InstallLibraryAsync(string guid)
+    {
+        var metaFile = GetLibMeta(guid);
+        
+        if (metaFile == null || string.IsNullOrEmpty(metaFile.Download))
+            return;
+        
+        var packagePath = await DownloadLibraryPackageAsync($"{guid}.zip", metaFile);
+        
+        var destDir = Path.Combine(GamePath.LibrariesPath, metaFile.GUID.ToString());
+        
+        if (Directory.Exists(destDir))
+            Directory.Delete(destDir, true);
+        
+        Directory.CreateDirectory(destDir);
+        
+        await ZipFile.ExtractToDirectoryAsync(packagePath, destDir, true);
+    }
+    
+    private static async Task<string> DownloadLibraryPackageAsync(string fileName, LibMeta meta)
+    {
+        Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), Constants.TEMP_DIRECTORY_NAME));
+        
+        try
+        {
+            var path = Path.Combine(Path.GetTempPath(), Constants.TEMP_DIRECTORY_NAME, fileName);
+            
+            await using var stream = await Utils.Client.GetStreamAsync(meta.Download);
+            await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+            
+            await stream.CopyToAsync(fs);
+            await fs.FlushAsync();
+            
+            return path;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to download library!");
+            
+            return string.Empty;
+        }
+    }
+    
+    public static async Task InstallAllModDependenciesAsync(List<ModInfo> mods)
+    {
+        try
+        {
+            await LibMeta.FetchAsync();
+        }
+        catch
+        {
+            // ignored
+        }
+        
+        foreach (var mod in mods.Where(x => x.Enabled))
+        {
+            await InstallModDependenciesAsync(mod.Name);
+        }
+    }
+    
+    public static async Task InstallModDependenciesAsync(string mod)
+    {
+        var modDir = GamePath.GetModDirectory(mod);
+        var metaFile = Path.Combine(modDir, "mod-meta.yaml");
+        
+        if (!Directory.Exists(modDir) || !File.Exists(metaFile))
+            return;
+        
+        var meta = await YamlHelpers.DeserializeYamlFromPathAsync<ModMeta>(metaFile);
+        
+        if (string.IsNullOrEmpty(meta.Dependencies))
+            return;
+        
+        foreach (var dep in meta.Dependencies.Split(';').Where(x => !DoesLibraryExist(x)))
+        {
+            await InstallLibraryAsync(dep);
+        }
     }
 }

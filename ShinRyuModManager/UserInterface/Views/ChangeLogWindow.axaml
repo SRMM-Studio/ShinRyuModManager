@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+        xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="750" d:DesignHeight="450"
+        x:Class="ShinRyuModManager.UserInterface.Views.ChangeLogWindow"
+        x:DataType="vm:ChangeLogWindowViewModel"
+        Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
+        Title="Changelog" 
+        Height="450" 
+        Width="750"
+        Background="#FF373535" 
+        Foreground="White"
+        CanResize="False">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ChangeLogWindowViewModel/>
+    </Design.DataContext>
+    
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            3*
+            *
+        </Grid.RowDefinitions>
+        
+        <md:MarkdownScrollViewer Grid.Row="0" Markdown="{Binding ChangeLogText}" />
+        
+        <Button Grid.Row="1" Background="#FF4B4B4B" Foreground="White" VerticalAlignment="Bottom" 
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Content="Close" FontSize="16" 
+                Click="Close_OnClick" />
+    </Grid>
+</Window>
