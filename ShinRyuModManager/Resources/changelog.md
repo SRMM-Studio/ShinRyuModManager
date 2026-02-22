@@ -1,4 +1,9 @@
-﻿> ### **%{color:gold} Version 4.8.0 %** ###
+﻿> ### **%{color:gold} Version 4.8.1 %** ###
+* Use version.dll instead of winmm.dll or dinput8.dll
+* This fixes SRMM not working on Windows 11 on Kiwami 3 etc
+* I recommend deleting winmm.dll and dinput8.dll from your game directory after doing this update but it shouldnt be required
+
+> ### **%{color:orange} Version 4.8.0 %** ###
 * Fix dinput8.dll being removed if winmm.dll (not winmm.lj) exists
 * A very small portion of advanced SRMM users might need both DLLs
 * Fix overwriting error with animations in Pirates and up

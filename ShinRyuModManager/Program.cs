@@ -139,7 +139,7 @@ namespace ShinRyuModManager
                     if (Program.MissingDLL())
                     {
                         MessageBox.Show(
-                            DINPUT8DLL + " is missing from this directory. Mods will NOT be applied without this file.",
+                            VERSIONDLL + " is missing from this directory. Mods will NOT be applied without this file.",
                             "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
 
@@ -421,66 +421,6 @@ namespace ShinRyuModManager
                 }
             }
 
-
-            if(File.Exists(DINPUT8DLL) && File.Exists(WINMMLJ))
-            {
-                // TODO: Maybe move this to a separate "Game patches" file
-                // Virtua Fighter eSports crashes when used with dinput8.dll as the ASI loader
-                if (game == Game.eve && File.Exists(DINPUT8DLL))
-                {
-                    if (File.Exists(VERSIONDLL))
-                    {
-                        Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because {VERSIONDLL} exists...");
-
-                        // Remove dinput8.dll
-                        File.Delete(DINPUT8DLL);
-                    }
-                    else
-                    {
-                        Console.Write($"Game s  pecific patch: Renaming {DINPUT8DLL} to {VERSIONDLL}...");
-
-                        // Rename dinput8.dll to version.dll to prevent the game from crashing
-                        File.Move(DINPUT8DLL, VERSIONDLL);
-                    }
-
-                    Console.WriteLine(" DONE!\n");
-                }
-                else if (game >= Game.YakuzaKiwami2 && game != Game.likeadragongaiden)
-                {
-                    //
-                    // Lost Judgment (and Judgment post update 1) does not like Ultimate ASI Loader, so instead we use a custom build of DllSpoofer (https://github.com/Kazurin-775/DllSpoofer)
-                    if (File.Exists(DINPUT8DLL))
-                    {
-                        Console.Write($"Game specific patch: Deleting {DINPUT8DLL} because it causes crashes with Judgment games...");
-
-                        // Remove dinput8.dll
-                        File.Delete(DINPUT8DLL);
-
-                        Console.WriteLine(" DONE!\n");
-                    }
-
-                    if (!File.Exists(WINMMDLL))
-                    {
-                        if (File.Exists(WINMMLJ))
-                        {
-                            Console.Write($"Game specific patch: Enabling {WINMMDLL} by renaming {WINMMLJ} to fix Judgment games crashes...");
-
-                            // Rename dinput8.dll to version.dll to prevent the game from crashing
-                            File.Move(WINMMLJ, WINMMDLL);
-
-                            Console.WriteLine(" DONE!\n");
-                        }
-                        else
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"WARNING: {WINMMLJ} was not found. Judgment games will NOT load mods without this file. Please redownload Shin Ryu Mod Manager.\n");
-                            Console.ResetColor();
-                        }
-                    }
-                }
-
-            }
-
             // Read ini (again) to check if we should try importing the old load order file
             ini = iniParser.ReadFile(INI);
 
@@ -672,7 +612,7 @@ namespace ShinRyuModManager
             // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
             if (MissingDLL())
             {
-                Console.WriteLine($"Warning: \"{DINPUT8DLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file\n");
+                Console.WriteLine($"Warning: \"{VERSIONDLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file\n");
             }
 
             // Check if the ASI is not in the directory
@@ -706,7 +646,7 @@ namespace ShinRyuModManager
 
         public static bool MissingDLL()
         {
-            return !(File.Exists(DINPUT8DLL) || File.Exists(VERSIONDLL) || File.Exists(WINMMDLL));
+            return !File.Exists(VERSIONDLL);
         }
 
 
