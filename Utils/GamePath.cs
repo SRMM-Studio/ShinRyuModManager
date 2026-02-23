@@ -182,5 +182,10 @@ namespace Utils
         {
             return currentGame.ToString() + ".exe";
         }
+
+        public static bool IsGOG()
+        {
+            return File.Exists("galaxy64.dll");
+        }
     }
 }

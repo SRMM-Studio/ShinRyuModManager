@@ -3,4 +3,4 @@
 [assembly: AssemblyTitle("Yakuza/Like a Dragon Mod Manager")]
 [assembly: AssemblyCopyright("Copyright © 2025 Shin Ryu Mod Manager Studio")]
 
-[assembly: AssemblyVersion("4.8.1")]
+[assembly: AssemblyVersion("4.8.2")]

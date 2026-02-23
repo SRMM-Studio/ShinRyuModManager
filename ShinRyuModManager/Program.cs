@@ -1,4 +1,6 @@
-﻿using ShinRyuModManager.ModLoadOrder;
+﻿using IniParser;
+using IniParser.Model;
+using ShinRyuModManager.ModLoadOrder;
 using ShinRyuModManager.ModLoadOrder.Mods;
 using ShinRyuModManager.Templates;
 using System;
@@ -6,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -14,13 +17,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using IniParser.Model;
-using IniParser;
 using Utils;
 using YamlDotNet.Serialization;
 using static Utils.Constants;
 using static Utils.GamePath;
-using System.IO.Compression;
 
 namespace ShinRyuModManager
 {
@@ -132,6 +132,19 @@ namespace ShinRyuModManager
                         CheckForUpdatesGUI();
                     }).Start();
                 }
+
+
+                if(File.Exists(VERSIONDLL))
+                {
+                    Game game = GetGame();
+
+                    if(game <= Game.Yakuza6)
+                    {
+                        if(!File.Exists(DINPUT8DLL))
+                            File.Move(VERSIONDLL, DINPUT8DLL);
+                    }
+                }
+
 
                 if (Program.ShowWarnings())
                 {
@@ -646,7 +659,7 @@ namespace ShinRyuModManager
 
         public static bool MissingDLL()
         {
-            return !File.Exists(VERSIONDLL);
+            return !File.Exists(VERSIONDLL) && !File.Exists(DINPUT8DLL);
         }
 
 
