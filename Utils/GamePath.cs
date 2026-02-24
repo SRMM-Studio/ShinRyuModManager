@@ -18,6 +18,7 @@ public static class GamePath
     public static string LibrariesPath { get; }
     public static string LocalLibrariesPath { get; }
     public static string GameExe { get; }
+    public static bool IsGOG { get; }
     
     static GamePath()
     {
@@ -28,6 +29,7 @@ public static class GamePath
         ExternalModsPath = Path.Combine(ModsPath, Constants.EXTERNAL_MODS);
         LibrariesPath = Path.Combine(FullGamePath, LIBRARIES);
         LocalLibrariesPath = Path.Combine(LibrariesPath, Constants.LIBRARIES_INFO_REPO_FILE_PATH);
+        IsGOG = File.Exists("galaxy64.dll");
         
         // Try to get game
         foreach (var file in Directory.GetFiles(FullGamePath, "*.exe"))

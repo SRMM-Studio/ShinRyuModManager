@@ -6,14 +6,17 @@
 * Use version.dll instead of winmm.dll or dinput8.dll
 * This fixes SRMM not working on Windows 11 on Kiwami 3 etc
 * I recommend deleting winmm.dll and dinput8.dll from your game directory after doing this update but it shouldnt be required
+---
 
 > ### **%{color:orange} Version 4.8.0 %** ###
 * Fix dinput8.dll being removed if winmm.dll (not winmm.lj) exists
 * A very small portion of advanced SRMM users might need both DLLs
 * Fix overwriting error with animations in Pirates and up
+---
 
 > ### **%{color:orange} Version 4.7.9 %** ###
 * Fix redirection for "esl" and "ese" language types in Kiwami 3
+---
 
 > ### **%{color:orange} Version 4.7.8 %** ###
 * Improve talk repacking for Kiwami 3
@@ -28,7 +31,7 @@
 
 > ### **%{color:orange} Version 4.7.6 %** ###
 * Fix hashing for PYIH and above
-* Experimental: New Talk and HAct repack method for Kiwami 3 (old one freezed the game 100%)
+* Experimental: New Talk and HAct repack method for Kiwami 3 (old one froze the game 100%)
 ---
 
 > ### **%{color:orange} Version 4.7.5 %** ###

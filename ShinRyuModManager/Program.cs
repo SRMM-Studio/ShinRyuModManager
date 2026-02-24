@@ -82,6 +82,8 @@ public static class Program
             IsRebuildMloSupported = false;
         }
         
+        HandleLoader();
+        
         // Check if there are any args, if so, run in CLI mode
         // Unfortunately, no one way to detect left Ctrl while being cross-platform
         if (args.Length == 0)
@@ -112,6 +114,8 @@ public static class Program
     private static async Task MainCli(string[] args)
     {
         Log.Information("Shin Ryu Mod Manager v{Version}", AssemblyVersion.GetVersion());
+        
+        HandleLoader();
         
         // Parse arguments
         var list = new List<string>(args);
@@ -459,6 +463,12 @@ public static class Program
         return _externalModsOnly && Directory.Exists(GamePath.ExternalModsPath);
     }
     
+    private static void HandleLoader() {
+        if (GamePath.CurrentGame <= Game.Yakuza6 && !File.Exists(Constants.DINPUT8DLL)) {
+            File.Move(Constants.VERSIONDLL, Constants.DINPUT8DLL);
+        }
+    }
+    
     private static List<ModInfo> ScanMods(ProfileMask activeProfiles = ProfileMask.All)
     {
         var mods = new List<ModInfo>();
@@ -483,7 +493,7 @@ public static class Program
     
     internal static bool MissingDll()
     {
-        return !File.Exists(Constants.VERSIONDLL);
+        return File.Exists(Constants.VERSIONDLL) || File.Exists(Constants.DINPUT8DLL);
     }
     
     internal static bool MissingAsi()
