@@ -2,6 +2,11 @@
 * TO BE FILLED OUT
 ---
 
+> ### **%{color:gold} Version 4.8.2 %** ###
+* Rename version.dll to dinput8.dll on Yakuza 6 and below
+* Blame Windows 11 for all these DLL updates
+---
+
 > ### **%{color:orange} Version 4.8.1 %** ###
 * Use version.dll instead of winmm.dll or dinput8.dll
 * This fixes SRMM not working on Windows 11 on Kiwami 3 etc

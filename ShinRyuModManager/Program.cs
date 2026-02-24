@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO.Compression;
 using Avalonia;
 using Avalonia.Svg.Skia;
