@@ -1,89 +1,80 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.IO;
-using YamlDotNet.Serialization;
+using JetBrains.Annotations;
+using ShinRyuModManager.Helpers;
+using Utils;
 
-namespace ShinRyuModManager
+namespace ShinRyuModManager;
+
+[UsedImplicitly]
+public class LibMeta
 {
-    public class LibMeta
+    public Guid GUID { get; private set; }
+    public string Name { get; set; }
+    public string Version { get; set; }
+    public string Author { get; set; }
+    public string Description { get; set; }
+    public bool CanBeDisabled { get; set; }
+    public bool IsDisabled { get; set; }
+    
+    /// <summary>
+    /// A semicolon (;) separated list of game executable names.
+    /// </summary>
+    public string TargetGames { get; set; }
+    
+    public string Source { get; set; }
+    public string Download { get; set; }
+    public string MainBinary { get; set; }
+    
+    private const string URL = $"https://raw.githubusercontent.com/{Constants.LIBRARIES_INFO_REPO_OWNER}/{Constants.LIBRARIES_INFO_REPO}/main/{Constants.LIBRARIES_INFO_REPO_FILE_PATH}";
+    
+    public static LibMeta ReadLibMeta(string yamlString)
     {
-        public Guid GUID { get; set; }
-
-        public string Name { get; set; }
-
-        public string Version { get; set; }
-
-        public string Author { get; set; }
-
-        public string Description { get; set; }
-
-        public bool CanBeDisabled { get; set; }
-
-        public bool IsDisabled { get; set; }
-
-        /// <summary>
-        /// A semicolon (;) separated list of game executable names.
-        /// </summary>
-        public string TargetGames { get; set; }
-
-        public string Source { get; set; }
-
-        public string Download { get; set; }
-
-        public string MainBinary { get; set; }
-
-
-
-        /// <summary>
-        /// Reads the <see cref="LibMeta"/> from a YAML string.
-        /// </summary>
-        /// <returns>A <see cref="LibMeta"/> object.</returns>
-        public static LibMeta ReadLibMeta(string yamlString)
+        return YamlHelpers.DeserializeYaml<LibMeta>(yamlString);
+    }
+    
+    public static List<LibMeta> Fetch()
+    {
+        var yamlString = Utils.Client.GetStringAsync(URL).GetAwaiter().GetResult();
+        
+        var localManifestCopyPath = GamePath.LocalLibrariesPath;
+        
+        if (!File.Exists(localManifestCopyPath) && !Utils.IsFileLocked(localManifestCopyPath))
         {
-            var deserializer = new DeserializerBuilder().Build();
-            LibMeta meta = deserializer.Deserialize<LibMeta>(yamlString);
-            return meta;
+            File.WriteAllText(localManifestCopyPath!, yamlString);
         }
-
-
-        public static List<LibMeta> Fetch()
+        
+        return ReadLibMetaManifest(yamlString);
+    }
+    
+    public static async Task<List<LibMeta>> FetchAsync()
+    {
+        var yamlString = await Utils.Client.GetStringAsync(URL);
+        
+        var localManifestCopyPath = GamePath.LocalLibrariesPath;
+        
+        if (!File.Exists(localManifestCopyPath) && !Utils.IsFileLocked(localManifestCopyPath))
         {
-            WebClient client = new WebClient();
-            //TODO UNCOMMENT THIS WHEN THE REPO IS READY. READING FROM LOCAL FILE IN THE MEANTIME
-            string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.LIBRARIES_INFO_REPO_OWNER}/{Settings.LIBRARIES_INFO_REPO}/main/{Settings.LIBRARIES_INFO_REPO_FILE_PATH}");
-            //string yamlString = File.ReadAllText(Program.GetLocalLibraryCopyPath());
-
-            // Save a copy of the manifest for offline use
-            string localManifestCopyPath = Program.GetLocalLibraryCopyPath();
-            if (!File.Exists(localManifestCopyPath) && !Util.IsFileBlocked(localManifestCopyPath))
-            {
-                File.WriteAllText(localManifestCopyPath, yamlString);
-            }
-
-            return LibMeta.ReadLibMetaManifest(yamlString);
+            await File.WriteAllTextAsync(localManifestCopyPath!, yamlString);
         }
-
-        /// <summary>
-        /// Reads the <see cref="LibMeta"/> manifest from a YAML string.
-        /// </summary>
-        /// <returns>A <see cref="LibMeta"/> list.</returns>
-        public static List<LibMeta> ReadLibMetaManifest(string yamlString)
+        
+        return ReadLibMetaManifest(yamlString);
+    }
+    
+    public static List<LibMeta> ReadLibMetaManifest(string yamlString)
+    {
+        var returnList = new List<LibMeta>();
+        var yamlObject = YamlHelpers.DeserializeYaml<Dictionary<string, LibMeta>>(yamlString);
+        
+        foreach (var key in yamlObject.Keys)
         {
-            List<LibMeta> returnList = new List<LibMeta>();
-
-            var deserializer = new DeserializerBuilder().Build();
-            var yamlObject = deserializer.Deserialize<Dictionary<string, LibMeta>>(yamlString);
-            foreach (string key in yamlObject.Keys)
-            {
-                LibMeta meta = yamlObject[key];
-                meta.GUID = new Guid(key);
-                returnList.Add(meta);
-            }
-
-            Program.LibraryMetaCache = returnList;
-
-            return returnList;
+            var meta = yamlObject[key];
+            
+            meta.GUID = Guid.Parse(key);
+            
+            returnList.Add(meta);
         }
+        
+        Program.LibraryMetaCache = returnList;
+        
+        return returnList;
     }
 }

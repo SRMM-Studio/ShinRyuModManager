@@ -1,178 +1,53 @@
-﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Diagnostics;
 using System.IO.Compression;
-using System.Net;
-using System.Reflection;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using Utils;
 
-namespace RyuUpdater
+namespace RyuUpdater;
+
+public static class Program
 {
-    internal class Program
+    private static async Task Main(string[] args)
     {
-        class Options
+        if (args.Length == 0)
         {
-            [Option('v', "srmmversion", Required = true, HelpText = "Shin Ryu Mod Manager version.")]
-            public string Version { get; set; }
-
-            [Option('b', "branch", Default = "release", HelpText = "Branch to download.")]
-            public string BranchName { get; set; }
-
-            [Option('k', "key", Default = null, HelpText = "Branch key.")]
-            public string BranchKey { get; set; }
-
-            [Option('c', "checkonly", Default = false, HelpText = "Only check if an update is available.")]
-            public bool CheckOnly { get; set; }
+            Console.WriteLine("This is a helper application for SRMM. Please don't run manually!\nPress any key to exit...");
+            Console.ReadKey();
+            
+            return;
         }
-
-
-        static void Main(string[] args)
+        
+        var pid = int.Parse(args[0]);
+        var updateFile = args[1];
+        var targetDir = args[2];
+        var srmmFileName = args[3];
+        
+        var tempDir = new FileInfo(updateFile).Directory!.FullName;
+        
+        try
         {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed<Options>(o =>
+            if (pid != -1)
             {
-                Console.WriteLine("Fetching branch data...");
-                Branch branch = GetBranchData(o.BranchName, o.BranchKey);
-                Console.WriteLine("Comparing versions...");
-                bool isHigher = Util.CompareVersionIsHigher(branch.Version, o.Version);
-                if (isHigher || branch.IgnoreInstalledVersion)
-                {
-                    if (o.CheckOnly)
-                    {
-                        Console.WriteLine("Writing flag file...");
-                        string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                        File.WriteAllText(Path.Combine(exePath, "update.txt"), branch.Version);
-                        return;
-                    }
-
-                    Console.WriteLine("Downloading update...");
-                    DownloadUpdate(branch);
-                    Console.WriteLine("Extracting update files...");
-                    ExtractUpdate();
-                    WriteRecentUpdateFlag();
-                    Console.WriteLine("Processing manifest...");
-                    ProcessManifest(GetManifest());
-                }
-            });
-        }
-
-
-        private static Branch GetBranchData(string branch, string key)
-        {
-            WebClient client = new WebClient();
-            string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.RepoOwner}/{Settings.RepoName}/main/{Settings.RepoPathBranchData}");
-
-#if DEBUG
-            Console.WriteLine(yamlString);
-#endif
-
-            var deserializer = new DeserializerBuilder().Build();
-            var yamlObject = deserializer.Deserialize<Dictionary<string, Dictionary<string, Branch>>>(yamlString);
-
-            if (yamlObject.TryGetValue("branches", out Dictionary<string, Branch> branchCollection))
-            {
-                if (branchCollection.ContainsKey(branch)) 
-                {
-                    Branch br = branchCollection[branch];
-                    if (br.Key == key)
-                    {
-                        return br;
-                    }
-                    else
-                    {
-                        throw new Exception("The supplied key does not match the branch key.");
-                    }
-                }
-                else
-                {
-                    throw new Exception($"The branch '{branch}' does not exist.");
-                }
-            }
-            else
-            {
-                throw new Exception("The config file does not contain branch information.");
-            }
-
-        }
-
-
-        private static void DownloadUpdate(Branch branch)
-        {
-            Directory.CreateDirectory(Settings.PathTempFolder);
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(branch.Download, Settings.PathTempUpdateFile);
-                Console.WriteLine(Path.Combine(Settings.PathTempFolder, Settings.PathTempUpdateFile));
+                await Process.GetProcessById(pid).WaitForExitAsync();
             }
         }
-
-
-        private static void ExtractUpdate()
+        catch
         {
-            string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            using (FileStream zipToOpen = new FileStream(Settings.PathTempUpdateFile, System.IO.FileMode.Open))
-            {
-                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
-                {
-                    archive.ExtractToDirectory(exePath, true);
-                }
-            }
-
-            if (File.Exists(Settings.PathTempUpdateFile))
-            {
-                File.Delete(Settings.PathTempUpdateFile);
-            }
+            // ignore
         }
-
-
-        private static Manifest GetManifest()
+        
+        await Task.Delay(500);
+        
+        await ZipFile.ExtractToDirectoryAsync(updateFile, targetDir, overwriteFiles: true);
+        Directory.Delete(tempDir, recursive: true);
+        
+        Flags.CreateFlag(Constants.UPDATE_RECENT_FLAG_FILE_NAME);
+        
+        var srmmPath = Path.Combine(targetDir, srmmFileName);
+        
+        Process.Start(new ProcessStartInfo
         {
-            try
-            {
-                WebClient client = new WebClient();
-                string yamlString = client.DownloadString($"https://raw.githubusercontent.com/{Settings.RepoOwner}/{Settings.RepoName}/main/{Settings.RepoPathManifest}");
-
-#if DEBUG
-                Console.WriteLine(yamlString);
-#endif
-
-                var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).IgnoreUnmatchedProperties().Build();
-                return deserializer.Deserialize<Manifest>(yamlString);
-            } catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return new Manifest();
-            }
-        }
-
-
-        private static void ProcessManifest(Manifest manifest)
-        {
-            string currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            if (manifest.Remove != null)
-            {
-                foreach (string file in manifest.Remove)
-                {
-                    string filePath = Path.Combine(currentPath, file);
-                    if (File.Exists(filePath))
-                    {
-                        File.Delete(filePath);
-                        Console.WriteLine($"Removed {file}");
-                    }
-                }
-            }
-        }
-
-
-        private static void WriteRecentUpdateFlag()
-        {
-            string exePath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            string flagPath = Path.Combine(exePath, Settings.RecentUpdateFlagName);
-            if (File.Exists(flagPath)) return;
-            File.Create(flagPath);
-            File.SetAttributes(flagPath, File.GetAttributes(flagPath) | FileAttributes.Hidden);
-        }
+            FileName = srmmPath,
+            UseShellExecute = true
+        });
     }
 }

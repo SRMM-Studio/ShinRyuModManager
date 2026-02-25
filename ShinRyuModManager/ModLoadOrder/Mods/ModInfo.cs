@@ -1,69 +1,68 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Runtime.CompilerServices;
-using Utils;
+using CommunityToolkit.Mvvm.ComponentModel;
+using ShinRyuModManager.Extensions;
 
-namespace ShinRyuModManager.ModLoadOrder.Mods
+namespace ShinRyuModManager.ModLoadOrder.Mods;
+
+public sealed partial class ModInfo : ObservableObject, IEquatable<ModInfo>
 {
-    public class ModInfo : IEqualityComparer<ModInfo>, INotifyPropertyChanged
+    [ObservableProperty] private string _name;
+    
+    public ProfileMask EnabledProfiles { get; set; }
+    
+    public bool Enabled
     {
-        private string name;
-        private bool enabled;
-
-        public string Name
+        get => EnabledProfiles.AppliesTo(Program.ActiveProfile);
+        set
         {
-            get => this.name;
-
-            set
+            if (value)
             {
-                this.name = value;
-                NotifyPropertyChanged();
+                EnabledProfiles |= Program.ActiveProfile.ToMask();
+            }
+            else
+            {
+                EnabledProfiles &= ~Program.ActiveProfile.ToMask();
             }
         }
-
-        public bool Enabled
-        {
-            get => this.enabled;
-
-            set
-            {
-                this.enabled = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public ModInfo(string name, bool enabled = true)
-        {
-            this.Name = name;
-            this.Enabled = enabled;
-        }
-
-        public void ToggleEnabled()
-        {
-            this.Enabled = !this.Enabled;
-        }
-
-        public bool Equals(ModInfo x, ModInfo y)
-        {
-            return x?.Name == y?.Name;
-        }
-
-        public int GetHashCode(ModInfo obj)
-        {
-            return obj.GetHashCode();
-        }
-
-        public static bool IsValid(ModInfo info)
-        {
-            return (info != null) && Directory.Exists(Path.Combine(GamePath.MODS, info.Name));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    }
+    
+    public ModInfo(string name, ProfileMask enabledMask = ProfileMask.All)
+    {
+        Name = name;
+        EnabledProfiles = enabledMask;
+    }
+    
+    public void ToggleEnabled()
+    {
+        Enabled = !Enabled;
+    }
+    
+    public bool Equals(ModInfo other)
+    {
+        if (other is null)
+            return false;
+        
+        if (ReferenceEquals(this, other))
+            return true;
+        
+        return Name == other.Name;
+    }
+    
+    public override bool Equals(object obj)
+    {
+        if (obj is null)
+            return false;
+        
+        if (ReferenceEquals(this, obj))
+            return true;
+        
+        if (obj.GetType() != GetType())
+            return false;
+        
+        return Equals((ModInfo)obj);
+    }
+    
+    public override int GetHashCode()
+    {
+        return Name.GetHashCode();
     }
 }

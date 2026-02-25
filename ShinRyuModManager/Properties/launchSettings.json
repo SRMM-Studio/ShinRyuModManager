@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ShinRyuModManager": {
-      "commandName": "Project",
-      "workingDirectory": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Yakuza 0 Directors Cut\\runtime\\media"
-    }
-  }
-}

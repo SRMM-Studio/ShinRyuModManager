@@ -1,67 +1,53 @@
-﻿using System.IO;
-using System.Collections.Generic;
-
+using Serilog;
 using Utils;
 
-namespace ShinRyuModManager.ModLoadOrder.Mods
+namespace ShinRyuModManager.ModLoadOrder.Mods;
+
+public class ParlessMod() : Mod(Constants.PARLESS_NAME)
 {
-    public class ParlessMod : Mod
+    public List<ParlessFolder> ParlessFolders { get; } = [];
+    
+    public new void PrintInfo()
     {
-        public List<(string, int)> ParlessFolders { get; }
-
-        public ParlessMod()
-            : base(Constants.PARLESS_NAME, 0)
+        if (ParlessFolders.Count > 0)
         {
-            this.ParlessFolders = new List<(string, int)>();
+            Log.Information("Added {ParlessFoldersCount} .parless path(s)", ParlessFolders.Count);
         }
-
-        public new void PrintInfo()
+        
+        base.PrintInfo();
+    }
+    
+    public new void AddFiles(string path, string check)
+    {
+        if (string.IsNullOrEmpty(check))
         {
-            this.console.WriteLineIfVerbose();
-
-            if (this.ParlessFolders.Count > 0)
-            {
-                this.console.WriteLine($"Added {this.ParlessFolders.Count} .parless path(s)");
-            }
-
-            base.PrintInfo();
+            check = CheckFolder(path);
         }
-
-        /// <summary>
-        /// Adds all files inside .parless folders in this path into the Files list.
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="check"></param>
-        public new void AddFiles(string path, string check)
+        
+        var index = path.IndexOf(".parless", StringComparison.Ordinal);
+        
+        if (index != -1)
         {
-            if (string.IsNullOrEmpty(check))
+            // Call the base class AddFiles method
+            base.AddFiles(path, check);
+            
+            // Remove ".parless" from the path
+            path = path.Remove(index, 8);
+            
+            // Add .parless folders to the list to make it easier to check for them in the ASI
+            var loosePath = GamePath.RemoveParlessPath(path);
+            var folder = new ParlessFolder(loosePath, index - GamePath.DataPath.Length);
+            
+            ParlessFolders.Add(folder);
+            
+            Log.Verbose("Adding .parless path: {LoosePath}", loosePath);
+        }
+        else
+        {
+            // Continue recursing until we find the next ".parless"
+            foreach (var folder in Directory.GetDirectories(path))
             {
-                check = this.CheckFolder(path);
-            }
-
-            int index = path.IndexOf(".parless");
-
-            if (index != -1)
-            {
-                // Call the base class AddFiles method
-                base.AddFiles(path, check, GamePath.GetGame());
-
-                // Remove ".parless" from the path
-                path = path.Remove(index, 8);
-
-                // Add .parless folders to the list to make it easier to check for them in the ASI
-                string loosePath = GamePath.RemoveParlessPath(path);
-                this.ParlessFolders.Add((loosePath, index - GamePath.GetDataPath().Length));
-
-                this.console.WriteLineIfVerbose($"Adding .parless path: {loosePath}");
-            }
-            else
-            {
-                // Continue recursing until we find the next ".parless"
-                foreach (string folder in Directory.GetDirectories(path))
-                {
-                    this.AddFiles(folder, check);
-                }
+                AddFiles(folder, check);
             }
         }
     }
