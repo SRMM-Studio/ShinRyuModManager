@@ -4,7 +4,8 @@ namespace CpkTools.Model;
 
 public class Utf
 {
-    public List<Column>? Columns { get; private set; }
+    public Dictionary<string, int>? ColumnIndex { get; private set; }
+    public Column[]? Columns { get; private set; }
     public Row[][]? Rows { get; private set; }
     
     private int _tableSize;
@@ -18,21 +19,21 @@ public class Utf
     
     public bool ReadUtf(Memory<byte> data)
     {
-        var reader = new EndianReader(data);
+        using var reader = new EndianReader(data);
         
         return ReadUtf(reader);
     }
     
     public bool ReadUtf(byte[] data)
     {
-        var reader = new EndianReader(data);
+        using var reader = new EndianReader(data);
         
         return ReadUtf(reader);
     }
     
     public bool ReadUtf(Stream stream)
     {
-        var reader = new EndianReader(stream);
+        using var reader = new EndianReader(stream);
         
         return ReadUtf(reader);
     }
@@ -59,8 +60,10 @@ public class Utf
         _rowLength = reader.ReadInt16();
         _numRows = reader.ReadInt32();
         
-        Columns = new List<Column>(_numColumns);
+        Columns = new Column[_numColumns];
         Rows = new Row[_numRows][];
+        
+        ColumnIndex = new Dictionary<string, int>(_numColumns, StringComparer.Ordinal);
         
         // Read Columns
         for (var i = 0; i < _numColumns; i++)
@@ -77,7 +80,9 @@ public class Utf
             }
             
             column.Name = Tools.ReadCString(reader, -1, reader.ReadInt32() + _stringsOffset);
-            Columns.Add(column);
+            Columns[i] = column;
+            
+            ColumnIndex[column.Name] = i;
         }
         
         const int storageMask = (int)StorageFlags.StorageMask;

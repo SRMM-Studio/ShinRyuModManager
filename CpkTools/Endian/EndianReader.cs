@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Buffers.Binary;
 using CommunityToolkit.HighPerformance;
 
@@ -171,21 +172,28 @@ public sealed class EndianReader : IDisposable
             return 0;
         }
         
-        var buffer = new byte[80 * 1024];
+        var buffer = ArrayPool<byte>.Shared.Rent(80 * 1024);
         var remaining = length;
         var totalRead = 0;
         
-        while (remaining > 0)
+        try
         {
-            var toRead = Math.Min(buffer.Length, remaining);
-            var read = BaseStream.Read(buffer, 0, toRead);
-            
-            if (read == 0) // EOF
-                break;
-            
-            dest.Write(buffer, 0, read);
-            totalRead += read;
-            remaining -= read;
+            while (remaining > 0)
+            {
+                var toRead = Math.Min(buffer.Length, remaining);
+                var read = BaseStream.Read(buffer, 0, toRead);
+                
+                if (read == 0) // EOF
+                    break;
+                
+                dest.Write(buffer, 0, read);
+                totalRead += read;
+                remaining -= read;
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
         }
         
         return totalRead;

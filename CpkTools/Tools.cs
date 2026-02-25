@@ -5,14 +5,17 @@ namespace CpkTools;
 
 public static class Tools
 {
+    private static readonly Encoding SjisEncoding;
+    
     static Tools()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        SjisEncoding = Encoding.GetEncoding(932);
     }
     
     public static string ReadCString(EndianReader reader, int maxLength = -1, long lOffset = -1, Encoding? enc = null)
     {
-        enc ??= Encoding.GetEncoding(932);
+        enc ??= SjisEncoding;
         
         var max = maxLength == -1 ? 255 : maxLength;
         var fTemp = reader.Position;
@@ -44,12 +47,6 @@ public static class Tools
         reader.Seek(returnSeek, SeekOrigin.Begin);
         
         return enc.GetString(bytes);
-    }
-    
-    public static void DeleteFileIfExists(string sPath)
-    {
-        if (File.Exists(sPath))
-            File.Delete(sPath);
     }
     
     public static string GetPath(string input)

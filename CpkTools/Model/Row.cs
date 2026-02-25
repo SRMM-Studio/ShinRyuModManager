@@ -29,7 +29,7 @@ public record struct Row()
         };
     }
     
-    public new Type? GetType()
+    public new Type? GetValueType()
     {
         return Type switch
         {
