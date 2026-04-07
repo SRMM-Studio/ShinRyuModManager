@@ -3,16 +3,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        xmlns:lang="using:ShinRyuModManager.Language.Views"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="175"
         x:Class="ShinRyuModManager.UserInterface.Views.MessageBoxWindow"
         x:DataType="vm:MessageBoxWindowViewModel"
         Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
         Title="Test" 
-        Height="175" 
+        MinHeight="175"
+        MaxHeight="500"
         Width="400"
+        SizeToContent="Height"
         Background="#FF373535" 
         Foreground="White"
-        CanResize="False">
+        CanResize="False"
+        CanMinimize="False">
     
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -20,18 +24,28 @@
         <vm:MessageBoxWindowViewModel/>
     </Design.DataContext>
     
-    <Grid>
-        <Grid.RowDefinitions>
-            3*
-            *
-        </Grid.RowDefinitions>
-        
-        <TextBlock Grid.Row="0" Padding="20" TextWrapping="Wrap" Text="{Binding MessageText}" />
-        
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
-            <Button Content="OK" Width="75" HorizontalContentAlignment="Center" Margin="0, 0, 5, 0" Click="Ok_Click"/>
-            <Button Content="Cancel" Width="75" HorizontalContentAlignment="Center" Click="Cancel_Click" IsVisible="{Binding IsVisible}"/>
-        </StackPanel>
+    <Grid RowDefinitions="2.75*,*">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <TextBlock Padding="20" TextWrapping="Wrap" x:Name="MessageTextBlock" />
+        </ScrollViewer>
+
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
+                <Button Content="{x:Static lang:MessageBoxWindow.Btn_DontRemindAgain}"
+                        MaxWidth="200" HorizontalContentAlignment="Center" Margin="5,0,5,5"
+                        IsDefault="True" Click="DontRemind_Click" IsVisible="{Binding ShowDontRemind}"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                <Button Content="{x:Static lang:MessageBoxWindow.Btn_Ok}" Width="75"
+                        HorizontalContentAlignment="Center" Margin="5,0,5,5"
+                        IsDefault="True" Click="Ok_Click"/>
+                <Button Content="{x:Static lang:MessageBoxWindow.Btn_Cancel}"
+                        Width="75" HorizontalContentAlignment="Center" Margin="5,0,5,5"
+                        IsCancel="True" Click="Cancel_Click" IsVisible="{Binding ShowCancel}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
     
 </Window>

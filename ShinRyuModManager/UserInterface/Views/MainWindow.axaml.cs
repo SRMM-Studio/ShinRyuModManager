@@ -56,6 +56,15 @@ public partial class MainWindow : Window
         RefreshModList();
     }
     
+    // Handles properly disposing of the folder watcher
+    protected override void OnClosed(EventArgs e)
+    {
+        _modsFolderWatcher.EnableRaisingEvents = false;
+        _modsFolderWatcher.Dispose();
+        
+        base.OnClosed(e);
+    }
+    
     private async void FileSystemWatcher_Created(object _, FileSystemEventArgs e)
     {
         try
@@ -90,19 +99,19 @@ public partial class MainWindow : Window
         // Referencing `Program` all the time isn't ideal. Maybe move to global settings/helper file?
         if (Program.ShouldBeExternalOnly())
         {
-            _ = await MessageBoxWindow.Show(this, "Warning", "External mods folder detected. Please run Shin Ryu Mod Manager in CLI mode (use --cli parameter) and use the external mod manager instead.");
+            await MessageBoxWindow.Show(this, "Warning", "External mods folder detected. Please run Shin Ryu Mod Manager in CLI mode (use --cli parameter) and use the external mod manager instead.");
         }
         
         if (Program.LogLevel <= LogEventLevel.Warning)
         {
             if (Program.MissingDll())
             {
-                _ = await MessageBoxWindow.Show(this, "Warning", $"{Constants.VERSIONDLL} is missing from this directory. Mods will NOT be applied without this file.");
+                await MessageBoxWindow.Show(this, "Warning", $"{Constants.VERSIONDLL} is missing from this directory. Mods will NOT be applied without this file.");
             }
             
             if (Program.MissingAsi())
             {
-                _ = await MessageBoxWindow.Show(this, "Warning", $"{Constants.ASI} is missing from this directory. Mods will NOT be applied without this file.");
+                await MessageBoxWindow.Show(this, "Warning", $"{Constants.ASI} is missing from this directory. Mods will NOT be applied without this file.");
             }
         }
     }
@@ -123,7 +132,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "Failed to select mod!");
             
-            _ = await MessageBoxWindow.Show(this, "Error", "An error has occurred. \nPlease check\"srmm_errors.txt\" for more info.");
+            await MessageBoxWindow.Show(this, "Error", "An error has occurred. \nPlease check\"srmm_errors.txt\" for more info.");
         }
     }
     
@@ -200,6 +209,18 @@ public partial class MainWindow : Window
             if (DataContext is not MainWindowViewModel viewModel)
                 return;
             
+            if (OperatingSystem.IsLinux() && !Flags.CheckFlag(Constants.LINUX_WIKI_REMINDER_FLAG_FILE_NAME))
+            {
+                var result = await MessageBoxWindow.Show(this, "Information",
+                    "Check your [launch settings](https://github.com/TheTrueColonel/ShinRyuModManager-CE/wiki/Launch-Options) to help ensure your mods load correctly.",
+                    showCancel: false, dontRemind: true);
+                
+                if (result == MessageBoxResult.DontRemind)
+                {
+                    Flags.CreateFlag(Constants.LINUX_WIKI_REMINDER_FLAG_FILE_NAME);
+                }
+            }
+            
             if (viewModel.ModList.Count > 0)
             {
                 var mods = viewModel.ModList.ToList();
@@ -211,7 +232,7 @@ public partial class MainWindow : Window
                 // Run generation only if it will not be run on game launch (i.e. if RebuildMlo is disabled or unsupported)
                 if (Program.RebuildMlo && Program.IsRebuildMloSupported)
                 {
-                    _ = await MessageBoxWindow.Show(this, "Information", "Mod list was saved. Mods will be applied next time the game is run.");
+                    await MessageBoxWindow.Show(this, "Information", "Mod list was saved. Mods will be applied next time the game is run.");
                     
                     return;
                 }
@@ -230,7 +251,7 @@ public partial class MainWindow : Window
                     {
                         Log.Error(ex, "Could not generate MLO!");
                         
-                        _ = await MessageBoxWindow.Show(this, "Error", "Mods could not be applied. Please make sure that the game directory has write access." +
+                        await MessageBoxWindow.Show(this, "Error", "Mods could not be applied. Please make sure that the game directory has write access." +
                             "\n\nPlease check\"srmm_errors.txt\" for more info.");
                     }
                 });
@@ -241,7 +262,7 @@ public partial class MainWindow : Window
             {
                 progressWindow.Close();
                 
-                _ = await MessageBoxWindow.Show(this, "Error", "Mod list is empty and was not saved.");
+                await MessageBoxWindow.Show(this, "Error", "Mod list is empty and was not saved.");
             }
         }
         catch (Exception ex)
@@ -250,7 +271,7 @@ public partial class MainWindow : Window
             
             progressWindow.Close();
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", $"An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -311,7 +332,7 @@ public partial class MainWindow : Window
             
             sb.Append("Your mods may not properly work without them. Consider installing or enabling them from the Libraries tab.");
             
-            _ = await MessageBoxWindow.Show(this, "Mod Library Dependency Warning", sb.ToString());
+            await MessageBoxWindow.Show(this, "Mod Library Dependency Warning", sb.ToString());
         }
     }
     
@@ -364,7 +385,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "ModInstalled failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -408,7 +429,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "ModMetaSampleYaml failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -435,7 +456,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "ModMetaSampleImage failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -455,7 +476,7 @@ public partial class MainWindow : Window
         {
             if (ModListView.SelectedItems.Count == 0)
             {
-                _ = await MessageBoxWindow.Show(this, "Error", "No mod selected.");
+                await MessageBoxWindow.Show(this, "Error", "No mod selected.");
                 
                 return;
             }
@@ -466,7 +487,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "MetaEditEnable failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -486,7 +507,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "MetaEditCancel failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -519,7 +540,7 @@ public partial class MainWindow : Window
             {
                 Log.Warning(ex, "MetaEditSave failed!");
                 
-                _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+                await ShowDefaultError();
                 
                 return;
             }
@@ -532,7 +553,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "MetaEditSave failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -559,14 +580,14 @@ public partial class MainWindow : Window
             }
             else
             {
-                _ = await MessageBoxWindow.Show(this, "Error", "The game can't be launched. Please launch manually.");
+                await MessageBoxWindow.Show(this, "Error", "The game can't be launched. Please launch manually.");
             }
         }
         catch (Exception ex)
         {
             Log.Fatal(ex, "LaunchGame failed!");
             
-            _ = await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -590,7 +611,7 @@ public partial class MainWindow : Window
         {
             Log.Error(ex, "Failed to load mod meta!");
             
-            _ = await MessageBoxWindow.Show(this, "Error", $"An error has occurred while trying to load mod-meta.\nPlease check\"srmm_errors.txt\" for more info.");
+            await MessageBoxWindow.Show(this, "Error", $"An error has occurred while trying to load mod-meta.\nPlease check\"srmm_errors.txt\" for more info.");
         }
         
         foreach (var filePath in matchingModImages)
@@ -607,7 +628,7 @@ public partial class MainWindow : Window
             {
                 Log.Error(ex, "Failed to load mod image!");
                 
-                _ = await MessageBoxWindow.Show(this, "Error", $"An error has occurred while trying to load {Path.GetFileName(filePath)}.\nPlease check\"srmm_errors.txt\" for more info.");
+                await MessageBoxWindow.Show(this, "Error", $"An error has occurred while trying to load {Path.GetFileName(filePath)}.\nPlease check\"srmm_errors.txt\" for more info.");
             }
         }
         
@@ -654,6 +675,10 @@ public partial class MainWindow : Window
         }
     }
     
+    private async Task ShowDefaultError() {
+        await MessageBoxWindow.Show(this, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+    }
+    
     private void ChangeUiState(UiState state)
     {
         switch (state)
@@ -692,6 +717,8 @@ public partial class MainWindow : Window
                 ModListView.IsEnabled = false;
                 
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(state), state, null);
         }
     }
 }

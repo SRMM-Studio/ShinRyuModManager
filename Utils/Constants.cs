@@ -53,4 +53,6 @@ public static class Constants
     
     //LOGGING
     public const string LOGS_BASE_PATH = "srmm-logs";
+    
+    public const string LINUX_WIKI_REMINDER_FLAG_FILE_NAME = ".SRMM_LINUX_WIKI_FLAG";
 }

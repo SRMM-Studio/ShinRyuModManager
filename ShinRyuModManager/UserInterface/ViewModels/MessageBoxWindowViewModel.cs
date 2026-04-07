@@ -4,14 +4,18 @@ namespace ShinRyuModManager.UserInterface.ViewModels;
 
 public partial class MessageBoxWindowViewModel : ViewModelBase
 {
-    [ObservableProperty] private string _messageText;
-    [ObservableProperty] private bool _isVisible;
+    [ObservableProperty] private bool _showCancel;
+    [ObservableProperty] private bool _showDontRemind;
     
-    public MessageBoxWindowViewModel() { }
-    
-    public MessageBoxWindowViewModel(string messageText, bool isVisible)
+    public MessageBoxWindowViewModel()
     {
-        MessageText = messageText;
-        IsVisible = isVisible;
+        ShowCancel = true;
+        ShowDontRemind = true;
+    }
+    
+    public MessageBoxWindowViewModel(bool showCancel, bool dontRemindButton)
+    {
+        ShowCancel = showCancel;
+        ShowDontRemind = dontRemindButton;
     }
 }

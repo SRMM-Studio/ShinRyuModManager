@@ -119,7 +119,7 @@ public partial class LibraryDisplayControl : UserControl
             Log.Fatal(ex, "Failed to install library!");
             
             var window = TopLevel.GetTopLevel(this) as Window;
-            _ = await MessageBoxWindow.Show(window, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
+            await MessageBoxWindow.Show(window, "Fatal", "An error has occurred.\nPlease check\"srmm_errors.txt\" for more info.");
         }
     }
     
