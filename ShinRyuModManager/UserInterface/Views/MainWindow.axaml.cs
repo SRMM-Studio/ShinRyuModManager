@@ -237,26 +237,18 @@ public partial class MainWindow : Window
                     return;
                 }
                 
-                progressWindow.Show(this);
+                _ = progressWindow.ShowDialog(this);
                 
-                await Task.Yield();
-                
-                await Task.Run(async () =>
-                {
-                    try
-                    {
-                        await Program.RunGeneration(mods.Where(x => x.Enabled).ToList());
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "Could not generate MLO!");
-                        
-                        await MessageBoxWindow.Show(this, "Error", "Mods could not be applied. Please make sure that the game directory has write access." +
-                            "\n\nPlease check\"srmm_errors.txt\" for more info.");
-                    }
-                });
-                
-                progressWindow.Close();
+                try {
+                    await Task.Run(() => Program.RunGeneration(mods.Where(x => x.Enabled).ToList()));
+                } catch (Exception ex) {
+                    Log.Error(ex, "Could not generate MLO!");
+                    
+                    await Dispatcher.UIThread.InvokeAsync(() => MessageBoxWindow.Show(this, "Error", "Mods could not be applied. Please make sure that the game directory has write access." +
+                        "\n\nPlease check\"srmm_errors.txt\" for more info."));
+                } finally {
+                    progressWindow.Close();
+                }
             }
             else
             {

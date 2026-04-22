@@ -131,7 +131,7 @@ public static class GameModel
             
             if (Directory.Exists(legacyCharaDir))
             {
-                var newCharaDir = Path.Combine(parlessDir.FullName, "chara", "ngen");
+                var newCharaDir = Path.Combine(modDir, "chara", "ngen");
                 
                 for (var i = 0; i < mlo.Files.Count; i++)
                 {
@@ -151,7 +151,7 @@ public static class GameModel
             
             if (Directory.Exists(legacyStageDir))
             {
-                var newStageDir = Path.Combine(parlessDir.FullName, "stage", "ngen");
+                var newStageDir = Path.Combine(modDir, "stage", "ngen");
                 
                 for (var i = 0; i < mlo.Files.Count; i++)
                 {
@@ -171,7 +171,7 @@ public static class GameModel
             
             if (Directory.Exists(legacyReactorDir))
             {
-                var newReactorDir = Path.Combine(parlessDir.FullName, "reactorpar", "reactor_ngen");
+                var newReactorDir = Path.Combine(modDir, "reactorpar", "reactor_ngen");
                 
                 for (var i = 0; i < mlo.Files.Count; i++)
                 {
