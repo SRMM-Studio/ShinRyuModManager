@@ -34,7 +34,10 @@
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <VersionSuffix>$(BuildSuffix)</VersionSuffix>
         <DebugType>embedded</DebugType>
-        <!--<PublishTrimmed Condition="'$(SelfContained)' == 'true'">true</PublishTrimmed>-->
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(BuildSuffix)' == 'linux-slim'">
+        <DefineConstants>$(DefineConstants);LINUX_SLIM</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

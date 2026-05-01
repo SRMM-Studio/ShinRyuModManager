@@ -29,6 +29,16 @@ jobs:
           repository: SRMM-Studio/YakuzaParless
           path: external/parless
           submodules: recursive
+          
+      - name: Verify Submodules
+        working-directory: external/parless
+        run: git submodule status --recursive
+
+      - name: Verify Submodule Contents
+        working-directory: external/parless
+        run: |
+          dir source\Utils
+          dir source\minhook
 
       - name: Install Premake 5
         uses: abel0b/setup-premake@b80dc6f70e8ab159fb854bdadbeb1a53cfc28723 # v2.4
@@ -36,7 +46,9 @@ jobs:
           version: "5.0.0-beta2"
 
       - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+        uses: TheMrMilchmann/setup-msvc-dev@79dac248aac9d0059f86eae9d8b5bfab4e95e97c # v4.0.0
+        with:
+          arch: x64
       
       - name: Generate VS Project
         working-directory: external/parless
@@ -80,9 +92,10 @@ jobs:
         with: 
           path: '${{ runner.temp }}/external'
           
-      - name: Download dinput and winmm
+      - name: Download version.dll
         run: |
           curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/version.dll -o $RUNNER_TEMP/external/version.dll
+          echo "79c74febb21082474c5dfff54fa4a2514b1fc3b6e02245cf491eb6f2d055bfe5  $RUNNER_TEMP/external/version.dll" | sha256sum --check
       
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v5
@@ -97,7 +110,7 @@ jobs:
         
       - name: Create Draft Release
         id: create_release
-        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21
         with:
           tag: "v${{ env.PR_TAG }}"
           name: ${{ env.PR_NAME }}

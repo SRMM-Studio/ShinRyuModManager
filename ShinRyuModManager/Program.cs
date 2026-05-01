@@ -77,10 +77,11 @@ public static class Program
                                           .WriteTo.Async(a => a.File(new JsonFormatter(renderMessage: true), errorLogsPath, rollingInterval: RollingInterval.Day)))
                      .CreateLogger();
         
-        if (!OperatingSystem.IsWindows())
-        {
-            IsRebuildMloSupported = false;
-        }
+#if LINUX_SLIM
+        // Slim versions of Linux need to have .NET 10 installed to run and Proton/Wine makes that
+        // annoying to find to get this working. Temporarily disabled.
+        RebuildMlo = false;
+#endif
         
         HandleLoader();
         
