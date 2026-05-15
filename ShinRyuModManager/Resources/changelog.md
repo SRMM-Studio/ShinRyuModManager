@@ -1,4 +1,7 @@
-﻿> ### **%{color:gold} Version 4.8.2 %** ###
+﻿> ### **%{color:gold} Version 4.8.3 %** ###
+* Fix motion.par redirection for Kiwami Remastered
+
+> ### **%{color:orange} Version 4.8.2 %** ###
 * Rename version.dll to dinput8.dll on Yakuza 6 and below
 * Blame Windows 11 for all these DLL updates
 
