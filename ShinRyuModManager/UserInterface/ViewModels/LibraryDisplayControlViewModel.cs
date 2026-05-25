@@ -4,28 +4,50 @@ namespace ShinRyuModManager.UserInterface.ViewModels;
 
 public partial class LibraryDisplayControlViewModel : ViewModelBase
 {
-    [ObservableProperty] private string _libName = "Name";
-    [ObservableProperty] private string _author = "Author";
-    [ObservableProperty] private string _description = "Description";
-    [ObservableProperty] private string _guid = "Guid";
-    [ObservableProperty] private string _version = "Version";
-    [ObservableProperty] private string _sourceLink;
+    [ObservableProperty]
+    public partial string LibName { get; set; } = "Name";
+
+    [ObservableProperty]
+    public partial string Author { get; set; } = "Author";
+
+    [ObservableProperty]
+    public partial string Description { get; set; } = "Description";
+
+    [ObservableProperty]
+    public partial string Guid { get; set; } = "Guid";
+
+    [ObservableProperty]
+    public partial string Version { get; set; } = "Version";
+
+    [ObservableProperty]
+    public partial string SourceLink { get; set; }
+
+    [ObservableProperty]
+    public partial bool EnableBtnVisibility { get; set; }
     
-    [ObservableProperty] private bool _enableBtnVisibility;
-    [ObservableProperty] private bool _disableBtnVisibility;
-    [ObservableProperty] private bool _installBtnVisibility;
-    [ObservableProperty] private bool _uninstallBtnVisibility;
-    [ObservableProperty] private bool _updateBtnVisibility;
-    [ObservableProperty] private bool _sourceBtnVisibility;
-    
+    [ObservableProperty]
+    public partial bool DisableBtnVisibility { get; set; }
+
+    [ObservableProperty]
+    public partial bool InstallBtnVisibility { get; set; }
+
+    [ObservableProperty]
+    public partial bool UninstallBtnVisibility { get; set; }
+
+    [ObservableProperty]
+    public partial bool UpdateBtnVisibility { get; set; }
+
+    [ObservableProperty]
+    public partial bool SourceBtnVisibility { get; set; }
+
     public LibraryDisplayControlViewModel() { }
     
     public LibraryDisplayControlViewModel(LibMeta meta)
     {
-        _libName = meta.Name;
-        _author = meta.Author;
-        _description = meta.Description;
-        _guid = meta.GUID.ToString();
-        _version = meta.Version;
+        LibName = meta.Name;
+        Author = meta.Author;
+        Description = meta.Description;
+        Guid = meta.GUID.ToString();
+        Version = meta.Version;
     }
 }

@@ -65,6 +65,8 @@ for TARGET in "${SRMM_BUILD_DIRS[@]}"; do
   OUTPUT_FILE_BASE="${SRMM_BASE_NAME}-${OUTPUT_TARGET_STR}-${SRMM_VERSION}"
   
   echo "Compressing ${OUTPUT_FILE_BASE}..."
+  
+  find "${DIR}" -name "*.pdb" -delete
 
   7za a "${SRMM_OUTPUT_DIR}/${OUTPUT_FILE_BASE}.zip" -tzip -bd -y "${DIR}/*" > /dev/null
   tar czf "${SRMM_OUTPUT_DIR}/${OUTPUT_FILE_BASE}.tar.gz" --owner=0 --group=0 --numeric-owner -C "${DIR}/" .

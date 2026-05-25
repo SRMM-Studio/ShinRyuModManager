@@ -6,5 +6,6 @@ namespace ShinRyuModManager.UserInterface.ViewModels;
 
 public partial class LibraryManagerViewModel : ViewModelBase
 {
-    [ObservableProperty] private ObservableCollection<LibraryDisplayControl> _library = [];
+    [ObservableProperty]
+    public partial ObservableCollection<LibraryDisplayControl> Library { get; set; } = [];
 }

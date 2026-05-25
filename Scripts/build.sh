@@ -8,7 +8,6 @@ IS_PREVIEW=false
 while getopts "p" flag; do
     case "${flag}" in
       p) IS_PREVIEW=true ;;
-      *) ;; # Do nothing
     esac
 done
 
@@ -94,7 +93,7 @@ for TARGET in "${!UPDATER_TARGET_ARGS[@]}"; do
   mkdir -p "${OUT_DIR}"
   
   # Reads the target's arguments and split them into an array
-  IFS=";" read -r -a arr <<< "${TARGET_ARGS[${TARGET}]}"
+  IFS=";" read -r -a arr <<< "${UPDATER_TARGET_ARGS[${TARGET}]}"
   
   echo "Building RyuUpdater ${TARGET}..."
   

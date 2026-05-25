@@ -42,8 +42,6 @@ public static class Generator
         
         Log.Information("Reading mods...\n");
         
-        // TODO: Make mod reading async
-        
         // Use a reverse loop to be able to remove items from the list when necessary
         for (var i = mods.Count - 1; i >= 0; i--)
         {

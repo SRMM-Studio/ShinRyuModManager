@@ -41,7 +41,7 @@ jobs:
           dir source\minhook
 
       - name: Install Premake 5
-        uses: abel0b/setup-premake@b80dc6f70e8ab159fb854bdadbeb1a53cfc28723 # v2.4
+        uses: abel0b/setup-premake@de7d79047789622064f7a2d251e929fadd166707 # v2.4
         with:
           version: "5.0.0-beta2"
 

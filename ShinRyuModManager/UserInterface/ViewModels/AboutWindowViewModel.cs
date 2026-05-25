@@ -5,9 +5,12 @@ namespace ShinRyuModManager.UserInterface.ViewModels;
 
 public partial class AboutWindowViewModel : ViewModelBase
 {
-    [ObservableProperty] private string _version;
-    [ObservableProperty] private string _creditsText;
-    
+    [ObservableProperty]
+    public partial string Version { get; set; }
+
+    [ObservableProperty]
+    public partial string CreditsText { get; set; }
+
     public AboutWindowViewModel()
     {
         Initialize();

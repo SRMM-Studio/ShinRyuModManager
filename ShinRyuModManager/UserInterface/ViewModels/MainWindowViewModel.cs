@@ -11,16 +11,30 @@ namespace ShinRyuModManager.UserInterface.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    [ObservableProperty] private string _titleText = "Shin Ryu Mod Manager";
-    [ObservableProperty] private string _appVersionText = "SRMM Version";
-    [ObservableProperty] private string _gameLaunchPath;
+    [ObservableProperty]
+    public partial string TitleText { get; set; } = "Shin Ryu Mod Manager";
+
+    [ObservableProperty]
+    public partial string AppVersionText { get; set; } = "SRMM Version";
+
+    [ObservableProperty]
+    public partial string GameLaunchPath { get; set; }
+
+    [ObservableProperty]
+    public partial string ModName { get; set; } = "Mod Name";
     
-    [ObservableProperty] private string _modName = "Mod Name";
-    [ObservableProperty] private string _modDescription = "Mod Description";
-    [ObservableProperty] private string _modAuthor = "Author";
-    [ObservableProperty] private string _modVersion = "Version";
-    [ObservableProperty] private ObservableCollection<ModInfo> _modList;
-    
+    [ObservableProperty]
+    public partial string ModDescription { get; set; } = "Mod Description";
+
+    [ObservableProperty]
+    public partial string ModAuthor { get; set; } = "Author";
+
+    [ObservableProperty]
+    public partial string ModVersion { get; set; } = "Version";
+
+    [ObservableProperty]
+    public partial ObservableCollection<ModInfo> ModList { get; set; }
+
     public MainWindowViewModel()
     {
         Initialize();

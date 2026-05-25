@@ -45,7 +45,7 @@
         </Style>
         
         <Style Selector="Grid.Controls">
-            <Setter Property="Margin" Value="20, 0, 20, 40" />
+            <Setter Property="Margin" Value="15, 0, -5, 40" />
         </Style>
         
         <Style Selector="Grid.Controls Button">
@@ -191,7 +191,7 @@
                     
                     <!-- Mod List DataGrid -->
                     <ThemeVariantScope Grid.Row="1" RequestedThemeVariant="Light">
-                        <DataGrid Name="ModListView" Margin="20, 0, 20, 20" Background="#FF4B4B4B" 
+                        <DataGrid Name="ModListView" Margin="20, 0, 0, 20" Background="#FF4B4B4B" 
                                   Width="318" ItemsSource="{Binding ModList}" 
                                   SelectionChanged="ModList_OnSelectionChanged">
                             <DataGrid.Columns>

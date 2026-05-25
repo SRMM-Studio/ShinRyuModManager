@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Serilog;
 using ShinRyuModManager.UserInterface.ViewModels;
@@ -21,10 +19,6 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
-            DisableAvaloniaDataAnnotationValidation();
-            
             var culture = new CultureInfo("en");
             
             CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -40,6 +34,10 @@ public partial class App : Application
             desktop.Exit += DesktopOnExit;
         }
         
+#if DEBUG
+        this.AttachDeveloperTools();
+#endif
+        
         base.OnFrameworkInitializationCompleted();
     }
     
@@ -47,19 +45,5 @@ public partial class App : Application
     private static void DesktopOnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
     {
         Log.CloseAndFlush();
-    }
-    
-    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Only removing validation plugins; no reflection or property access used.")]
-    private static void DisableAvaloniaDataAnnotationValidation()
-    {
-        // Get an array of plugins to remove
-        var dataValidationPluginsToRemove =
-            BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
-        
-        // remove each entry found
-        foreach (var plugin in dataValidationPluginsToRemove)
-        {
-            BindingPlugins.DataValidators.Remove(plugin);
-        }
     }
 }

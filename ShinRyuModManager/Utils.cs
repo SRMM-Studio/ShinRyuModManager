@@ -70,16 +70,16 @@ public static class Utils
         await using var fs = File.OpenRead(path);
         
         // TEMP: Handle .7z files. Remove when SharpCompress fixes this issue.
-        var is7Z = SevenZipArchive.IsSevenZipFile(fs);
+        var is7Z = await SevenZipArchive.IsSevenZipFileAsync(fs);
         
         fs.Seek(0, SeekOrigin.Begin);
         
         if (is7Z)
         {
-            return Extract7ZFile(fs);
+            return await Extract7ZFileAsync(fs);
         }
         
-        using var reader = ReaderFactory.Open(fs);
+        await using var reader = await ReaderFactory.OpenAsyncReader(fs);
         
         var options = new ExtractionOptions
         {
@@ -87,11 +87,11 @@ public static class Utils
             Overwrite = true
         };
         
-        while (reader.MoveToNextEntry())
+        while (await reader.MoveToNextEntryAsync())
         {
             if (!reader.Entry.IsDirectory)
             {
-                reader.WriteEntryToDirectory(GamePath.ModsPath, options);
+                await reader.WriteEntryToDirectoryAsync(GamePath.ModsPath, options);
             }
         }
         
@@ -100,12 +100,12 @@ public static class Utils
     
     // For some reason the SharpCompress doesn't handle .7z files automatically.
     // This looks to be a working workaround for the time being.
-    private static bool Extract7ZFile(Stream stream)
+    private static async Task<bool> Extract7ZFileAsync(Stream stream)
     {
-        using var archive = SevenZipArchive.Open(stream);
-        using var reader = archive.ExtractAllEntries();
+        await using var archive = await SevenZipArchive.OpenAsyncArchive(stream);
+        await using var reader = await archive.ExtractAllEntriesAsync();
         
-        reader.WriteAllToDirectory(GamePath.ModsPath, new ExtractionOptions
+        await reader.WriteAllToDirectoryAsync(GamePath.ModsPath, new ExtractionOptions
         {
             ExtractFullPath = true,
             Overwrite = true
