@@ -1,4 +1,12 @@
-﻿> ### **%{color:gold} Version 4.8.3 %** ###
+﻿> ### **%{color:gold} Version 4.8.5 %** ###
+* Redirect paths for localized languages for Kiwami 1 Legacy
+* This may break some old mods for Kiwami 1 Legacy if they are targeting localized Japanese files, they may need to be updated
+* But it is necessary, as it was being done incorrectly for the past 4-5 years
+
+> ### **%{color:orange} Version 4.8.4 %** ###
+* Redirect paths for localized languages for Kiwami Remastered
+
+> ### **%{color:orange} Version 4.8.3 %** ###
 * Fix motion.par redirection for Kiwami Remastered
 
 > ### **%{color:orange} Version 4.8.2 %** ###
