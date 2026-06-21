@@ -48,7 +48,7 @@ public static class AutoUpdating
         // Update check for SRMM
         _updater = new PortableUpdater(appcastUrl, new Ed25519Checker(SecurityMode.Unsafe))
         {
-            UIFactory = new UIFactory
+            UIFactory = new CustomUIFactory
             {
                 HideReleaseNotes = true,
                 UseStaticUpdateWindowBackgroundColor = true,

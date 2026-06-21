@@ -27,7 +27,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         
-        AutoUpdating.Init();
+        if (Program.CheckForUpdates)
+        {
+            AutoUpdating.Init();
+        }
     }
     
     private void Window_OnLoaded(object sender, RoutedEventArgs e)
