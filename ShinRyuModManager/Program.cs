@@ -188,7 +188,9 @@ public static class Program
             
             if (_iniData.TryGetKey("RyuModManager.CheckForUpdates", out var check))
             {
-                CheckForUpdates = int.Parse(check) == 1;
+#warning TODO 23.06.2026: Reimplement updates for Github once we're good to go on NexusMods again
+                CheckForUpdates = false;
+                //CheckForUpdates = int.Parse(check) == 1;
             }
             
             if (_iniData.TryGetKey("RyuModManager.ShowWarnings", out var showWarnings))
