@@ -47,9 +47,6 @@ UPDATER_OUTPUT_DIR="${UPDATER_SELECTOR}/out"
 
 APPCAST_OUTPUT_DIR="${DIST_SELECTOR}/appcast"
 
-SRMM_URL_BASE="https://github.com/TheTrueColonel/ShinRyuModManager/releases/download/v"
-UPDATER_URL_BASE="https://thetruecolonel.github.io/SRMM-AppCast/updater/"
-
 rm -rf "${SRMM_OUTPUT_DIR}"
 rm -rf "${UPDATER_OUTPUT_DIR}"
 
@@ -82,20 +79,6 @@ for TARGET in "${SRMM_BUILD_DIRS[@]}"; do
     EXEC_NAME="ShinRyuModManager.exe"
   fi
   
-  # Create only for .zip, as that's universally available
-  if [[ "$IS_PREVIEW" = false ]]; then
-    netsparkle-generate-appcast \
-        -a "${APPCAST_OUTPUT_DIR}" \
-        --single-file "${SRMM_OUTPUT_DIR}/${OUTPUT_FILE_BASE}.zip" \
-        -o "${OS_NAME}" \
-        -n "${EXEC_NAME}" \
-        --output-file-name "appcast_${TARGET}" \
-        --use-ed25519-signature-attribute \
-        --human-readable \
-        --file-version "${SRMM_VERSION}-${TARGET}" \
-        -u "${SRMM_URL_BASE}${SRMM_VERSION}/" > /dev/null
-  fi
-  
 done
 
 if [[ "$IS_PREVIEW" = false ]]; then
@@ -121,18 +104,6 @@ if [[ "$IS_PREVIEW" = false ]]; then
       OS_NAME="windows"
       EXEC_NAME="${UPDATER_BASE_NAME}.exe"
     fi
-    
-    # Create only for .zip, as that's universally available
-    netsparkle-generate-appcast \
-      -a "${APPCAST_OUTPUT_DIR}" \
-      --single-file "${UPDATER_OUTPUT_DIR}/${OUTPUT_FILE_BASE}.zip" \
-      -o "${OS_NAME}" \
-      -n "${EXEC_NAME}" \
-      --output-file-name "appcast_ryuupdater-${TARGET}" \
-      --use-ed25519-signature-attribute \
-      --human-readable \
-      --file-version "${UPDATER_VERSION}" \
-      -u "${UPDATER_URL_BASE}" > /dev/null
   done
 
   ### Copy AppCasts to repo

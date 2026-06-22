@@ -79,13 +79,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
-        
-      - name: Checkout AppCast Repo
-        uses: actions/checkout@v6
-        with:
-          repository: 'TheTrueColonel/SRMM-AppCast'
-          token: '${{ secrets.SRMM_APPCAST_TOKEN }}'
-          path: AppcastRepo
           
       - name: Download Parless Artifact
         uses: actions/download-artifact@v7
@@ -101,9 +94,6 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
-          
-      - name: Install Netsparkle Tool
-        run: dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator
 
       - name: Add .NET tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
@@ -142,31 +132,3 @@ jobs:
               --no-progress-meter \
               "${UPLOAD_URL%%\{*}?name=$name" > /dev/null
           done
-  
-      - name: Commit Appcasts and Updater
-        run: |
-          cd ${{ github.workspace }}/AppcastRepo
-          branch="update-appcasts-${{ github.run_number }}"
-          git checkout -b "${branch}"
-          
-          git add .
-          git commit -m "Update Appcasts and Updater for SRMM version $PR_TAG and Updater version $PR_UPDATER_VERSION"
-          git push origin "${branch}"
-        env:
-          GIT_AUTHOR_NAME: github-actions
-          GIT_AUTHOR_EMAIL: github-actions@github.com
-          GIT_COMMITTER_NAME: github-actions
-          GIT_COMMITTER_EMAIL: github-actions@github.com
-          
-      - name: Create Pull Request
-        run: |
-          cd ${{ github.workspace }}/AppcastRepo
-          branch="update-appcasts-${{ github.run_number }}"
-          
-          gh pr create \
-            --title "Update Appcasts and Updater" \
-            --body "Automated update for SRMM version $PR_TAG and Updater version $PR_UPDATER_VERSION" \
-            --head "${branch}" \
-            --base main
-        env:
-          GITHUB_TOKEN: ${{ secrets.SRMM_APPCAST_TOKEN }}
