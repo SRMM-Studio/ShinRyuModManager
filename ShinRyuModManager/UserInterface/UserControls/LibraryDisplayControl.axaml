@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+             xmlns:lang="using:ShinRyuModManager.Language.UserControls"
+             x:DataType="vm:LibraryDisplayControlViewModel"
+             x:Class="ShinRyuModManager.UserInterface.UserControls.LibraryDisplayControl"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="200"
+             Background="#FF373535">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:LibraryDisplayControlViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Styles>
+        <Style Selector="Button.Option">
+            <Setter Property="Background" Value="#FF4B4B4B" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Height" Value="28" />
+        </Style>
+        
+        <!-- Button hovered over -->
+        <Style Selector="Button.Option:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Orange" />
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+        
+        <!-- Button is pressed -->
+        <Style Selector="Button.Option:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="DarkOrange" />
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+    </UserControl.Styles>
+    
+    <Border BorderThickness="2" BorderBrush="Gray" Margin="5">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                0.75*
+                0.25*
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="0" Margin="15">
+                <Grid.RowDefinitions>
+                    0.40*
+                    0.40*
+                    0.20*
+                </Grid.RowDefinitions>
+                
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <HyperlinkButton Name="Source" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0, 0, 5, 0" 
+                                     Background="Transparent" BorderBrush="Transparent" ToolTip.Tip="Source" 
+                                     IsVisible="{Binding SourceBtnVisibility}" 
+                                     NavigateUri="{Binding SourceLink}">
+                        <Image Source="../Assets/Icons/PNG/Github_Light.png" Width="24" Height="24" 
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    </HyperlinkButton>
+                    
+                    <Label Name="LibName" Content="{Binding LibName}" 
+                           FontSize="24" Foreground="White" VerticalAlignment="Center" />
+                </StackPanel>
+                
+                <Label Grid.Row="0" Name="Author" Content="{Binding Author}" 
+                       FontSize="12" Foreground="DimGray" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                <Label Grid.Row="1" Name="Description" Content="{Binding Description}" 
+                       FontSize="18" Foreground="LightGray" VerticalAlignment="Center" />
+                <Label Grid.Row="2" Name="GUID" Content="{Binding Guid}" 
+                       FontSize="12" Foreground="DimGray" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <Label Grid.Row="2" Name="Version" Content="{Binding Version}" 
+                       FontSize="12" Foreground="DimGray" HorizontalAlignment="Right" VerticalAlignment="Center" />
+            </Grid>
+            
+            <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="15">
+                <Button Name="Install" Classes="Option" Content="{x:Static lang:LibraryDisplay.Btn_Install}" 
+                        IsVisible="{Binding InstallBtnVisibility}" Click="InstallOrUpdate_OnClick" />
+                <Button Name="Uninstall" Classes="Option" Content="{x:Static lang:LibraryDisplay.Btn_Uninstall}" 
+                        IsVisible="{Binding UninstallBtnVisibility}" Click="Uninstall_OnClick" />
+                <Button Name="Enable" Classes="Option" Content="{x:Static lang:LibraryDisplay.Btn_Enable}" 
+                        IsVisible="{Binding EnableBtnVisibility}" Click="Enable_OnClick" />
+                <Button Name="Disable" Classes="Option" Content="{x:Static lang:LibraryDisplay.Btn_Disable}" 
+                        IsVisible="{Binding DisableBtnVisibility}" Click="Disable_OnClick" />
+                <Button Name="Update" Classes="Option" Content="{x:Static lang:LibraryDisplay.Btn_Update}" 
+                        IsVisible="{Binding UpdateBtnVisibility}" Click="InstallOrUpdate_OnClick" />
+            </StackPanel>
+        </Grid>
+    </Border>
+    
+</UserControl>

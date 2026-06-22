@@ -1,135 +1,138 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using Yarhl.IO;
 using Utils;
+using Yarhl.IO;
 
-namespace ShinRyuModManager
+namespace ShinRyuModManager.ModLoadOrder;
+
+public class MLO
 {
-    public class MLO
+    private const string MAGIC = "_OLM";   // MLO_ but in little endian, because that's how the yakuza works
+    private const uint ENDIANNESS = 0x21;  // Little endian
+    private const uint VERSION = 0x020000; // 2.0
+    private const uint FILESIZE = 0x0;     // Remaining faithful to RGG by adding a filesize that's not used
+    
+    public List<string> Mods { get; }
+    public List<ParlessFile> Files { get; }
+    public List<ParlessFolder> ParlessFolders { get; }
+    public List<CpkFolder> CpkFolders { get; }
+    
+    public MLO(List<int> modIndices, List<string> mods, OrderedSet<string> fileSet, List<ParlessFolder> parlessFolders, Dictionary<string, List<int>> cpkFolders)
     {
-        public const string MAGIC    = "_OLM"; // MLO_ but in little endian cause that's how the yakuza works
-        public const uint ENDIANNESS = 0x21; // Little endian
-        public const uint VERSION    = 0x020000; // 2.0
-        public const uint FILESIZE   = 0x0; // Remaining faithful to RGG by adding a filesize that is not used
-
-        public List<string> Mods;
-        public List<(string, int)> Files;
-        public List<(string, int)> ParlessFolders;
-        public List<(string, List<ushort>)> CpkFolders;
-
-        public MLO(List<int> modIndices, List<string> mods, OrderedSet<string> fileSet, List<(string, int)> parlessFolders, Dictionary<string, List<int>> cpkFolders)
+        var files = fileSet.ToList();
+        
+        Mods = mods;
+        Files = [];
+        
+        for (var i = 0; i < modIndices.Count - 1; i++)
         {
-            List<string> files = fileSet.ToList();
-
-            this.Mods = mods;
-            this.Files = new List<(string, int)>();
-            for (int i = 0; i < modIndices.Count - 1; i++)
+            for (var j = modIndices[i]; j < modIndices[i + 1]; j++)
             {
-                for (int j = modIndices[i]; j < modIndices[i + 1]; j++)
-                {
-                    this.Files.Add((files[j].ToLowerInvariant().Replace('\\', '/'), i));
-                }
+                var file = new ParlessFile(Utils.NormalizeToNodePath(files[j].ToLowerInvariant()), i);
+                
+                Files.Add(file);
             }
-
-            this.ParlessFolders = parlessFolders.Select(f => (f.Item1.ToLowerInvariant().Replace('\\', '/'), f.Item2)).ToList();
-            this.CpkFolders = cpkFolders.Select(pair => (pair.Key.ToLowerInvariant().Replace('\\', '/'), pair.Value.Select(v => (ushort)v).ToList())).ToList();
         }
-
-        public void WriteMLO(string path)
+        
+        ParlessFolders = parlessFolders.Select(f => f with
         {
-            DataWriter writer = new DataWriter(new FileStream(path, FileMode.Create, FileAccess.Write));
-
-            // Write header
-            writer.Write(MAGIC, false);
-            writer.Write(ENDIANNESS);
-            writer.Write(VERSION);
-            writer.Write(FILESIZE);
-
-            writer.Write(0x40); // Mods start (size of header)
-            writer.WriteOfType(typeof(uint), this.Mods.Count);
-
-            writer.Write(0); // Files start (to be written later)
-            writer.WriteOfType(typeof(uint), this.Files.Count);
-
-            writer.Write(0); // Parless folders start (to be written later)
-            writer.WriteOfType(typeof(uint), this.ParlessFolders.Count);
-
-            writer.Write(0); // Cpk folders start (to be written later)
-            writer.WriteOfType(typeof(uint), this.CpkFolders.Count);
-
-            // Pad
-            writer.WriteTimes(0, 0x10);
-
-            // 0x0: length
-            // 0x2: string
-            foreach (string mod in this.Mods)
-            {
-                writer.WriteOfType(typeof(ushort), mod.Length + 1);
-                writer.Write(mod);
-            }
-
-            long fileStartPos = writer.Stream.Position;
-
-            // 0x0: index of mod
-            // 0x2: length
-            // 0x4: string
-            foreach ((string file, int index) in this.Files)
-            {
-                writer.WriteOfType(typeof(ushort), index);
-                writer.WriteOfType(typeof(ushort), file.Length + 1);
-                writer.Write(file);
-            }
-
-            long parlessStartPos = writer.Stream.Position;
-
-            // 0x0: index of .parless in string
-            // 0x2: length
-            // 0x4: string
-            foreach ((string folder, int index) in this.ParlessFolders)
-            {
-                writer.WriteOfType(typeof(ushort), index);
-                writer.WriteOfType(typeof(ushort), folder.Length + 1);
-                writer.Write(folder);
-            }
-
-            long cpkFoldersStartPos = writer.Stream.Position;
-
-            // 0x0: mod count
-            // 0x2: length
-            // 0x4: string
-            // 0x?: mod indices
-            foreach ((string folder, List<ushort> indices) in this.CpkFolders)
-            {
-                writer.WriteOfType(typeof(ushort), indices.Count);
-                writer.WriteOfType(typeof(ushort), folder.Length + 1);
-                writer.Write(folder);
-
-                foreach (ushort index in indices)
-                {
-                    writer.WriteOfType(typeof(ushort), index);
-                }
-            }
-
-            // Write file size
-            writer.Stream.Seek(0xC, SeekOrigin.Begin);
-            writer.WriteOfType(typeof(uint), writer.Stream.Length);
-
-            // Write files start position
-            writer.Stream.Seek(0x18, SeekOrigin.Begin);
-            writer.WriteOfType(typeof(uint), fileStartPos);
-
-            // Write parless folders start position
-            writer.Stream.Seek(0x20, SeekOrigin.Begin);
-            writer.WriteOfType(typeof(uint), parlessStartPos);
-
-            // Write cpk folders start position
-            writer.Stream.Seek(0x28, SeekOrigin.Begin);
-            writer.WriteOfType(typeof(uint), cpkFoldersStartPos);
-
-            // Close the file stream
-            writer.Stream.Dispose();
+            Name = Utils.NormalizeToNodePath(f.Name.ToLowerInvariant())
+        }).ToList();
+        
+        CpkFolders = cpkFolders
+                     .Select(pair => new CpkFolder(Utils.NormalizeToNodePath(pair.Key.ToLowerInvariant()), pair.Value.Select(v => (ushort)v).ToList()))
+                     .ToList();
+    }
+    
+    public void WriteMLO(string path)
+    {
+        var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+        using var dataStream = DataStreamFactory.FromStream(stream);
+        
+        var writer = new DataWriter(dataStream);
+        
+        // Write header
+        writer.Write(MAGIC, false);
+        writer.Write(ENDIANNESS);
+        writer.Write(VERSION);
+        writer.Write(FILESIZE);
+        
+        writer.Write(0x40); // Mods start (size of header)
+        writer.WriteOfType((uint)Mods.Count);
+        
+        writer.Write(0); // Files start (to be written later)
+        writer.WriteOfType((uint)Files.Count);
+        
+        writer.Write(0); // Parless folders start (to be written later)
+        writer.WriteOfType((uint)ParlessFolders.Count);
+        
+        writer.Write(0); // Cpk folders start (to be written later)
+        writer.WriteOfType((uint)CpkFolders.Count);
+        
+        writer.WriteTimes(0, 0x10); // Padding
+        
+        // 0x0: Length
+        // 0x2: String
+        foreach (var mod in Mods)
+        {
+            writer.WriteOfType((ushort)(mod.Length + 1));
+            writer.Write(mod);
         }
+        
+        var fileStartPos = writer.Stream.Position;
+        
+        // 0x0: Index of mod
+        // 0x2: Length
+        // 0x4: String
+        foreach (var file in Files)
+        {
+            writer.WriteOfType((ushort)file.Index);
+            writer.WriteOfType((ushort)(file.Name.Length + 1));
+            writer.Write(file.Name);
+        }
+        
+        var parlessStartPos = writer.Stream.Position;
+        
+        // 0x0: Index of .parless in string
+        // 0x2: Length
+        // 0x4: String
+        foreach (var folder in ParlessFolders)
+        {
+            writer.WriteOfType((ushort)folder.Index);
+            writer.WriteOfType((ushort)(folder.Name.Length + 1));
+            writer.Write(folder.Name);
+        }
+        
+        var cpkFolderStartPos = writer.Stream.Position;
+        
+        // 0x0: Mod Count
+        // 0x2: Length
+        // 0x4: String
+        // 0x?: Mod Indices
+        foreach (var folder in CpkFolders)
+        {
+            writer.WriteOfType((ushort)folder.Indices.Count);
+            writer.WriteOfType((ushort)(folder.Name.Length + 1));
+            writer.Write(folder.Name);
+            
+            foreach (var index in folder.Indices)
+            {
+                writer.WriteOfType(index);
+            }
+        }
+        
+        // Write file size
+        writer.Stream.Seek(0xC, SeekOrigin.Begin);
+        writer.WriteOfType((uint)writer.Stream.Length);
+        
+        // Write file start position
+        writer.Stream.Seek(0x18, SeekOrigin.Begin);
+        writer.WriteOfType((uint)fileStartPos);
+        
+        // Write parless folders start position
+        writer.Stream.Seek(0x20, SeekOrigin.Begin);
+        writer.WriteOfType((uint)parlessStartPos);
+        
+        // Write cpk folders start position
+        writer.Stream.Seek(0x28, SeekOrigin.Begin);
+        writer.WriteOfType((uint)cpkFolderStartPos);
     }
 }

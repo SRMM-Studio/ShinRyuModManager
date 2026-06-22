@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        xmlns:lang="using:ShinRyuModManager.Language.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
+        x:Class="ShinRyuModManager.UserInterface.Views.LibraryManagerWindow"
+        x:DataType="vm:LibraryManagerViewModel"
+        Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
+        Title="Library Manager" 
+        Height="650" 
+        Width="800" 
+        Background="#FF373535" 
+        Foreground="White"
+        CanResize="False">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:LibraryManagerViewModel/>
+    </Design.DataContext>
+        
+    <Grid>
+        <Grid.RowDefinitions>
+            Auto
+            Auto
+            Auto
+            1*
+        </Grid.RowDefinitions>
+        
+        <Label Grid.Row="0" Content="{x:Static lang:LibraryManager.Text_Title}" FontSize="30" 
+               Foreground="Gold" Margin="10" />
+        
+        <Label Grid.Row="1" Content="{x:Static lang:LibraryManager.Text_Description}" FontSize="14" 
+               Foreground="White" Margin="10,0,0,10"/>
+        
+        <Label Name="ManifestDownloadError" Grid.Row="2" Content="{x:Static lang:LibraryManager.Text_ErrorMessage}" 
+               FontSize="14" Foreground="OrangeRed" Margin="10,0,0,10" IsVisible="False"/>
+        
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+            <ItemsControl ItemsSource="{Binding Library}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Name="Libraries" Orientation="Vertical" Margin="10" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid> 
+        
+</Window>

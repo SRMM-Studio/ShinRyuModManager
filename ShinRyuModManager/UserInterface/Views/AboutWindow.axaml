@@ -1,0 +1,63 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        xmlns:lang="using:ShinRyuModManager.Language.Views"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+        x:Class="ShinRyuModManager.UserInterface.Views.AboutWindow"
+        x:DataType="vm:AboutWindowViewModel"
+        Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
+        Title="About" 
+        Height="600" 
+        Width="500"
+        Background="#FF373535" 
+        Foreground="White"
+        CanResize="False">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:AboutWindowViewModel/>
+    </Design.DataContext>
+    
+    <Window.Styles>
+        
+        <Style Selector="StackPanel">
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+        
+        <Style Selector="StackPanel Image">
+            <Setter Property="Width" Value="250" />
+            <Setter Property="Height" Value="250" />
+        </Style>
+        
+        <Style Selector="StackPanel TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        
+        <Style Selector="HyperlinkButton">
+            <Setter Property="TextBlock.TextDecorations" Value="" />
+        </Style>
+        
+    </Window.Styles>
+    
+    <StackPanel>
+        <Image Source="../Assets/SRMMLogo250.png" />
+        
+        <TextBlock Margin="20, 0" FontSize="20">
+            <LineBreak />
+            <HyperlinkButton NavigateUri="https://github.com/SRMM-Studio/ShinRyuModManager"
+                Foreground="Gold">
+                Shin Ryu Mod Manager
+            </HyperlinkButton>
+        </TextBlock>
+        <TextBlock Margin="20, 0" Text="{Binding Version}" />
+        <TextBlock Margin="0, 40, 0, 0" FontSize="16" Foreground="#f59b42" Text="{x:Static lang:About.Text_Credits}" />
+        <TextBlock Margin="15" Text="{Binding CreditsText}" />
+    </StackPanel>
+        
+</Window>

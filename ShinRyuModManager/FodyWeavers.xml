@@ -1,5 +1,0 @@
-﻿<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
-  <Costura
-    Unmanaged32Assemblies='System.Text.Encoding.CodePages'
-    Unmanaged64Assemblies='System.Text.Encoding.CodePages' />
-</Weavers>

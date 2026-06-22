@@ -16,8 +16,20 @@ For actual usage, check the [Installing Mods](../../wiki/Installing-Mods) and [C
 To run the program, you can launch it with no arguments to open the GUI, or hold `left ctrl` to open it in CLI mode. Either method will generate an MLO file to be used by [Parless](https://github.com/SRMM-Studio/YakuzaParless), the Yakuza mod loader.
 All of the mod manager [releases](../../releases) include Parless and all necessary files for usage, so no need to download Parless separately.
 
+### CLI Mode
+
+#### Windows
+```powershell
+> .\ShinRyuModManager.exe --cli
+```
+
+#### Linux
+```sh
+$ ./ShinRyuModManager-CE --cli
+```
+
 # Building
-Clone the repository and fetch the submodules, then open the solution file (.sln) in Visual Studio. You can then `dotnet publish` the `ShinRyuModManager` project.
+Clone the repository and fetch the submodules, then open the solution file (.slnx) in Visual Studio. You can then `dotnet publish` the `ShinRyuModManager` project.
 
 # Credits
 Original project by [SutandoTsukai181](https://github.com/SutandoTsukai181).

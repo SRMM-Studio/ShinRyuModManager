@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="175"
+        x:Class="ShinRyuModManager.UserInterface.Views.ProgressWindow"
+        x:DataType="vm:ProgressWindowViewModel"
+        Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
+        Title="{Binding Title}"
+        Height="175"
+        Width="400"
+        Background="#FF373535" 
+        Foreground="White"
+        CanResize="False"
+        CanMinimize="False"
+        CanMaximize="False">
+    
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:ProgressWindowViewModel/>
+    </Design.DataContext>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            3*
+            *
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Padding="20" TextWrapping="Wrap" TextAlignment="Center" Text="{Binding MessageText}" />
+        <ProgressBar Grid.Row="1" Margin="10" Height="25" IsIndeterminate="{Binding IsIndeterminate}" />
+    </Grid>
+</Window>
