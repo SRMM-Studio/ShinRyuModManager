@@ -79,6 +79,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
+        with:
+          submodules: 'recursive'
           
       - name: Download Parless Artifact
         uses: actions/download-artifact@v7
