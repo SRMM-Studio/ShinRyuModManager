@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ### Check arguments
-if ! [[ "${#}" -gt 3 ]]; then
+if ! [[ "${#}" -gt 2 ]]; then
   echo "Not enough args! ${#}"
   echo "Usage: $0 -s <SRMM Version Number>"
   exit 1
