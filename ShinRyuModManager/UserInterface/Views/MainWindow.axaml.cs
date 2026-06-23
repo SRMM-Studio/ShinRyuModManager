@@ -9,7 +9,6 @@ using Serilog;
 using Serilog.Events;
 using ShinRyuModManager.Helpers;
 using ShinRyuModManager.ModLoadOrder.Mods;
-using ShinRyuModManager.UserInterface.Updater;
 using ShinRyuModManager.UserInterface.ViewModels;
 using Utils;
 using YamlDotNet.Core;
@@ -26,23 +25,10 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        
-        if (Program.CheckForUpdates)
-        {
-            AutoUpdating.Init();
-        }
     }
     
     private void Window_OnLoaded(object sender, RoutedEventArgs e)
     {
-        // Display change log if the recent update flag exists
-        if (Flags.CheckFlag(Constants.UPDATE_RECENT_FLAG_FILE_NAME))
-        {
-            CreateOrActivateWindow<ChangeLogWindow>();
-            
-            Flags.DeleteFlag(Constants.UPDATE_RECENT_FLAG_FILE_NAME);
-        }
-        
         RunPreInitAsync().ConfigureAwait(false);
         
         Program.ReadCachedLocalLibraryData();

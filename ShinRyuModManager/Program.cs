@@ -188,9 +188,10 @@ public static class Program
             
             if (_iniData.TryGetKey("RyuModManager.CheckForUpdates", out var check))
             {
-                //TODO 23.06.2026: Reimplement updates for Github once we're good to go on NexusMods again
-                CheckForUpdates = false;
-                //CheckForUpdates = int.Parse(check) == 1;
+                //NOTE FOR NEXUSMODS STAFF: This will only check for updates and redirect to nexusmods in the future, will not ever download it by itself.
+                //As of this build submitted for your review, it does not even do anything.
+                //The code for downloading the files are completely deleted.
+                CheckForUpdates = int.Parse(check) == 1;
             }
             
             if (_iniData.TryGetKey("RyuModManager.ShowWarnings", out var showWarnings))

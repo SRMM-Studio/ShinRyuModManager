@@ -5,7 +5,6 @@
   <Project Path="CpkTools/CpkTools.csproj" />
   <Project Path="ParLibrary.Tests/ParLibrary.Tests.csproj" />
   <Project Path="ParLibrary/ParLibrary.csproj" />
-  <Project Path="RyuUpdater/RyuUpdater.csproj" />
   <Project Path="ShinRyuModManager\ShinRyuModManager.csproj">
     <Platform Project="x64" />
   </Project>
