@@ -6,15 +6,10 @@ on:
         description: "Tag for the release (example: 1.2.3)"
         required: true
         default: "1.0.0"
-      updater_version:
-        description: "Version for RyuUpdater (example: 1.2.3)"
-        required: true
-        default: "1.0.0"
 
 env:
   PR_NAME: 'ShinRyuModManager ${{ github.event.inputs.tag }}'
   PR_TAG: ${{ github.event.inputs.tag }}
-  PR_UPDATER_VERSION: ${{ github.event.inputs.updater_version }}
       
 jobs:
   build-parless:
@@ -110,7 +105,7 @@ jobs:
       - name: Run Scripts
         run: |
           ./Scripts/build.sh
-          ./Scripts/package.sh -s $PR_TAG -u $PR_UPDATER_VERSION
+          ./Scripts/package.sh -s $PR_TAG
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
           SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
