@@ -1,5 +1,19 @@
 > ### **%{color:gold} Version 5.0.0 %** ###
-* TO BE FILLED OUT
+Big thanks to @TheTrueColonel
+
+- Full UI migration from WPF to Avalonia
+- All projects fully ported to .NET 10
+- Rebuilt CPKGen as CPKTools project
+- Overhauled logging with Serilog
+- Added profile support
+- Save file format needed to be updated to save these changes. All previous formats are supported
+- Added GitHub actions to automate publishes
+- Many performance and code organizational changes
+- Opening CLI by running SRMM with Left-CTRL held no longer exists.
+- Doesn't work cross-platform
+- External console doesn't exist anymore. (Console Output)
+- No native Message Boxes because of [no native Avalonia support](https://docs.avaloniaui.net/docs/basics/user-interface/messagebox)
+- RebuildMLO has partial support on Linux/Steam Deck
 ---
 
 > ### **%{color:gold} Version 4.8.6 %** ###

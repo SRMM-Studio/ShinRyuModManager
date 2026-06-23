@@ -482,8 +482,15 @@ public static class Program
     }
     
     private static void HandleLoader() {
-        if (GamePath.CurrentGame <= Game.Yakuza6 && !File.Exists(Constants.DINPUT8DLL)) {
-            File.Move(Constants.VERSIONDLL, Constants.DINPUT8DLL);
+        if (File.Exists(Constants.VERSIONDLL))
+        {
+            Game game = GamePath.CurrentGame;
+
+            if (game <= Game.Yakuza6)
+            {
+                if (!File.Exists(Constants.DINPUT8DLL))
+                    File.Move(Constants.VERSIONDLL, Constants.DINPUT8DLL);
+            }
         }
     }
     
@@ -511,7 +518,7 @@ public static class Program
     
     internal static bool MissingDll()
     {
-        return File.Exists(Constants.VERSIONDLL) || File.Exists(Constants.DINPUT8DLL);
+        return !File.Exists(Constants.VERSIONDLL) && !File.Exists(Constants.DINPUT8DLL);
     }
     
     internal static bool MissingAsi()
