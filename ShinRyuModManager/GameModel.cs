@@ -415,10 +415,7 @@ public static class GameModel
         var ubikDir = Path.Combine(Constants.PARLESS_MODS_PATH, "ubik");
         var par = NodeFactory.FromFile(charaPath, "par");
         
-        par.TransformWith<ParArchiveReader, ParArchiveReaderParameters>(new ParArchiveReaderParameters
-        {
-            Recursive = true
-        });
+        par.TransformWith(typeof(ParArchiveReader), new ParArchiveReaderParameters { Recursive = true });
         
         var ubik = Navigator.IterateNodes(par).FirstOrDefault(x => x.Path.EndsWith("ubik"));
         

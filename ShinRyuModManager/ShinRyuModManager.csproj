@@ -42,7 +42,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CpkTools\CpkTools.csproj" />
-        <ProjectReference Include="..\ParManager\ParLibrary\ParLibrary.csproj" />
+        <ProjectReference Include="..\ParLibrary\ParLibrary.csproj" />
         <ProjectReference Include="..\Utils\Utils.csproj" />
     </ItemGroup>
 
