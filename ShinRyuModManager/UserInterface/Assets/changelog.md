@@ -1,36 +1,41 @@
 > ### **%{color:gold} Version 5.0.0 %** ###
 Big thanks to @TheTrueColonel
 
-- Full UI migration from WPF to Avalonia
-- All projects fully ported to .NET 10
-- Rebuilt CPKGen as CPKTools project
-- Overhauled logging with Serilog
-- Added profile support
-- Save file format needed to be updated to save these changes. All previous formats are supported
-- Added GitHub actions to automate publishes
-- Many performance and code organizational changes
-- Opening CLI by running SRMM with Left-CTRL held no longer exists.
-- Doesn't work cross-platform
-- External console doesn't exist anymore. (Console Output)
-- No native Message Boxes because of [no native Avalonia support](https://docs.avaloniaui.net/docs/basics/user-interface/messagebox)
-- RebuildMLO has partial support on Linux/Steam Deck
+* Full UI migration from WPF to Avalonia
+* All projects fully ported to .NET 10
+* Rebuilt CPKGen as CPKTools project
+* Overhauled logging with Serilog
+* Added profile support
+  * Save file format needed to be updated to save these changes. All previous formats are supported
+* Added GitHub actions to automate publishes
+* Many performance and code organizational changes
+* Opening CLI by running SRMM with Left-CTRL held no longer exists
+  * Doesn't work cross-platform
+* External console doesn't exist anymore. (Console Output)
+* No native Message Boxes because of [no native Avalonia support](https://docs.avaloniaui.net/docs/basics/user-interface/messagebox)
+* RebuildMLO has partial support on Linux/Steam Deck
+  * Only supports non "slim" version
 ---
 
-> ### **%{color:gold} Version 4.8.6 %** ###
+> ### **%{color:orange} Version 4.8.6 %** ###
 * Fix stream redirection for English and Chinese dubs on Yakuza 0 Director's Cut
 * Add motion par redirection for Yakuza 0 Director's Cut
 * Add USM redirection for Yakuza 0 Director's Cut
+---
 
 > ### **%{color:orange} Version 4.8.5 %** ###
 * Redirect paths for localized languages for Kiwami 1 Legacy
 * This may break some old mods for Kiwami 1 Legacy if they are targeting localized Japanese files, they may need to be updated
 * But it is necessary, as it was being done incorrectly for the past 4-5 years
+---
 
 > ### **%{color:orange} Version 4.8.4 %** ###
 * Redirect paths for localized languages for Kiwami Remastered
+---
 
 > ### **%{color:orange} Version 4.8.3 %** ###
 * Fix motion.par redirection for Kiwami Remastered
+---
 
 > ### **%{color:orange} Version 4.8.2 %** ###
 * Rename version.dll to dinput8.dll on Yakuza 6 and below

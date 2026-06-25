@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.IO.Compression;
 using Avalonia;
 using Avalonia.Svg.Skia;
-using CpkTools.Model;
 using IniParser;
 using IniParser.Model;
 using Serilog;
@@ -24,8 +23,6 @@ namespace ShinRyuModManager;
 
 public static class Program
 {
-    public static bool CheckForUpdates { get; private set; }
-    
     private static bool _externalModsOnly = true;
     private static bool _looseFilesEnabled;
     private static bool _cpkRepackingEnabled = true;
@@ -126,7 +123,7 @@ public static class Program
         {
             Log.Information("""
                             Usage: run without arguments to generate mod load order.
-                              -s, --silent     prevent checking for updates and remove prompts.
+                              -s, --silent     removes prompts.
                               -h, --help       show this message and exit.
                               -r, --run        run the game after the program finishes.
                             """);
@@ -186,14 +183,6 @@ public static class Program
                 LogLevel = LogEventLevel.Verbose;
             }
             
-            if (_iniData.TryGetKey("RyuModManager.CheckForUpdates", out var check))
-            {
-                //NOTE FOR NEXUSMODS STAFF: This will only check for updates and redirect to nexusmods in the future, will not ever download it by itself.
-                //As of this build submitted for your review, it does not even do anything.
-                //The code for downloading the files are completely deleted.
-                CheckForUpdates = int.Parse(check) == 1;
-            }
-            
             if (_iniData.TryGetKey("RyuModManager.ShowWarnings", out var showWarnings))
             {
                 //ConsoleOutput.ShowWarnings = int.Parse(showWarnings) == 1;
@@ -232,20 +221,6 @@ public static class Program
             Log.Information($"{Constants.INI} was not found. Creating default ini...");
             IniParser.WriteFile(Constants.INI, IniTemplate.NewIni());
         }
-    }
-    
-    internal static void DisableAutoUpdate()
-    {
-        CheckForUpdates = false;
-        
-        if (!File.Exists(Constants.INI))
-            return;
-        
-        _iniData = IniParser.ReadFile(Constants.INI);
-        
-        _iniData.Sections["RyuModManager"]["CheckForUpdates"] = "0";
-        
-        IniParser.WriteFile(Constants.INI, IniTemplate.UpdateIni(_iniData));
     }
     
     internal static List<ModInfo> PreRun(Profile? profile = null)

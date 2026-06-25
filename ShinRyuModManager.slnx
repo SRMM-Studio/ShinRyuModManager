@@ -3,8 +3,12 @@
     <Platform Name="x64" />
   </Configurations>
   <Project Path="CpkTools/CpkTools.csproj" />
-  <Project Path="ParLibrary.Tests/ParLibrary.Tests.csproj" />
-  <Project Path="ParLibrary/ParLibrary.csproj" />
+  <Project Path="ParLibrary.Tests/ParLibrary.Tests.csproj">
+    <Platform Solution="Debug|*" Project="x64" />
+  </Project>
+  <Project Path="ParLibrary/ParLibrary.csproj">
+    <Platform Solution="Debug|*" Project="x64" />
+  </Project>
   <Project Path="ShinRyuModManager\ShinRyuModManager.csproj">
     <Platform Project="x64" />
   </Project>

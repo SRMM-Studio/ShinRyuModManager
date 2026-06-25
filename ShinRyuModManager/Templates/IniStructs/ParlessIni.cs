@@ -119,13 +119,6 @@ public static class ParlessIni
                     
                     new IniKey
                     {
-                        Name = "CheckForUpdates",
-                        Comments = ["Check for updates before exiting the program"],
-                        DefaultValue = 1
-                    },
-                    
-                    new IniKey
-                    {
                         Name = "ShowWarnings",
                         Comments = ["Show warnings whenever a mod was possibly not extracted correctly"],
                         DefaultValue = 1

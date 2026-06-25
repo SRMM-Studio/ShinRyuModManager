@@ -41,9 +41,9 @@ public static class ParRepacker
         {
             DeleteDirectory(GamePath.ParlessDir);
         }
-        catch
+        catch (Exception ex)
         {
-            Log.Warning("Failed to remove old pars! {PathToParlessMods}", GamePath.ParlessDir);
+            Log.Warning(ex, "Failed to remove old pars! {PathToParlessMods}", GamePath.ParlessDir);
         }
         
         Log.Information("Removed old pars.");
