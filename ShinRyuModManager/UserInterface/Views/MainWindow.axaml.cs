@@ -95,7 +95,7 @@ public partial class MainWindow : Window
         {
             if (Program.MissingDll())
             {
-                await MessageBoxWindow.Show(this, "Warning", $"{Constants.VERSIONDLL} is missing from this directory. Mods will NOT be applied without this file.");
+                await MessageBoxWindow.Show(this, "Warning", $"Warning: Neither \"{Constants.VERSIONDLL}\" or \"{Constants.DINPUT8DLL}\" is present in this directory. Shin Ryu Mod Manager will NOT function properly without this file");
             }
             
             if (Program.MissingAsi())

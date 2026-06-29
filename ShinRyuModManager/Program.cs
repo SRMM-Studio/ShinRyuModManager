@@ -436,7 +436,7 @@ public static class Program
         // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
         if (MissingDll())
         {
-            Log.Warning($"Warning: \"{Constants.VERSIONDLL}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file");
+            Log.Warning($"Warning: Neither \"{Constants.VERSIONDLL}\", \"{Constants.DINPUT8DLL}\" or \"{Constants.WINMMDLL}\" is present in this directory. Shin Ryu Mod Manager will NOT function properly without this file");
         }
         
         // Check if the ASI is not in the directory
@@ -494,7 +494,7 @@ public static class Program
     
     internal static bool MissingDll()
     {
-        return !File.Exists(Constants.VERSIONDLL) && !File.Exists(Constants.DINPUT8DLL);
+        return !File.Exists(Constants.VERSIONDLL) && !File.Exists(Constants.DINPUT8DLL) && !File.Exists(Constants.WINMMDLL);
     }
     
     internal static bool MissingAsi()
