@@ -25,6 +25,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Log.Information("MainWindow InitializeComponent");
     }
     
     private void Window_OnLoaded(object sender, RoutedEventArgs e)
@@ -43,6 +44,8 @@ public partial class MainWindow : Window
         _modsFolderWatcher.Renamed += FileSystemWatcher_DeletedRenamed;
         
         RefreshModList();
+
+        Log.Information("MainWindow OnLoaded");
     }
     
     // Handles properly disposing of the folder watcher

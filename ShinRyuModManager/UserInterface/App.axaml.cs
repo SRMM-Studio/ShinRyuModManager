@@ -12,11 +12,14 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        Log.Information("Avalonia App Init");
         AvaloniaXamlLoader.Load(this);
     }
     
     public override void OnFrameworkInitializationCompleted()
     {
+        Log.Information("OnFrameworkInitializationCompleted");
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var culture = new CultureInfo("en");
@@ -25,7 +28,9 @@ public partial class App : Application
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
-            
+
+            Log.Information("Start MainWindow");
+
             desktop.MainWindow = new MainWindow
             {
                 DataContext = new MainWindowViewModel(),
