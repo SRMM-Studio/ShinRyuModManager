@@ -298,7 +298,7 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
                 var baseDate = DateTime.UnixEpoch;
             
                 if (node.Tags.TryGetValue("Timestamp", out var timestamp)) {
-                    date = baseDate.AddSeconds((double)timestamp);
+                    date = baseDate.AddSeconds((ulong)timestamp);
                 }
             
                 if (node.Tags.TryGetValue("FileInfo", out var fileInfo) && fileInfo is FileInfo info) {
