@@ -1,3 +1,9 @@
+> ### **%{color:gold} Version 5.0.1 %** ###
+* Fix a bug with repacking hacts that caused an error
+* Fix a bug with Linux MLO
+* Add more logs
+* Update some messages
+
 > ### **%{color:gold} Version 5.0.0 %** ###
 Big thanks to @TheTrueColonel
 
