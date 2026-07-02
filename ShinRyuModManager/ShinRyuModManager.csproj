@@ -12,6 +12,7 @@
         <IsPackable>false</IsPackable>
         <ApplicationIcon>UserInterface\Assets\Icons\SRMM_icon.ico</ApplicationIcon>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         
         <!-- Versioning -->
         <AssemblyVersion>5.0.1</AssemblyVersion>
@@ -35,9 +36,12 @@
         <VersionSuffix>$(BuildSuffix)</VersionSuffix>
         <DebugType>embedded</DebugType>
     </PropertyGroup>
-    
-    <PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(BuildSuffix)' == 'linux-slim'">
-        <DefineConstants>$(DefineConstants);LINUX_SLIM</DefineConstants>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DefineConstants Condition="'$(BuildSuffix)' == 'linux-slim'">$(DefineConstants);LINUX_SLIM</DefineConstants>
+        <DefineConstants Condition="'$(BuildSuffix)' == 'linux'">$(DefineConstants);LINUX</DefineConstants>
+        <DefineConstants Condition="'$(BuildSuffix)' == 'windows-slim'">$(DefineConstants);WINDOWS_SLIM</DefineConstants>
+        <DefineConstants Condition="'$(BuildSuffix)' == 'windows'">$(DefineConstants);WINDOWS</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

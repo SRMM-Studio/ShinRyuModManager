@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Svg.Skia;
 using IniParser;
@@ -21,8 +22,14 @@ using Constants = Utils.Constants;
 
 namespace ShinRyuModManager;
 
-public static class Program
+public static partial class Program
 {
+#if WINDOWS || WINDOWS_SLIM
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetDefaultDllDirectories(int directoryFlags);
+#endif    
+
     private static bool _externalModsOnly = true;
     private static bool _looseFilesEnabled;
     private static bool _cpkRepackingEnabled = true;
@@ -53,6 +60,15 @@ public static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+#if WINDOWS || WINDOWS_SLIM
+        // Try to prevent DLL hijacking by limiting the DLL search path to System32. This should avoid the GUI from crashing due to mod injections.
+        // https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-setdefaultdlldirectories
+        if (!SetDefaultDllDirectories(0x00000800)) // 0x00000800 corresponds to %windows%\system32
+        {
+            Console.WriteLine($"Failed to set DLL search path.\nError: {Marshal.GetLastWin32Error()}");
+        }
+#endif
+        
         Directory.CreateDirectory(Constants.LOGS_BASE_PATH);
         
         var defaultLogsPath = Path.Combine(Constants.LOGS_BASE_PATH, "srmm_logs.log");
