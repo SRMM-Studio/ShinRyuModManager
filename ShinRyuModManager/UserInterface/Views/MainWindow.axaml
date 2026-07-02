@@ -191,34 +191,6 @@
                     
                     <!-- Mod List DataGrid -->
                     <ThemeVariantScope Grid.Row="1" RequestedThemeVariant="Light">
-                        <!-- Override DataGrid styling to prevent it using the system colors -->
-                        <ThemeVariantScope.Styles>
-                            <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-                                <Setter Property="Fill" Value="#0078D4" />
-                            </Style>
-                            <Style Selector="DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
-                                <Setter Property="Fill" Value="#0078D4" />
-                            </Style>
-                            <Style Selector="DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
-                                <Setter Property="Fill" Value="#005A9E" />
-                            </Style>
-                        </ThemeVariantScope.Styles>
-                        
-                        <ThemeVariantScope.Resources>
-                            <ResourceDictionary>
-                                <ResourceDictionary.ThemeDictionaries>
-                                    <ResourceDictionary x:Key="Light">
-                                        <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#0078D4" />
-                                        <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#005A9E" />
-                                        <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPressed" Color="#004E87" />
-                                    </ResourceDictionary>
-                                </ResourceDictionary.ThemeDictionaries>
-                            </ResourceDictionary>
-                        </ThemeVariantScope.Resources>
-                        
                         <DataGrid Name="ModListView" Margin="20, 0, 0, 20" Background="#FF4B4B4B" 
                                   Width="318" ItemsSource="{Binding ModList}" 
                                   SelectionChanged="ModList_OnSelectionChanged">
