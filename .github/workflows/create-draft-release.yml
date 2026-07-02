@@ -19,21 +19,11 @@ jobs:
       
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: SRMM-Studio/YakuzaParless
           path: external/parless
           submodules: recursive
-          
-      - name: Verify Submodules
-        working-directory: external/parless
-        run: git submodule status --recursive
-
-      - name: Verify Submodule Contents
-        working-directory: external/parless
-        run: |
-          dir source\Utils
-          dir source\minhook
 
       - name: Install Premake 5
         uses: abel0b/setup-premake@de7d79047789622064f7a2d251e929fadd166707 # v2.4
@@ -54,7 +44,7 @@ jobs:
         run: msbuild YakuzaParless.sln /p:Configuration=Release /p:Platform=Win64
         
       - name: Upload Parless Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with: 
           name: 'ParlessArtifact'
           path: external\parless\build\bin\Win64\Release\YakuzaParless.asi
@@ -73,7 +63,7 @@ jobs:
     
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
           
       - name: Download Parless Artifact
         uses: actions/download-artifact@v7
