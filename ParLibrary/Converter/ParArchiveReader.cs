@@ -2,66 +2,74 @@
 // © Kaplas. Licensed under MIT. See LICENSE for details.
 // -------------------------------------------------------
 
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Yarhl.FileFormat;
 using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace ParLibrary.Converter;
-    
+
 /// <summary>
 /// Converter from BinaryFormat to ParArchive.
 /// </summary>
-public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
-    private ParArchiveReaderParameters _parameters = new ParArchiveReaderParameters {
+public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat>
+{
+    private ParArchiveReaderParameters _parameters = new ParArchiveReaderParameters
+    {
         Recursive = false,
     };
-
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="ParArchiveReader"/> class.
     /// </summary>
-    public ParArchiveReader() {
+    public ParArchiveReader()
+    {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
-
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="ParArchiveReader"/> class.
     /// </summary>
     /// <param name="parameters">The parameters.</param>
-    public ParArchiveReader(ParArchiveReaderParameters parameters) : this() {
+    public ParArchiveReader(ParArchiveReaderParameters parameters) : this()
+    {
         _parameters = parameters;
     }
     
-    public void Initialize(ParArchiveReaderParameters parameters) {
+    public void Initialize(ParArchiveReaderParameters parameters)
+    {
         _parameters = parameters;
     }
     
     /// <inheritdoc/>
-    public NodeContainerFormat Convert(BinaryFormat source) {
+    public NodeContainerFormat Convert(BinaryFormat source)
+    {
         ArgumentNullException.ThrowIfNull(source);
-
+        
         source.Stream.Position = 0;
         
         var result = new NodeContainerFormat();
         
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         
-        var reader = new DataReader(source.Stream) {
+        var reader = new DataReader(source.Stream)
+        {
             DefaultEncoding = Encoding.GetEncoding(1252),
             Endianness = EndiannessMode.BigEndian,
         };
         
         var magicId = reader.ReadString(4);
         
-        if (magicId == "SLLZ") {
+        if (magicId == "SLLZ")
+        {
             var subStream = new DataStream(source.Stream, 0, source.Stream.Length);
             var compressed = new ParFile(subStream);
             
             source = (ParFile)ConvertFormat.With(typeof(Sllz.Decompressor), compressed);
             source.Stream.Position = 0;
             
-            reader = new DataReader(source.Stream) {
+            reader = new DataReader(source.Stream)
+            {
                 DefaultEncoding = Encoding.GetEncoding(1252),
                 Endianness = EndiannessMode.BigEndian,
             };
@@ -69,7 +77,8 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
             magicId = reader.ReadString(4);
         }
         
-        if (magicId != "PARC") {
+        if (magicId != "PARC")
+        {
             throw new FormatException("PARC: Bad magic Id.");
         }
         
@@ -81,7 +90,8 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
         result.Root.Tags["SizeExtended"] = reader.ReadByte();
         result.Root.Tags["Relocated"] = reader.ReadByte();
         
-        if (endianness == 0x00) {
+        if (endianness == 0x00)
+        {
             reader.Endianness = EndiannessMode.LittleEndian;
         }
         
@@ -95,17 +105,20 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
         
         var folderNames = new string[totalFolderCount];
         
-        for (var i = 0; i < totalFolderCount; i++) {
+        for (var i = 0; i < totalFolderCount; i++)
+        {
             folderNames[i] = reader.ReadString(0x40).TrimEnd('\0');
             
-            if (folderNames[i].Length < 1) {
+            if (folderNames[i].Length < 1)
+            {
                 folderNames[i] = ".";
             }
         }
         
         var fileNames = new string[totalFileCount];
         
-        for (var i = 0; i < totalFileCount; i++) {
+        for (var i = 0; i < totalFileCount; i++)
+        {
             fileNames[i] = reader.ReadString(0x40).TrimEnd('\0');
         }
         
@@ -113,9 +126,12 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
         
         var folders = new Node[totalFolderCount];
         
-        for (var i = 0; i < totalFolderCount; i++) {
-            folders[i] = new Node(folderNames[i], new NodeContainerFormat()) {
-                Tags = {
+        for (var i = 0; i < totalFolderCount; i++)
+        {
+            folders[i] = new Node(folderNames[i], new NodeContainerFormat())
+            {
+                Tags =
+                {
                     ["FolderCount"] = reader.ReadInt32(),
                     ["FirstFolderIndex"] = reader.ReadInt32(),
                     ["FileCount"] = reader.ReadInt32(),
@@ -132,7 +148,8 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
         
         var files = new Node[totalFileCount];
         
-        for (var i = 0; i < totalFileCount; i++) {
+        for (var i = 0; i < totalFileCount; i++)
+        {
             var compressionFlag = reader.ReadUInt32();
             var size = reader.ReadUInt32();
             var compressedSize = reader.ReadUInt32();
@@ -145,7 +162,8 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
             
             offset &= 0x00FFFFFFFFFFFFFF;
             
-            var file = new ParFile(source.Stream, offset, compressedSize) {
+            var file = new ParFile(source.Stream, offset, compressedSize)
+            {
                 CanBeCompressed = false, // Don't try to compress if the original was not compressed.
                 IsCompressed = compressionFlag == 0x80000000,
                 DecompressedSize = size,
@@ -153,7 +171,8 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
                 Timestamp = timestamp,
             };
             
-            files[i] = new Node(fileNames[i], file) {
+            files[i] = new Node(fileNames[i], file)
+            {
                 Tags = { ["Timestamp"] = timestamp, },
             };
         }
@@ -165,11 +184,13 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
         return result;
     }
     
-    private static void BuildTree(Node node, IReadOnlyList<Node> folders, IReadOnlyList<Node> files, ParArchiveReaderParameters parameters) {
+    private static void BuildTree(Node node, IReadOnlyList<Node> folders, IReadOnlyList<Node> files, ParArchiveReaderParameters parameters)
+    {
         var firstFolderIndex = (int)node.Tags["FirstFolderIndex"];
         var folderCount = (int)node.Tags["FolderCount"];
         
-        for (var i = firstFolderIndex; i < firstFolderIndex + folderCount; i++) {
+        for (var i = firstFolderIndex; i < firstFolderIndex + folderCount; i++)
+        {
             node.Add(folders[i]);
             
             BuildTree(folders[i], folders, files, parameters);
@@ -178,9 +199,11 @@ public class ParArchiveReader : IConverter<BinaryFormat, NodeContainerFormat> {
         var firstFileIndex = (int)node.Tags["FirstFileIndex"];
         var fileCount = (int)node.Tags["FileCount"];
         
-        for (var i = firstFileIndex; i < firstFileIndex + fileCount; i++) {
+        for (var i = firstFileIndex; i < firstFileIndex + fileCount; i++)
+        {
             if (parameters.Recursive &&
-                files[i].Name.EndsWith(".par", StringComparison.InvariantCultureIgnoreCase)) {
+                files[i].Name.EndsWith(".par", StringComparison.InvariantCultureIgnoreCase))
+            {
                 files[i].TransformWith(typeof(ParArchiveReader), parameters);
             }
             

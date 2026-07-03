@@ -7,7 +7,8 @@ namespace ParLibrary.Converter;
 /// <summary>
 /// Parameters for ParArchiveWriter.
 /// </summary>
-public class ParArchiveWriterParameters {
+public class ParArchiveWriterParameters
+{
     /// <summary>
     /// Gets or sets the compressor version to use.
     /// </summary>

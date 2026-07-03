@@ -7,7 +7,8 @@ namespace ParLibrary.Converter;
 /// <summary>
 /// Parameters for ParArchiveReader.
 /// </summary>
-public class ParArchiveReaderParameters {
+public class ParArchiveReaderParameters
+{
     /// <summary>
     /// Gets or sets a value indicating whether the reading is recursive.
     /// </summary>

@@ -12,18 +12,21 @@ namespace ParLibrary.Sllz;
 /// <summary>
 /// Manages SLLZ compression used in Yakuza games.
 /// </summary>
-public class Decompressor : IConverter<ParFile, ParFile> {
+public class Decompressor : IConverter<ParFile, ParFile>
+{
     /// <summary>Decompresses a SLLZ file.</summary>
     /// <returns>The decompressed file.</returns>
     /// <param name="source">Source file to decompress.</param>
-    public ParFile Convert(ParFile source) {
+    public ParFile Convert(ParFile source)
+    {
         ArgumentNullException.ThrowIfNull(source);
-
+        
         source.Stream.Position = 0;
         
         var outputDataStream = Decompress(source.Stream);
         
-        var result = new ParFile(outputDataStream) {
+        var result = new ParFile(outputDataStream)
+        {
             CanBeCompressed = true,
             IsCompressed = false,
             DecompressedSize = source.DecompressedSize,
@@ -34,8 +37,10 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         return result;
     }
     
-    private static DataStream Decompress(DataStream inputDataStream) {
-        var reader = new DataReader(inputDataStream) {
+    private static DataStream Decompress(DataStream inputDataStream)
+    {
+        var reader = new DataReader(inputDataStream)
+        {
             DefaultEncoding = Encoding.ASCII,
         };
         
@@ -43,7 +48,8 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         
         var magic = reader.ReadString(4);
         
-        if (magic != "SLLZ") {
+        if (magic != "SLLZ")
+        {
             throw new FormatException("SLLZ: Bad magic Id.");
         }
         
@@ -58,14 +64,16 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         
         reader.Stream.Seek(headerSize);
         
-        return version switch {
+        return version switch
+        {
             1 => DecompressV1(inputDataStream, compressedSize, decompressedSize),
             2 => DecompressV2(inputDataStream, compressedSize, decompressedSize),
             _ => throw new FormatException($"SLLZ: Unknown compression version {version}.")
         };
     }
     
-    private static DataStream DecompressV1(DataStream inputDataStream, int compressedSize, int decompressedSize) {
+    private static DataStream DecompressV1(DataStream inputDataStream, int compressedSize, int decompressedSize)
+    {
         var inputData = new byte[compressedSize];
         var outputData = new byte[decompressedSize];
         
@@ -79,12 +87,15 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         
         var flagCount = 8;
         
-        do {
-            if ((flag & 0x80) == 0x80) {
+        do
+        {
+            if ((flag & 0x80) == 0x80)
+            {
                 flag = (byte)(flag << 1);
                 flagCount--;
                 
-                if (flagCount == 0) {
+                if (flagCount == 0)
+                {
                     flag = inputData[inputPosition];
                     inputPosition++;
                     flagCount = 8;
@@ -98,16 +109,20 @@ public class Decompressor : IConverter<ParFile, ParFile> {
                 
                 var i = 0;
                 
-                do {
+                do
+                {
                     outputData[outputPosition] = outputData[outputPosition - copyDistance];
                     outputPosition++;
                     i++;
                 } while (i < copyCount);
-            } else {
+            }
+            else
+            {
                 flag = (byte)(flag << 1);
                 flagCount--;
                 
-                if (flagCount == 0) {
+                if (flagCount == 0)
+                {
                     flag = inputData[inputPosition];
                     inputPosition++;
                     flagCount = 8;
@@ -124,7 +139,8 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         return outputDataStream;
     }
     
-    private static DataStream DecompressV2(DataStream inputDataStream, int compressedSize, int decompressedSize) {
+    private static DataStream DecompressV2(DataStream inputDataStream, int compressedSize, int decompressedSize)
+    {
         var inputData = new byte[compressedSize];
         var outputData = new byte[decompressedSize];
         
@@ -133,20 +149,26 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         var inputPosition = 0;
         var outputPosition = 0;
         
-        while (outputPosition < decompressedSize) {
-            var compressedChunkSize = (inputData[inputPosition] << 16) | (inputData[inputPosition + 1] << 8) | inputData[inputPosition + 2];
+        while (outputPosition < decompressedSize)
+        {
+            var compressedChunkSize = (inputData[inputPosition] << 16) | (inputData[inputPosition + 1] << 8) |
+                                      inputData[inputPosition + 2];
             var decompressedChunkSize = ((inputData[inputPosition + 3] << 8) | inputData[inputPosition + 4]) + 1;
             var isCompressed = (compressedChunkSize & 0x00800000) == 0x00000000;
             
-            if (isCompressed) {
+            if (isCompressed)
+            {
                 var decompressedData = ZlibDecompress(inputData, inputPosition + 5, compressedChunkSize - 5);
                 
-                if (decompressedChunkSize != decompressedData.Length) {
+                if (decompressedChunkSize != decompressedData.Length)
+                {
                     throw new FormatException("SLLZ: Wrong decompressed data.");
                 }
                 
                 Array.Copy(decompressedData, 0, outputData, outputPosition, decompressedData.Length);
-            } else {
+            }
+            else
+            {
                 // The data isn't compressed in this chunk, just copy it
                 compressedChunkSize = (int)(compressedChunkSize & 0xFF7FFFFF);
                 
@@ -162,7 +184,8 @@ public class Decompressor : IConverter<ParFile, ParFile> {
         return outputDataStream;
     }
     
-    private static byte[] ZlibDecompress(byte[] compressedData, int index, int count) {
+    private static byte[] ZlibDecompress(byte[] compressedData, int index, int count)
+    {
         using var inputMemoryStream = new MemoryStream(compressedData, index, count);
         using var outputMemoryStream = new MemoryStream();
         using var zlibStream = new ZLibStream(inputMemoryStream, CompressionMode.Decompress);

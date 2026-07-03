@@ -8,15 +8,17 @@ using Yarhl.FileFormat;
 using Yarhl.IO;
 
 namespace ParLibrary.Sllz;
-    
+
 /// <summary>
 /// Manages SLLZ compression used in Yakuza games.
 /// </summary>
-public class Compressor : IConverter<ParFile, ParFile> {
+public class Compressor : IConverter<ParFile, ParFile>
+{
     private const int MAX_WINDOW_SIZE = 4096;
     private const int MAX_ENCODED_LENGTH = 18;
     
     private CompressorParameters _compressorParameters;
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="Compressor"/> class.
     /// </summary>
@@ -26,7 +28,8 @@ public class Compressor : IConverter<ParFile, ParFile> {
     /// Initializes a new instance of the <see cref="Compressor"/> class.
     /// </summary>
     /// <param name="parameters">Compressor configuration.</param>
-    public Compressor(CompressorParameters parameters) {
+    public Compressor(CompressorParameters parameters)
+    {
         _compressorParameters = parameters;
     }
     
@@ -34,20 +37,23 @@ public class Compressor : IConverter<ParFile, ParFile> {
     /// Initializes the compressor parameters.
     /// </summary>
     /// <param name="parameters">Compressor configuration.</param>
-    public void Initialize(CompressorParameters parameters) {
+    public void Initialize(CompressorParameters parameters)
+    {
         _compressorParameters = parameters;
     }
     
     /// <summary>Compresses a file with SLLZ.</summary>
     /// <returns>The compressed file.</returns>
     /// <param name="source">Source file to compress.</param>
-    public ParFile Convert(ParFile source) {
+    public ParFile Convert(ParFile source)
+    {
         ArgumentNullException.ThrowIfNull(source);
-
+        
         source.Stream.Seek(0);
         
         var outputDataStream = Compress(source.Stream, _compressorParameters);
-        var result = new ParFile(outputDataStream) {
+        var result = new ParFile(outputDataStream)
+        {
             CanBeCompressed = false,
             IsCompressed = true,
             DecompressedSize = source.DecompressedSize,
@@ -58,24 +64,31 @@ public class Compressor : IConverter<ParFile, ParFile> {
         return result;
     }
     
-    private static DataStream Compress(DataStream inputDataStream, CompressorParameters parameters) {
+    private static DataStream Compress(DataStream inputDataStream, CompressorParameters parameters)
+    {
         var outputDataStream = DataStreamFactory.FromMemory();
-        var writer = new DataWriter(outputDataStream) {
+        var writer = new DataWriter(outputDataStream)
+        {
             DefaultEncoding = Encoding.ASCII,
         };
         
-        parameters ??= new CompressorParameters {
+        parameters ??= new CompressorParameters
+        {
             Version = 0x01,
             Endianness = 0x00,
         };
         
         DataStream compressedDataStream;
         
-        switch (parameters.Version) {
+        switch (parameters.Version)
+        {
             case 1:
-                try {
+                try
+                {
                     compressedDataStream = CompressV1(inputDataStream);
-                } catch (SllzCompressorException) {
+                }
+                catch (SllzCompressorException)
+                {
                     compressedDataStream = inputDataStream;
                 }
                 
@@ -93,7 +106,8 @@ public class Compressor : IConverter<ParFile, ParFile> {
                 throw new FormatException($"SLLZ: Unknown compression version {parameters.Version}.");
         }
         
-        if (compressedDataStream == inputDataStream) {
+        if (compressedDataStream == inputDataStream)
+        {
             return inputDataStream;
         }
         
@@ -118,7 +132,8 @@ public class Compressor : IConverter<ParFile, ParFile> {
         return outputDataStream;
     }
     
-    private static DataStream CompressV1(DataStream inputDataStream) {
+    private static DataStream CompressV1(DataStream inputDataStream)
+    {
         // It's easier to implement working with a byte array.
         var inputData = new byte[inputDataStream.Length];
         
@@ -137,17 +152,20 @@ public class Compressor : IConverter<ParFile, ParFile> {
         
         ThrowIfCompressedIsLarger(outputPosition, outputSize);
         
-        while (inputPosition < inputData.Length) {
+        while (inputPosition < inputData.Length)
+        {
             var windowSize = Math.Min(inputPosition, MAX_WINDOW_SIZE);
             var maxOffsetLength = Math.Min((uint)(inputData.Length - inputPosition), MAX_ENCODED_LENGTH);
             
             var match = FindMatch(inputData, inputPosition, windowSize, maxOffsetLength);
             
-            if (match == null) {
+            if (match == null)
+            {
                 // currentFlag |= (byte)(0 << (7 - bitCount)); // It's zero
                 bitCount++;
                 
-                if (bitCount == 0x08) {
+                if (bitCount == 0x08)
+                {
                     outputData[flagPosition] = currentFlag;
                     
                     currentFlag = 0x00;
@@ -164,11 +182,14 @@ public class Compressor : IConverter<ParFile, ParFile> {
                 outputPosition++;
                 
                 ThrowIfCompressedIsLarger(outputPosition, outputSize);
-            } else {
+            }
+            else
+            {
                 currentFlag |= (byte)(1 << (7 - bitCount));
                 bitCount++;
                 
-                if (bitCount == 0x08) {
+                if (bitCount == 0x08)
+                {
                     outputData[flagPosition] = currentFlag;
                     
                     currentFlag = 0x00;
@@ -191,7 +212,7 @@ public class Compressor : IConverter<ParFile, ParFile> {
                 
                 outputData[outputPosition] = (byte)(tuple >> 8);
                 outputPosition++;
-
+                
                 ThrowIfCompressedIsLarger(outputPosition, outputSize);
                 
                 inputPosition += match.Item2;
@@ -205,7 +226,8 @@ public class Compressor : IConverter<ParFile, ParFile> {
         return outputDataStream;
     }
     
-    private static DataStream CompressV2(DataStream inputDataStream) {
+    private static DataStream CompressV2(DataStream inputDataStream)
+    {
         var input = new byte[inputDataStream.Length];
         
         inputDataStream.ReadExactly(input, 0, input.Length);
@@ -214,7 +236,8 @@ public class Compressor : IConverter<ParFile, ParFile> {
         var writer = new DataWriter(outputDataStream);
         var currentPosition = 0;
         
-        while (currentPosition < input.Length) {
+        while (currentPosition < input.Length)
+        {
             var decompressedChunkSize = Math.Min(input.Length - currentPosition, 0x10000);
             var decompressedData = new byte[decompressedChunkSize];
             
@@ -239,17 +262,20 @@ public class Compressor : IConverter<ParFile, ParFile> {
         return outputDataStream;
     }
     
-    private static Tuple<uint, uint> FindMatch(byte[] inputData, uint inputPosition, uint windowSize, uint maxOffsetLength) {
+    private static Tuple<uint, uint> FindMatch(byte[] inputData, uint inputPosition, uint windowSize, uint maxOffsetLength)
+    {
         ReadOnlySpan<byte> bytes = inputData;
         var data = bytes.Slice((int)(inputPosition - windowSize), (int)windowSize);
         var currentLength = maxOffsetLength;
         
-        while (currentLength >= 3) {
+        while (currentLength >= 3)
+        {
             var pattern = bytes.Slice((int)inputPosition, (int)currentLength);
             
             var pos = data.LastIndexOf(pattern);
             
-            if (pos >= 0) {
+            if (pos >= 0)
+            {
                 return new Tuple<uint, uint>((uint)(windowSize - pos), currentLength);
             }
             
@@ -259,7 +285,8 @@ public class Compressor : IConverter<ParFile, ParFile> {
         return null;
     }
     
-    private static byte[] ZlibCompress(byte[] decompressedData) {
+    private static byte[] ZlibCompress(byte[] decompressedData)
+    {
         using var inputMemoryStream = new MemoryStream(decompressedData);
         using var outputMemoryStream = new MemoryStream();
         using var zlibStream = new ZLibStream(outputMemoryStream, CompressionLevel.SmallestSize);
@@ -269,9 +296,11 @@ public class Compressor : IConverter<ParFile, ParFile> {
         
         return outputMemoryStream.ToArray();
     }
-
-    private static void ThrowIfCompressedIsLarger(uint outputPosition, uint outputSize) {
-        if (outputPosition >= outputSize) {
+    
+    private static void ThrowIfCompressedIsLarger(uint outputPosition, uint outputSize)
+    {
+        if (outputPosition >= outputSize)
+        {
             throw new SllzCompressorException("Compressed size is bigger than original size.");
         }
     }

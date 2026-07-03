@@ -7,7 +7,8 @@ namespace ParLibrary.Sllz;
 /// <summary>
 /// Parameters for SLLZ compressor.
 /// </summary>
-public class CompressorParameters {
+public class CompressorParameters
+{
     /// <summary>
     /// Gets or sets the compression algorithm version.
     /// </summary>

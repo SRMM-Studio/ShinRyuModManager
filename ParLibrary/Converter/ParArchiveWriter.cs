@@ -9,12 +9,14 @@ using Yarhl.FileSystem;
 using Yarhl.IO;
 
 namespace ParLibrary.Converter;
-    
+
 /// <summary>
 /// Converter from PAR to BinaryFormat.
 /// </summary>
-public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
-    private ParArchiveWriterParameters _parameters = new() {
+public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile>
+{
+    private ParArchiveWriterParameters _parameters = new()
+    {
         CompressorVersion = 0x01,
         IncludeDots = false,
     };
@@ -44,11 +46,12 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
     /// Occurs after the file is compressed.
     /// </summary>
     public static event NodeEventHandler FileCompressed;
-
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="ParArchiveWriter"/> class.
     /// </summary>
-    public ParArchiveWriter() {
+    public ParArchiveWriter()
+    {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
     
@@ -56,11 +59,13 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
     /// Initializes a new instance of the <see cref="ParArchiveWriter"/> class.
     /// </summary>
     /// <param name="parameters">The parameters.</param>
-    public ParArchiveWriter(ParArchiveWriterParameters parameters) : this() {
+    public ParArchiveWriter(ParArchiveWriterParameters parameters) : this()
+    {
         _parameters = parameters;
     }
     
-    public void Initialize(ParArchiveWriterParameters parameters) {
+    public void Initialize(ParArchiveWriterParameters parameters)
+    {
         _parameters = parameters;
     }
     
@@ -69,7 +74,8 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
     /// </summary>
     /// <param name="source">The par.</param>
     /// <returns>The BinaryFormat.</returns>
-    public ParFile Convert(NodeContainerFormat source) {
+    public ParFile Convert(NodeContainerFormat source)
+    {
         ArgumentNullException.ThrowIfNull(source);
         
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -78,7 +84,8 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
             ? DataStreamFactory.FromMemory()
             : DataStreamFactory.FromFile(_parameters.OutputPath, FileOpenMode.Write);
         
-        var writer = new DataWriter(dataStream) {
+        var writer = new DataWriter(dataStream)
+        {
             DefaultEncoding = Encoding.GetEncoding(1252),
             Endianness = EndiannessMode.BigEndian,
         };
@@ -86,7 +93,8 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         var folders = new List<Node>();
         var files = new List<Node>();
         
-        if (_parameters.IncludeDots) {
+        if (_parameters.IncludeDots)
+        {
             var parFolderRootNode = new Node(".", new NodeContainerFormat());
             source.MoveChildrenTo(parFolderRootNode);
             folders.Add(parFolderRootNode);
@@ -103,25 +111,34 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         
         writer.Write("PARC", 4, false);
         
-        if (source.Root.Tags.TryGetValue("PlatformId", out var platformId)) {
+        if (source.Root.Tags.TryGetValue("PlatformId", out var platformId))
+        {
             writer.Write((byte)platformId);
-        } else {
+        }
+        else
+        {
             writer.Write((byte)0x02);
         }
         
-        if (source.Root.Tags.TryGetValue("Endianness", out var rootTag)) {
+        if (source.Root.Tags.TryGetValue("Endianness", out var rootTag))
+        {
             var endianness = (byte)rootTag;
             writer.Write(endianness);
             writer.Endianness = endianness == 0x00 ? EndiannessMode.LittleEndian : EndiannessMode.BigEndian;
-        } else {
+        }
+        else
+        {
             writer.Write((byte)0x01);
         }
         
         writer.Write((ushort)0x0000); // extended size and relocated
         
-        if (source.Root.Tags.TryGetValue("Version", out var version)) {
+        if (source.Root.Tags.TryGetValue("Version", out var version))
+        {
             writer.Write((int)version);
-        } else {
+        }
+        else
+        {
             writer.Write(0x00020001);
         }
         
@@ -141,14 +158,17 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         dataStream.Seek(0, SeekOrigin.End);
         writer.WritePadding(0, 2048);
         
-        var result = new ParFile(dataStream) {
+        var result = new ParFile(dataStream)
+        {
             CanBeCompressed = false,
         };
         
         return result;
     }
     
-    private static void GetFoldersAndFiles(Node root, List<Node> folders, List<Node> files, ParArchiveWriterParameters parameters) {
+    private static void GetFoldersAndFiles(Node root, List<Node> folders, List<Node> files,
+        ParArchiveWriterParameters parameters)
+    {
         var folderIndex = folders.Count;
         var fileIndex = 0;
         
@@ -156,7 +176,8 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         
         queue.Enqueue(root);
         
-        while (queue.Count != 0) {
+        while (queue.Count != 0)
+        {
             var folder = queue.Dequeue();
             
             folder.Tags["FirstFolderIndex"] = folderIndex;
@@ -168,16 +189,19 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
             folder.Tags["Unused2"] = 0x00000000;
             folder.Tags["Unused3"] = 0x00000000;
             
-            foreach (var child in folder.Children) {
-                if (child.IsContainer) {
-                    if (child.Name.EndsWith(".par", StringComparison.InvariantCultureIgnoreCase)) {
+            foreach (var child in folder.Children)
+            {
+                if (child.IsContainer)
+                {
+                    if (child.Name.EndsWith(".par", StringComparison.InvariantCultureIgnoreCase))
+                    {
                         NestedParCreating?.Invoke(child);
                         
-                        child.TransformWith(new ParArchiveWriter(
-                            new ParArchiveWriterParameters {
-                                CompressorVersion = parameters.CompressorVersion,
-                                IncludeDots = parameters.IncludeDots,
-                            }));
+                        child.TransformWith(new ParArchiveWriter(new ParArchiveWriterParameters
+                        {
+                            CompressorVersion = parameters.CompressorVersion,
+                            IncludeDots = parameters.IncludeDots,
+                        }));
                         
                         NestedParCreated?.Invoke(child);
                         
@@ -185,15 +209,20 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
                         fileIndex++;
                         
                         folder.Tags["FileCount"] = (int)folder.Tags["FileCount"] + 1;
-                    } else {
+                    }
+                    else
+                    {
                         folders.Add(child);
                         folderIndex++;
                         folder.Tags["FolderCount"] = (int)folder.Tags["FolderCount"] + 1;
                         
                         queue.Enqueue(child);
                     }
-                } else {
-                    if (child.Format is not ParFile) {
+                }
+                else
+                {
+                    if (child.Format is not ParFile)
+                    {
                         child.TransformWith<ParFile>();
                     }
                     
@@ -205,16 +234,20 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         }
     }
     
-    private static void CompressFiles(IEnumerable<Node> files, int compressorVersion) {
-        var compressorParameters = new CompressorParameters {
+    private static void CompressFiles(IEnumerable<Node> files, int compressorVersion)
+    {
+        var compressorParameters = new CompressorParameters
+        {
             Endianness = 0x00,
             Version = (byte)compressorVersion,
         };
         
-        Parallel.ForEach(files, node => {
+        Parallel.ForEach(files, node =>
+        {
             var parFile = node.GetFormatAs<ParFile>();
             
-            if (parFile == null || !parFile.CanBeCompressed || compressorVersion == 0x00 || parFile.Stream.Length == 0) {
+            if (parFile == null || !parFile.CanBeCompressed || compressorVersion == 0x00 || parFile.Stream.Length == 0)
+            {
                 return;
             }
             
@@ -224,7 +257,8 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
             
             var diff = parFile.Stream.Length - compressed.Stream.Length;
             
-            if (diff >= 0 && (parFile.Stream.Length < 2048 || diff >= 2048)) {
+            if (diff >= 0 && (parFile.Stream.Length < 2048 || diff >= 2048))
+            {
                 node.ChangeFormat(compressed);
             }
             
@@ -232,8 +266,10 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         });
     }
     
-    private static long Align(long position, int align) {
-        if (position % align == 0) {
+    private static long Align(long position, int align)
+    {
+        if (position % align == 0)
+        {
             return position;
         }
         
@@ -242,22 +278,28 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         return position + padding;
     }
     
-    private static void WriteNames(DataWriter writer, IEnumerable<Node> nodes) {
-        foreach (var node in nodes) {
+    private static void WriteNames(DataWriter writer, IEnumerable<Node> nodes)
+    {
+        foreach (var node in nodes)
+        {
             writer.Write(node.Name, 64, false);
         }
     }
     
-    private static void WriteFolders(DataWriter writer, IEnumerable<Node> folders) {
-        foreach (var tags in folders.Select(x => x.Tags)) {
+    private static void WriteFolders(DataWriter writer, IEnumerable<Node> folders)
+    {
+        foreach (var tags in folders.Select(x => x.Tags))
+        {
             var attributes = 0x00000010;
             
-            if (tags.TryGetValue("DirectoryInfo", out var directoryInfo)) {
+            if (tags.TryGetValue("DirectoryInfo", out var directoryInfo))
+            {
                 var info = (DirectoryInfo)directoryInfo;
                 attributes = (int)info.Attributes;
             }
             
-            if (tags.TryGetValue("Attributes", out var attrs)) {
+            if (tags.TryGetValue("Attributes", out var attrs))
+            {
                 attributes = (int)attrs;
             }
             
@@ -272,41 +314,48 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
         }
     }
     
-    private static void WriteFiles(DataWriter writer, IEnumerable<Node> files, long dataPosition, ParArchiveWriterParameters parameters) {
+    private static void WriteFiles(DataWriter writer, IEnumerable<Node> files, long dataPosition, ParArchiveWriterParameters parameters)
+    {
         long blockSize = 0;
         
-        foreach (var node in files) {
+        foreach (var node in files)
+        {
             var parFile = node.GetFormatAs<ParFile>();
             
-            if (parFile == null)
-                continue;
-
+            if (parFile == null) continue;
+            
             var streamLength = node.Stream!.Length;
-
-            if (streamLength > 2048 || streamLength >= blockSize) {
+            
+            if (streamLength > 2048 || streamLength >= blockSize)
+            {
                 blockSize = 2048 + (-streamLength % 2048);
                 dataPosition = Align(dataPosition, 2048);
-            } else {
+            }
+            else
+            {
                 blockSize -= streamLength;
             }
-
+            
             ulong seconds = 0;
             var attributes = parFile.Attributes;
-
-            if (!parameters.ResetFileDates) {
+            
+            if (!parameters.ResetFileDates)
+            {
                 var date = parFile.FileDate;
                 var baseDate = DateTime.UnixEpoch;
-            
-                if (node.Tags.TryGetValue("Timestamp", out var timestamp)) {
+                
+                if (node.Tags.TryGetValue("Timestamp", out var timestamp))
+                {
                     date = baseDate.AddSeconds((ulong)timestamp);
                 }
-            
-                if (node.Tags.TryGetValue("FileInfo", out var fileInfo) && fileInfo is FileInfo info) {
+                
+                if (node.Tags.TryGetValue("FileInfo", out var fileInfo) && fileInfo is FileInfo info)
+                {
                     attributes = HandleAttributes(info);
-            
+                    
                     date = info.LastWriteTime;
                 }
-            
+                
                 seconds = (ulong)(date - baseDate).TotalSeconds;
             }
             
@@ -327,17 +376,18 @@ public class ParArchiveWriter : IConverter<NodeContainerFormat, ParFile> {
             writer.Stream.Seek(currentPos);
         }
     }
-
+    
     // Linux doesn't have `FileAttributes.Archive` and Wine defaults files to have the Archive bit set
     // So follow Wine and assume loose files set as `FileAttributes.Normal` have the Archive bit
-    private static int HandleAttributes(FileInfo fileInfo) {
-        if (!OperatingSystem.IsLinux())
-            return (int)fileInfo.Attributes;
-
-        if (fileInfo.Attributes == FileAttributes.Normal) {
+    private static int HandleAttributes(FileInfo fileInfo)
+    {
+        if (!OperatingSystem.IsLinux()) return (int)fileInfo.Attributes;
+        
+        if (fileInfo.Attributes == FileAttributes.Normal)
+        {
             return (int)FileAttributes.Archive;
         }
-
+        
         return (int)fileInfo.Attributes;
     }
 }
