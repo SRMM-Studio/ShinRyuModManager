@@ -9,6 +9,7 @@ using Serilog;
 using Serilog.Events;
 using ShinRyuModManager.Helpers;
 using ShinRyuModManager.ModLoadOrder.Mods;
+using ShinRyuModManager.Services.ReleaseCheck;
 using ShinRyuModManager.UserInterface.ViewModels;
 using Utils;
 using YamlDotNet.Core;
@@ -28,24 +29,38 @@ public partial class MainWindow : Window
         Log.Information("MainWindow InitializeComponent");
     }
     
-    private void Window_OnLoaded(object sender, RoutedEventArgs e)
+    private async void Window_OnLoaded(object sender, RoutedEventArgs e)
     {
-        RunPreInitAsync().ConfigureAwait(false);
-        
-        Program.ReadCachedLocalLibraryData();
-        
-        _modsFolderWatcher = new FileSystemWatcher(GamePath.ModsPath)
+        try
         {
-            EnableRaisingEvents = true
-        };
-        
-        _modsFolderWatcher.Created += FileSystemWatcher_Created;
-        _modsFolderWatcher.Deleted += FileSystemWatcher_DeletedRenamed;
-        _modsFolderWatcher.Renamed += FileSystemWatcher_DeletedRenamed;
-        
-        RefreshModList();
-
-        Log.Information("MainWindow OnLoaded");
+            await RunPreInitAsync();
+            
+            var updateVersion = await ReleaseCheck.CheckForUpdate();
+            
+            if (updateVersion != null)
+            {
+                await UpdateAvailableWindow.Show(this, updateVersion);
+            }
+            
+            Program.ReadCachedLocalLibraryData();
+            
+            _modsFolderWatcher = new FileSystemWatcher(GamePath.ModsPath)
+            {
+                EnableRaisingEvents = true
+            };
+            
+            _modsFolderWatcher.Created += FileSystemWatcher_Created;
+            _modsFolderWatcher.Deleted += FileSystemWatcher_DeletedRenamed;
+            _modsFolderWatcher.Renamed += FileSystemWatcher_DeletedRenamed;
+            
+            RefreshModList();
+            
+            Log.Information("MainWindow OnLoaded");
+        }
+        catch
+        {
+            // ignored
+        }
     }
     
     // Handles properly disposing of the folder watcher
@@ -221,7 +236,7 @@ public partial class MainWindow : Window
                 
                 await CheckModDependenciesAsync(mods);
                 
-                // Run generation only if it will not be run on game launch (i.e. if RebuildMlo is disabled or unsupported)
+                // Run generation only if it will not be run on game launch (i.e., if RebuildMlo is disabled or unsupported)
                 if (Program.RebuildMlo && Program.IsRebuildMloSupported)
                 {
                     await MessageBoxWindow.Show(this, "Information", "Mod list was saved. Mods will be applied next time the game is run.");

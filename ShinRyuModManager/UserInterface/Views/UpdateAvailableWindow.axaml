@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ShinRyuModManager.UserInterface.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="175"
+        x:Class="ShinRyuModManager.UserInterface.Views.UpdateAvailableWindow"
+        x:DataType="vm:UpdateAvailableViewModel"
+        Icon="/UserInterface/Assets/Icons/SRMM_icon.ico"
+        Title="Update Available"
+        Height="175"
+        Width="400"
+        Background="#FF373535"
+        Foreground="White"
+        CanResize="False">
+    
+    <Grid RowDefinitions="2.75*,*">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <TextBlock Padding="20" TextWrapping="Wrap" x:Name="MessageTextBlock" Text="{Binding UpdateAvailableText}" />
+        </ScrollViewer>
+        
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
+                <Button Content="Open Nexus Mods" 
+                        MaxWidth="150" HorizontalContentAlignment="Center" Margin="5, 0, 5 5"
+                        IsDefault="True" Click="OpenBrowser_Click" />
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                <Button Content="Close"
+                        MaxWidth="125" HorizontalContentAlignment="Center" Margin="5, 0, 5 5"
+                        IsDefault="True" Click="Close_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+        
+</Window>

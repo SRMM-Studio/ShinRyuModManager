@@ -11,10 +11,10 @@ public static class AssemblyVersion {
         return Assembly.GetEntryAssembly()!.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
     }
 
-    public static string GetBuildVersion() {
+    public static Version GetBuildVersion() {
         var fullVersion = GetVersion();
 
-        return fullVersion[..(fullVersion.IndexOf('-'))];
+        return Version.Parse(fullVersion[..fullVersion.IndexOf('-')]);
     }
 
     public static string GetBuildSuffix() {

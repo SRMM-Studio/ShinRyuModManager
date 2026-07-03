@@ -28,8 +28,7 @@
         <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
             <TextBlock Padding="20" TextWrapping="Wrap" x:Name="MessageTextBlock" />
         </ScrollViewer>
-
-
+        
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
             <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
                 <Button Content="{x:Static lang:MessageBoxWindow.Btn_DontRemindAgain}"
