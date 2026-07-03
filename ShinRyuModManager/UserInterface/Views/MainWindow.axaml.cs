@@ -219,7 +219,7 @@ public partial class MainWindow : Window
             if (OperatingSystem.IsLinux() && !Flags.CheckFlag(Constants.LINUX_WIKI_REMINDER_FLAG_FILE_NAME))
             {
                 var result = await MessageBoxWindow.Show(this, "Information",
-                    "Check your [launch settings](https://github.com/TheTrueColonel/ShinRyuModManager-CE/wiki/Launch-Options) to help ensure your mods load correctly.",
+                    "Check your [launch settings](https://github.com/SRMM-Studio/ShinRyuModManager/wiki/Launch-Options) to help ensure your mods load correctly.",
                     showCancel: false, dontRemind: true);
                 
                 if (result == MessageBoxResult.DontRemind)
