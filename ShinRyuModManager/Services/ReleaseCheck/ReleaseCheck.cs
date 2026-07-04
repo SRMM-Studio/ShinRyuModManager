@@ -39,7 +39,7 @@ public static class ReleaseCheck
             return null;
         }
         
-        return tagVersion >= buildVersion ? tagVersion : null;
+        return tagVersion > buildVersion ? tagVersion : null;
     }
 }
 
