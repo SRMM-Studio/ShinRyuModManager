@@ -15,7 +15,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         
         <!-- Versioning -->
-        <AssemblyVersion>5.0.1</AssemblyVersion>
+        <AssemblyVersion>5.0.2</AssemblyVersion>
         <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
         <AssemblyTitle>ShinRyuModManager</AssemblyTitle>
         <Company>SRMM Studio</Company>

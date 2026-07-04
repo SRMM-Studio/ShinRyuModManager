@@ -1,10 +1,15 @@
-> ### **%{color:gold} Version 5.0.1 %** ###
+> ### **%{color:gold} Version 5.0.2 %** ###
+* Add update prompt when a update is available
+* Unlike the old auto updater, this is only for reminder and does not install the update by itself
+* Fix a potential issue where the mod manager wont start unless version.dll is renamed
+
+> ### **%{color:orange} Version 5.0.1 %** ###
 * Fix a bug with repacking hacts that caused an error
 * Fix a bug with Linux MLO
 * Add more logs
 * Update some messages
 
-> ### **%{color:gold} Version 5.0.0 %** ###
+> ### **%{color:orange} Version 5.0.0 %** ###
 Big thanks to @TheTrueColonel
 
 * Full UI migration from WPF to Avalonia
