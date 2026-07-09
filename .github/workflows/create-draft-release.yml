@@ -53,6 +53,7 @@ jobs:
           retention-days: 1
           compression-level: 0
           overwrite: true
+          archive: false
           
       - name: Sign Parless
         uses: signpath/github-action-submit-signing-request@v2
@@ -123,6 +124,7 @@ jobs:
           retention-days: 1
           compression-level: 0
           overwrite: true
+          archive: false
           
       - name: Sign SRMM Binaries
         uses: signpath/github-action-submit-signing-request@v2
