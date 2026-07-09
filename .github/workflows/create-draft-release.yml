@@ -65,7 +65,7 @@ jobs:
           artifact-configuration-slug: 'parless'
           github-artifact-id: '${{ steps.upload-unsigned-parless.outputs.artifact-id }}'
           wait-for-completion: true
-          output-artifact-directory: 'external\parless\build\bin\Win64\Release\signed'
+          output-artifact-directory: '${{ runner.temp }}/external'
           skip-decompress: true
   
   release:
@@ -79,13 +79,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v7
-          
-      - name: Download Parless Artifact
-        uses: actions/download-artifact@v8
-        with: 
-          path: '${{ runner.temp }}/external'
-          artifact-ids: '${{ steps.upload-unsigned-parless.outputs.artifact-id }}'
-          skip-decompress: true
           
       - name: Download version.dll
         run: |
@@ -143,10 +136,8 @@ jobs:
           
       - name: Replace for Packaging
         run: |
-          ls "${{ runner.temp }}/signed"
-          unzip -o "${{ runner.temp }}/signed/to-sign.zip" -d "${{ runner.temp }}/signed-output"
-          cp "${{ runner.temp }}/signed-out/windows/ShinRyuModManager.exe" dist/srmm/windows/ShinRyuModManager.exe
-          cp "${{ runner.temp }}/signed-out/windows-slim/ShinRyuModManager.exe" dist/srmm/windows-slim/ShinRyuModManager.exe
+          cp "${{ runner.temp }}/signed/windows/ShinRyuModManager.exe" dist/srmm/windows/ShinRyuModManager.exe
+          cp "${{ runner.temp }}/signed/windows-slim/ShinRyuModManager.exe" dist/srmm/windows-slim/ShinRyuModManager.exe
       
       - name: Package Binaries
         run: ./Scripts/package.sh -s $PR_TAG
