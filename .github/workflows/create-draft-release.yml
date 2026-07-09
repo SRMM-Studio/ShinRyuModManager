@@ -44,14 +44,27 @@ jobs:
         run: msbuild YakuzaParless.sln /p:Configuration=Release /p:Platform=Win64
         
       - name: Upload Parless Artifact
+        id: upload-unsigned-parless
         uses: actions/upload-artifact@v7
         with: 
-          name: 'ParlessArtifact'
+          name: 'ParlessArtifact-unsigned'
           path: external\parless\build\bin\Win64\Release\YakuzaParless.asi
           if-no-files-found: 'error'
           retention-days: 1
           compression-level: 0
           overwrite: true
+          
+      - name: Sign Parless
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'ShinRyuModManager'
+          signing-policy-slug: 'test-signing'
+          artifact-configuration-slug: 'parless'
+          github-artifact-id: '${{ steps.upload-unsigned-parless.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: 'external\parless\build\bin\Win64\Release\signed'
   
   release:
     runs-on: ubuntu-latest
@@ -92,13 +105,45 @@ jobs:
           draft: true
           generateReleaseNotesPreviousTag: true
         
-      - name: Run Scripts
+      - name: Build SRMM Versions
+        run: ./Scripts/build.sh
+        
+      - name: Prepare Windows Binaries for Signing
         run: |
-          ./Scripts/build.sh
-          ./Scripts/package.sh -s $PR_TAG
-        env:
-          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+          cd "${{ github.workspace }}/dist/srmm"
+          zip -r "${{ runner.temp }}/to-sign.zip" windows/ShinRyuModManager.exe windows-slim/ShinRyuModManager.exe
+          
+      - name: Upload SRMM Artifact
+        id: upload-unsigned-srmm
+        uses: actions/upload-artifact@v7
+        with:
+          name: 'SRMM-unsigned'
+          path: ${{ runner.temp }}/to-sign.zip
+          if-no-files-found: 'error'
+          retention-days: 1
+          compression-level: 0
+          overwrite: true
+          
+      - name: Sign SRMM Binaries
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'ShinRyuModManager'
+          signing-policy-slug: 'test-signing'
+          artifact-configuration-slug: 'srmm-exe'
+          github-artifact-id: '${{ steps.upload-unsigned-srmm.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: '${{ runner.temp }}/signed'
+          
+      - name: Replace for Packaging
+        run: |
+          unzip -o "${{ runner.temp }}/signed/to-sign.zip" -d "${{ runner.temp }}/signed-output"
+          cp "${{ runner.temp }}/signed-out/windows/ShinRyuModManager.exe" dist/srmm/windows/ShinRyuModManager.exe
+          cp "${{ runner.temp }}/signed-out/windows-slim/ShinRyuModManager.exe" dist/srmm/windows-slim/ShinRyuModManager.exe
+      
+      - name: Package Binaries
+        run: ./Scripts/package.sh -s $PR_TAG
           
       - name: Upload SRMM Release Assets
         env:
