@@ -66,6 +66,7 @@ jobs:
           github-artifact-id: '${{ steps.upload-unsigned-parless.outputs.artifact-id }}'
           wait-for-completion: true
           output-artifact-directory: 'external\parless\build\bin\Win64\Release\signed'
+          skip-decompress: true
   
   release:
     runs-on: ubuntu-latest
