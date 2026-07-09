@@ -82,6 +82,7 @@ jobs:
           
       - name: Download version.dll
         run: |
+          mkdir $RUNNER_TEMP/external/
           curl -L https://github.com/SRMM-Studio/srmm-distrib/raw/refs/heads/main/Native/version.dll -o $RUNNER_TEMP/external/version.dll
           echo "79c74febb21082474c5dfff54fa4a2514b1fc3b6e02245cf491eb6f2d055bfe5  $RUNNER_TEMP/external/version.dll" | sha256sum --check
       
