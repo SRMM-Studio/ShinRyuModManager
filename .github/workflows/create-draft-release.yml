@@ -143,6 +143,7 @@ jobs:
           
       - name: Replace for Packaging
         run: |
+          ls "${{ runner.temp }}/signed"
           unzip -o "${{ runner.temp }}/signed/to-sign.zip" -d "${{ runner.temp }}/signed-output"
           cp "${{ runner.temp }}/signed-out/windows/ShinRyuModManager.exe" dist/srmm/windows/ShinRyuModManager.exe
           cp "${{ runner.temp }}/signed-out/windows-slim/ShinRyuModManager.exe" dist/srmm/windows-slim/ShinRyuModManager.exe
