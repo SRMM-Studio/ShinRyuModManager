@@ -62,7 +62,7 @@ jobs:
           project-slug: 'ShinRyuModManager'
           signing-policy-slug: 'test-signing'
           artifact-configuration-slug: 'parless'
-          github-artifact-id: '${{ steps.upload-unsigned-parless.artifact-id }}'
+          github-artifact-id: '${{ steps.upload-unsigned-parless.outputs.artifact-id }}'
           wait-for-completion: true
           output-artifact-directory: 'external\parless\build\bin\Win64\Release\signed'
   
@@ -132,7 +132,7 @@ jobs:
           project-slug: 'ShinRyuModManager'
           signing-policy-slug: 'test-signing'
           artifact-configuration-slug: 'srmm-exe'
-          github-artifact-id: '${{ steps.upload-unsigned-srmm.artifact-id }}'
+          github-artifact-id: '${{ steps.upload-unsigned-srmm.outputs.artifact-id }}'
           wait-for-completion: true
           output-artifact-directory: '${{ runner.temp }}/signed'
           
