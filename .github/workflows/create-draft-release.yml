@@ -93,7 +93,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: '${{ runner.temp }}/external'
-          artifact-ids: '${{ steps.upload-signed-parless.outputs.artifact-id }}'
+          name: 'ParlessArtifact'
           
       - name: Download version.dll
         run: |
