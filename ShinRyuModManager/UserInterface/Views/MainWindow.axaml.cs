@@ -103,6 +103,14 @@ public partial class MainWindow : Window
     
     private async Task RunPreInitAsync()
     {
+        // Third party mods disclaimer. Show on first launch.
+        if (!Flags.CheckFlag(Constants.THIRD_PARTY_DISCLAIMER_FLAG_NAME))
+        {
+            await MessageBoxWindow.Show(this, "Notice", "Mods are third-party content, not verified or moderated by SRMM Studio. Only install mods from sources you trust (e.g. NexusMods). Some may modify game files or otherwise affect your installation.");
+            
+            Flags.CreateFlag(Constants.THIRD_PARTY_DISCLAIMER_FLAG_NAME);
+        }
+        
         // Referencing `Program` all the time isn't ideal. Maybe move to global settings/helper file?
         if (Program.ShouldBeExternalOnly())
         {
@@ -113,7 +121,7 @@ public partial class MainWindow : Window
         {
             if (Program.MissingDll())
             {
-                await MessageBoxWindow.Show(this, "Warning", $"Warning: Neither \"{Constants.VERSIONDLL}\" or \"{Constants.DINPUT8DLL}\" is present in this directory. Shin Ryu Mod Manager will NOT function properly without this file");
+                await MessageBoxWindow.Show(this, "Warning", $"Warning: Neither \"{Constants.VERSIONDLL}\" or \"{Constants.DINPUT8DLL}\" is present in this directory. Shin Ryu Mod Manager will NOT function properly without these files.");
             }
             
             if (Program.MissingAsi())
@@ -280,21 +288,21 @@ public partial class MainWindow : Window
         var disabledLibraries = new List<string>();
         var missingLibraries = new List<string>();
         
-        foreach (var enabledMod in mods.Where(x => x.Enabled))
+        foreach (var modName in mods.Where(x => x.Enabled).Select(x => x.Name))
         {
-            foreach (var dependencyGuid in Program.GetModDependencies(enabledMod.Name))
+            foreach (var dependencyGuid in Program.GetModDependencies(modName))
             {
                 if (!Program.DoesLibraryExist(dependencyGuid))
                 {
-                    if (!modsWithDependencyProblems.Contains(enabledMod.Name))
-                        modsWithDependencyProblems.Add(enabledMod.Name);
+                    if (!modsWithDependencyProblems.Contains(modName))
+                        modsWithDependencyProblems.Add(modName);
                     
                     missingLibraries.Add(dependencyGuid);
                 }
                 else if (!Program.IsLibraryEnabled(dependencyGuid))
                 {
-                    if (!modsWithDependencyProblems.Contains(enabledMod.Name))
-                        modsWithDependencyProblems.Add(enabledMod.Name);
+                    if (!modsWithDependencyProblems.Contains(modName))
+                        modsWithDependencyProblems.Add(modName);
                     
                     disabledLibraries.Add(dependencyGuid);
                 }

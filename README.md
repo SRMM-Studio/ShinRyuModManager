@@ -42,5 +42,10 @@ Thanks to Kent for providing the logo and UI graphics.
 
 For the mod loader credits, please check the [YakuzaParless](https://github.com/SRMM-Studio/YakuzaParless) repository.
 
+## Code Signing
+
+ShinRyuModManager's binaries are digitally signed using [SignPath.io](https://signpath.io) to ensure authenticity and security. 
+This helps verify that the downloaded software hasn't been tampered with and comes from a trusted source.
+
 # License
 This project uses the MIT License, so feel free to include it in whatever you want.
