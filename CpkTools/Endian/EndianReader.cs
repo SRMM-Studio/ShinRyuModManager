@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Buffers.Binary;
+using System.Runtime.CompilerServices;
 using CommunityToolkit.HighPerformance;
 
 namespace CpkTools.Endian;
@@ -8,12 +9,11 @@ public sealed class EndianReader : IDisposable
 {
     public bool IsLittleEndian { get; set; }
     
-    public long Position
-    {
-        get => BaseStream.Position;
-    }
+    public long Position => BaseStream.Position;
     
     public Stream BaseStream { get; }
+    
+    private delegate TRet SpanReader<TIn, out TRet>(ReadOnlySpan<TIn> span);
     
     public EndianReader(Memory<byte> data, bool isLittleEndian = false)
     {
@@ -35,101 +35,47 @@ public sealed class EndianReader : IDisposable
     
     public Half ReadHalf()
     {
-        Span<byte> buffer = stackalloc byte[2];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadHalfLittleEndian(buffer)
-            : BinaryPrimitives.ReadHalfBigEndian(buffer);
+        return Read(BinaryPrimitives.ReadHalfLittleEndian, BinaryPrimitives.ReadHalfBigEndian);
     }
     
     public float ReadSingle()
     {
-        Span<byte> buffer = stackalloc byte[4];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadSingleLittleEndian(buffer)
-            : BinaryPrimitives.ReadSingleBigEndian(buffer);
+        return Read(BinaryPrimitives.ReadSingleLittleEndian, BinaryPrimitives.ReadSingleBigEndian);
     }
     
     public double ReadDouble()
     {
-        Span<byte> buffer = stackalloc byte[8];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadDoubleLittleEndian(buffer)
-            : BinaryPrimitives.ReadDoubleBigEndian(buffer);
+        return Read(BinaryPrimitives.ReadDoubleLittleEndian, BinaryPrimitives.ReadDoubleBigEndian);
     }
     
     public short ReadInt16()
     {
-        Span<byte> buffer = stackalloc byte[2];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadInt16LittleEndian(buffer)
-            : BinaryPrimitives.ReadInt16BigEndian(buffer);
+        return Read(BinaryPrimitives.ReadInt16LittleEndian, BinaryPrimitives.ReadInt16BigEndian);
     }
     
     public int ReadInt32()
     {
-        Span<byte> buffer = stackalloc byte[4];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadInt32LittleEndian(buffer)
-            : BinaryPrimitives.ReadInt32BigEndian(buffer);
+        return Read(BinaryPrimitives.ReadInt32LittleEndian, BinaryPrimitives.ReadInt32BigEndian);
     }
     
     public long ReadInt64()
     {
-        Span<byte> buffer = stackalloc byte[8];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadInt64LittleEndian(buffer)
-            : BinaryPrimitives.ReadInt64BigEndian(buffer);
+        return Read(BinaryPrimitives.ReadInt64LittleEndian, BinaryPrimitives.ReadInt64BigEndian);
     }
     
     public ushort ReadUInt16()
     {
-        Span<byte> buffer = stackalloc byte[2];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadUInt16LittleEndian(buffer)
-            : BinaryPrimitives.ReadUInt16BigEndian(buffer);
+        return Read(BinaryPrimitives.ReadUInt16LittleEndian, BinaryPrimitives.ReadUInt16BigEndian);
     }
     
     public uint ReadUInt32()
     {
-        Span<byte> buffer = stackalloc byte[4];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadUInt32LittleEndian(buffer)
-            : BinaryPrimitives.ReadUInt32BigEndian(buffer);
+        return Read(BinaryPrimitives.ReadUInt32LittleEndian, BinaryPrimitives.ReadUInt32BigEndian);
     }
     
     public ulong ReadUInt64()
     {
-        Span<byte> buffer = stackalloc byte[8];
-        
-        BaseStream.ReadExactly(buffer);
-        
-        return IsLittleEndian
-            ? BinaryPrimitives.ReadUInt64LittleEndian(buffer)
-            : BinaryPrimitives.ReadUInt64BigEndian(buffer);
+        return Read(BinaryPrimitives.ReadUInt64LittleEndian, BinaryPrimitives.ReadUInt64BigEndian);
     }
     
     public byte ReadByte()
@@ -207,5 +153,15 @@ public sealed class EndianReader : IDisposable
     public void Dispose()
     {
         BaseStream.Dispose();
+    }
+    
+    // Helper method, since all ReadX methods are the same shape
+    private T Read<T>(SpanReader<byte, T> le, SpanReader<byte, T> be) where T : struct
+    {
+        Span<byte> buffer = stackalloc byte[Unsafe.SizeOf<T>()];
+        
+        BaseStream.ReadExactly(buffer);
+        
+        return IsLittleEndian ? le(buffer) : be(buffer);
     }
 }
