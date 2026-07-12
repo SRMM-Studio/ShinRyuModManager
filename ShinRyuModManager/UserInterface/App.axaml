@@ -6,16 +6,16 @@
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Resources>
-        <Color x:Key="SystemAccentColor">#FF0078D4</Color>
-        <Color x:Key="SystemAccentColorLight1">#FF429CE3</Color>
-        <Color x:Key="SystemAccentColorLight2">#FF6CB4E8</Color>
-        <Color x:Key="SystemAccentColorLight3">#FF96CBEE</Color>
-        <Color x:Key="SystemAccentColorDark1">#FF005A9E</Color>
-        <Color x:Key="SystemAccentColorDark2">#FF003D6B</Color>
-        <Color x:Key="SystemAccentColorDark3">#FF002038</Color>
+        <Color x:Key="SystemAccentColor">#FFD41F1F</Color>
+        <Color x:Key="SystemAccentColorLight1">#FFE35A42</Color>
+        <Color x:Key="SystemAccentColorLight2">#FFE87F6C</Color>
+        <Color x:Key="SystemAccentColorLight3">#FFEEA896</Color>
+        <Color x:Key="SystemAccentColorDark1">#FF9E1600</Color>
+        <Color x:Key="SystemAccentColorDark2">#FF6B0F00</Color>
+        <Color x:Key="SystemAccentColorDark3">#FF380800</Color>
     </Application.Resources>
     
-<Application.DataTemplates>
+    <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
   
