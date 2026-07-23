@@ -161,11 +161,17 @@ public static class Utils
         };
         
         var nodeName = new DirectoryInfo(inputPath).Name;
-        using var node = ParRepacker.ReadDirectory(inputPath, nodeName);
+        var node = ParRepacker.ReadDirectory(inputPath, nodeName);
         
         node.SortChildren((x, y) => string.CompareOrdinal(x.Name.ToLowerInvariant(), y.Name.ToLowerInvariant()));
         
-        using var containerNode = node.GetFormatAs<NodeContainerFormat>();
-        using var par = node.TransformWith(typeof(ParArchiveWriter), parameters);
+        var containerNode = node.GetFormatAs<NodeContainerFormat>();
+        var par = node.TransformWith(typeof(ParArchiveWriter), parameters);
+        
+        // Explicitly dispose to ensure everything is disposed in the correct order,
+        // preventing "file-in-use" errors on Windows
+        par.Dispose();
+        node.Dispose();
+        containerNode?.Root.Dispose();
     }
 }
