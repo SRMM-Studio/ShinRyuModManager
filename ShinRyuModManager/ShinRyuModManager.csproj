@@ -68,9 +68,10 @@
         <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-        <PackageReference Include="SharpCompress" Version="0.49.1" />
+        <PackageReference Include="SharpCompress" Version="0.50.3" />
         <PackageReference Include="Skia.Controls.Avalonia" Version="12.0.0.13" />
         <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="12.0.0.13" />
+        <PackageReference Include="System.IO.Hashing" Version="10.0.10" />
         <PackageReference Include="YamlDotNet" Version="18.1.0" />
     </ItemGroup>
 
