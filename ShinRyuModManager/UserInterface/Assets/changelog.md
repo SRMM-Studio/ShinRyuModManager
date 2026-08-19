@@ -1,4 +1,8 @@
-> ### **%{color:gold} Version 5.0.3 %** ###
+> ### **%{color:gold} Version 5.0.4 %** ###
+* Entity support for Judgment
+---
+
+> ### **%{color:orange} Version 5.0.3 %** ###
 * Implemented first run disclaimer
 ---
 
