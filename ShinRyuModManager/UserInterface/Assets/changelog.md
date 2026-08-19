@@ -1,5 +1,6 @@
 > ### **%{color:gold} Version 5.0.4 %** ###
 * Entity support for Judgment
+* Fix error with importing some RAR files
 ---
 
 > ### **%{color:orange} Version 5.0.3 %** ###
