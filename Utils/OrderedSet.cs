@@ -2,97 +2,75 @@ using System.Collections;
 
 namespace Utils;
 
-public class OrderedSet<T> : ICollection<T>
+// Note: This class is very slow at removes (O(n)). Minimize the need to remove values
+public class OrderedSet<T> : ICollection<T> where T : notnull
 {
-    private readonly IDictionary<T, LinkedListNode<T>> _dictionary;
-    private readonly LinkedList<T> _linkedList;
-    
+    // We don't care about the value
+    private readonly OrderedDictionary<T, byte> _dictionary;
+
     public OrderedSet() : this(EqualityComparer<T>.Default) { }
-    
+
     public OrderedSet(IEqualityComparer<T> comparer)
     {
-        _dictionary = new Dictionary<T, LinkedListNode<T>>(comparer);
-        _linkedList = new LinkedList<T>();
+        _dictionary = new OrderedDictionary<T, byte>(comparer);
     }
-    
-    public int Count
-    {
-        get => _dictionary.Count;
-    }
-    
-    public bool IsReadOnly
-    {
-        get => _dictionary.IsReadOnly;
-    }
-    
-    void ICollection<T>.Add(T item)
-    {
-        Add(item);
-    }
-    
+
+    public int Count => _dictionary.Count;
+
+    public bool IsReadOnly => false;
+
+    void ICollection<T>.Add(T item) => Add(item);
+
     public bool Add(T item)
     {
-        if (_dictionary.ContainsKey(item))
-            return false;
-        
-        var node = _linkedList.AddLast(item);
-        _dictionary.Add(item, node);
-        
-        return true;
+        return _dictionary.TryAdd(item, 0);
     }
-    
+
     public void Clear()
     {
-        _linkedList.Clear();
         _dictionary.Clear();
     }
-    
+
     public bool Remove(T item)
     {
-        if (item is null)
-            return false;
-        
-        var found = _dictionary.TryGetValue(item, out var node);
-        
-        if (!found)
-            return false;
-        
-        _dictionary.Remove(item);
-        _linkedList.Remove(node);
-        
-        return true;
+        return _dictionary.Remove(item);
     }
-    
+
     public void UnionWith(IEnumerable<T> other)
     {
         ArgumentNullException.ThrowIfNull(other);
-        
+
         foreach (var item in other)
         {
             Add(item);
         }
     }
-    
+
     public IEnumerator<T> GetEnumerator()
     {
-        return _linkedList.GetEnumerator();
+        foreach (var kvp in _dictionary)
+        {
+            yield return kvp.Key;
+        }
     }
-    
+
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
-    
+
     public bool Contains(T item)
     {
-        if (item is null)
-            return false;
-        
         return _dictionary.ContainsKey(item);
     }
-    
+
     public void CopyTo(T[] array, int arrayIndex)
     {
-        _linkedList.CopyTo(array, arrayIndex);
+        ArgumentNullException.ThrowIfNull(array);
+
+        foreach (var key in _dictionary.Keys)
+        {
+            array[arrayIndex++] = key;
+        }
     }
 }

@@ -1,3 +1,7 @@
+> ### **%{color:gold} Version 5.0.5 %** ###
+* Fixed game launching bug for GOG users
+---
+
 > ### **%{color:gold} Version 5.0.4 %** ###
 * Entity support for Judgment
 * Fix error with importing some RAR files

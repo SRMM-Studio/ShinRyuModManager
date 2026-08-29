@@ -32,7 +32,7 @@ public static class GamePath
         IsGOG = File.Exists("galaxy64.dll");
         
         // Try to get game
-        foreach (var file in Directory.GetFiles(FullGamePath, "*.exe"))
+        foreach (var file in Directory.EnumerateFiles(FullGamePath, "*.exe"))
         {
             if (!Enum.TryParse<Game>(Path.GetFileNameWithoutExtension(file), true, out var game))
                 continue;
@@ -148,8 +148,11 @@ public static class GamePath
     
     public static string GetGameLaunchPath()
     {
+        var isSteamApiFound = Directory.EnumerateFiles(FullGamePath)
+                                       .Any(f => Path.GetFileName(f).Equals("steam_api64.dll", StringComparison.OrdinalIgnoreCase));
+        
         // Prefer launching through Steam, but if Windows, allow launching via exe
-        if (IsSteamInstalled())
+        if (isSteamApiFound && IsSteamInstalled())
         {
             return $"steam://launch/{GetGameSteamId(CurrentGame)}";
         }
