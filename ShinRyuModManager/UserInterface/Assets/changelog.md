@@ -1,8 +1,9 @@
 > ### **%{color:gold} Version 5.0.5 %** ###
 * Fixed game launching bug for GOG users
+* Fixed SRMM failing to launch with certain DLLs in the same folder
 ---
 
-> ### **%{color:gold} Version 5.0.4 %** ###
+> ### **%{color:orange} Version 5.0.4 %** ###
 * Entity support for Judgment
 * Fix error with importing some RAR files
 ---
