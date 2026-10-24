@@ -2,6 +2,7 @@
 * Added support for installing mods with drag-and-drop
 * Added support for viewing logs in a console via Help -> View Logs
 * Fixed issues with SRMM looking wrong on light vs dark theme
+* Added ability to delete selected mods with right-click
 ---
 
 > ### **%{color:orange} Version 5.0.5 %** ###

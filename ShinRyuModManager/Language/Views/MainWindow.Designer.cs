@@ -129,12 +129,6 @@ namespace ShinRyuModManager.Language.Views {
             }
         }
         
-        public static string Menu_UninstallMod {
-            get {
-                return ResourceManager.GetString("Menu_UninstallMod", resourceCulture);
-            }
-        }
-        
         public static string MetaEditCancel_Tooltip {
             get {
                 return ResourceManager.GetString("MetaEditCancel_Tooltip", resourceCulture);
@@ -270,6 +264,12 @@ namespace ShinRyuModManager.Language.Views {
         public static string Menu_ViewLogs {
             get {
                 return ResourceManager.GetString("Menu_ViewLogs", resourceCulture);
+            }
+        }
+        
+        public static string DataGridContextMenu_DeleteMod {
+            get {
+                return ResourceManager.GetString("DataGridContextMenu_DeleteMod", resourceCulture);
             }
         }
     }

@@ -32,10 +32,7 @@ public partial class App : Application
 
             Log.Information("Start MainWindow");
 
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
+            desktop.MainWindow = new MainWindow(new MainWindowViewModel());
             
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
             

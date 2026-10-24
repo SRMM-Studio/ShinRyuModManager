@@ -165,7 +165,6 @@
             <MenuItem Header="{x:Static lang:MainWindow.Menu_Manage}">
                 <MenuItem Name="ModInstallMenuItem" Header="{x:Static lang:MainWindow.Menu_InstallMod}" 
                           Click="ModInstall_OnClick" />
-                <!--<MenuItem Header="{x:Static lang:MainWindow.Menu_UninstallMod}" />-->
             </MenuItem>
             <MenuItem Header="{x:Static lang:MainWindow.Menu_Libraries}" Click="MenuItem_OnClick" />
             <MenuItem Header="{x:Static lang:MainWindow.Menu_ModMeta}">
@@ -250,27 +249,39 @@
                                ToolTip.Tip="{x:Static lang:MainWindow.ModList_Tooltip}" Foreground="LightGray" />
                     
                     <!-- Mod List DataGrid -->
-                    <ThemeVariantScope Grid.Row="1" RequestedThemeVariant="Light">
-                        <DataGrid Name="ModListView" Margin="20, 0, 0, 20" Background="#FF4B4B4B" 
-                                  Width="318" ItemsSource="{Binding ModList}" 
-                                  SelectionChanged="ModList_OnSelectionChanged">
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="{x:Static lang:MainWindow.ModList_Enabled}" 
-                                                        CanUserSort="False">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate DataType="mods:ModInfo">
-                                            <CheckBox IsChecked="{Binding Enabled}" 
-                                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
+                    <Panel Grid.Row="1">
+                        
+                        <Panel.ContextMenu>
+                            <ContextMenu Name="ModListContextMenu">
+                                <MenuItem Header="{x:Static lang:MainWindow.DataGridContextMenu_DeleteMod}" 
+                                          Click="DeleteMod_OnClick" />
+                            </ContextMenu>
+                        </Panel.ContextMenu>
+                        
+                        <ThemeVariantScope RequestedThemeVariant="Light">
+                            <DataGrid Name="ModListView" Margin="20, 0, 0, 20" Background="#FF4B4B4B" 
+                                      Width="318" ItemsSource="{Binding ModList}" 
+                                      SelectionChanged="ModList_OnSelectionChanged"
+                                      ContextRequested="ModListView_OnContextRequested">
                                 
-                                <DataGridTextColumn Header="{x:Static lang:MainWindow.ModList_ModName}" Width="*" 
-                                                    Binding="{Binding Name}" CanUserSort="False" 
-                                                    IsReadOnly="True" Foreground="White" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </ThemeVariantScope>
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="{x:Static lang:MainWindow.ModList_Enabled}" 
+                                                            CanUserSort="False">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate DataType="mods:ModInfo">
+                                                <CheckBox IsChecked="{Binding Enabled}" 
+                                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    
+                                    <DataGridTextColumn Header="{x:Static lang:MainWindow.ModList_ModName}" Width="*" 
+                                                        Binding="{Binding Name}" CanUserSort="False" 
+                                                        IsReadOnly="True" Foreground="White" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </ThemeVariantScope>
+                    </Panel>
                     
                     <!-- General Application Controls -->
                     <Grid Grid.Row="2" Grid.Column="0" Classes="Controls">

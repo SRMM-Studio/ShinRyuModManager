@@ -60,9 +60,6 @@
     <data name="Menu_ModMetaSampleYaml" xml:space="preserve">
         <value>Export sample mod-meta.yaml</value>
     </data>
-    <data name="Menu_UninstallMod" xml:space="preserve">
-        <value>Uninstall Mod (WIP)</value>
-    </data>
     <data name="MetaEditCancel_Tooltip" xml:space="preserve">
         <value>Cancel editing</value>
     </data>
@@ -131,5 +128,8 @@
     </data>
     <data name="Menu_ViewLogs" xml:space="preserve">
         <value>View Logs</value>
+    </data>
+    <data name="DataGridContextMenu_DeleteMod" xml:space="preserve">
+        <value>Delete mod(s)</value>
     </data>
 </root>

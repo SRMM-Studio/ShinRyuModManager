@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using Avalonia;
@@ -8,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Serilog;
 using Serilog.Events;
 using ShinRyuModManager.Helpers;
@@ -27,8 +29,16 @@ public partial class MainWindow : Window
     private bool _isDragInside;
     private bool _isEditing;
     
-    public MainWindow()
+    private readonly MainWindowViewModel _viewModel;
+    
+    // Needed for previewer
+    public MainWindow() : this(new MainWindowViewModel()) { }
+    
+    public MainWindow(MainWindowViewModel viewModel)
     {
+        _viewModel = viewModel;
+        DataContext = viewModel;
+        
         InitializeComponent();
         
         DragDrop.SetAllowDrop(this, true);
@@ -123,9 +133,6 @@ public partial class MainWindow : Window
         
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
             var files = e.DataTransfer.TryGetFiles()?
                 .OfType<IStorageFile>()
                 .Where(x => CustomFilePickerFileTypes.IsModArchive(x.Name))
@@ -136,7 +143,7 @@ public partial class MainWindow : Window
             
             Directory.CreateDirectory(GamePath.MODS);
             
-            await InstallModsAsync(files, viewModel.ModList);
+            await InstallModsAsync(files, _viewModel.ModList);
         }
         catch
         {
@@ -149,11 +156,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
             await Dispatcher.UIThread.InvokeAsync(RefreshModList);
-            await Program.InstallAllModDependenciesAsync(viewModel.ModList.ToList());
+            await Program.InstallAllModDependenciesAsync(_viewModel.ModList.ToList());
         }
         catch
         {
@@ -219,7 +223,7 @@ public partial class MainWindow : Window
         {
             Log.Fatal(ex, "Failed to select mod!");
             
-            await MessageBoxWindow.Show(this, "Error", "An error has occurred. \nPlease check\"srmm_errors.txt\" for more info.");
+            await ShowDefaultError();
         }
     }
     
@@ -233,18 +237,15 @@ public partial class MainWindow : Window
     
     private void ModUp_OnClick(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainWindowViewModel viewModel)
-            return;
-        
-        var selection = ModListView.SelectedItems.Cast<ModInfo>().OrderBy(m => viewModel!.ModList.IndexOf(m)).ToList();
+        var selection = ModListView.SelectedItems.Cast<ModInfo>().OrderBy(m => _viewModel!.ModList.IndexOf(m)).ToList();
         
         var limit = 0;
         
-        foreach (var i in selection.Select(m => viewModel.ModList.IndexOf(m)).OrderBy(x => x))
+        foreach (var i in selection.Select(m => _viewModel.ModList.IndexOf(m)).OrderBy(x => x))
         {
             if (i > limit)
             {
-                (viewModel.ModList[i - 1], viewModel.ModList[i]) = (viewModel.ModList[i], viewModel.ModList[i - 1]);
+                (_viewModel.ModList[i - 1], _viewModel.ModList[i]) = (_viewModel.ModList[i], _viewModel.ModList[i - 1]);
             }
             else
             {
@@ -261,18 +262,15 @@ public partial class MainWindow : Window
     
     private void ModDown_OnClick(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainWindowViewModel viewModel)
-            return;
+        var selection = ModListView.SelectedItems.Cast<ModInfo>().OrderBy(m => _viewModel.ModList.IndexOf(m)).ToList();
         
-        var selection = ModListView.SelectedItems.Cast<ModInfo>().OrderBy(m => viewModel.ModList.IndexOf(m)).ToList();
+        var limit = _viewModel.ModList.Count - 1;
         
-        var limit = viewModel.ModList.Count - 1;
-        
-        foreach (var i in selection.Select(m => viewModel.ModList.IndexOf(m)).OrderByDescending(x => x))
+        foreach (var i in selection.Select(m => _viewModel.ModList.IndexOf(m)).OrderByDescending(x => x))
         {
             if (i < limit)
             {
-                (viewModel.ModList[i + 1], viewModel.ModList[i]) = (viewModel.ModList[i], viewModel.ModList[i + 1]);
+                (_viewModel.ModList[i + 1], _viewModel.ModList[i]) = (_viewModel.ModList[i], _viewModel.ModList[i + 1]);
             }
             else
             {
@@ -293,9 +291,6 @@ public partial class MainWindow : Window
         
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
             if (OperatingSystem.IsLinux() && !Flags.CheckFlag(Constants.LINUX_WIKI_REMINDER_FLAG_FILE_NAME))
             {
                 var result = await MessageBoxWindow.Show(this, "Information",
@@ -308,9 +303,9 @@ public partial class MainWindow : Window
                 }
             }
             
-            if (viewModel.ModList.Count > 0)
+            if (_viewModel.ModList.Count > 0)
             {
-                var mods = viewModel.ModList.ToList();
+                var mods = _viewModel.ModList.ToList();
                 
                 Program.SaveModList(mods);
                 
@@ -415,15 +410,15 @@ public partial class MainWindow : Window
         }
     }
     
-    private void ModClose_OnClick(object sender, RoutedEventArgs e) => Close();
+    private void ModClose_OnClick(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
     
     private async void ModInstall_OnClick(object sender, RoutedEventArgs e)
     {
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
             Directory.CreateDirectory(GamePath.MODS);
             
             var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -435,7 +430,7 @@ public partial class MainWindow : Window
             if (files.Count == 0)
                 return;
             
-            await InstallModsAsync(files, viewModel.ModList);
+            await InstallModsAsync(files, _viewModel.ModList);
         }
         catch (Exception ex)
         {
@@ -450,7 +445,10 @@ public partial class MainWindow : Window
         CreateOrActivateWindow<LibraryManagerWindow>();
     }
     
-    private void ModListViewRefresh_OnClick(object sender, RoutedEventArgs e) => RefreshModList();
+    private void ModListViewRefresh_OnClick(object sender, RoutedEventArgs e)
+    {
+        RefreshModList();
+    }
     
     private async void ModMetaSampleYaml_OnClick(object sender, RoutedEventArgs e)
     {
@@ -557,13 +555,10 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
             ChangeUiState(UiState.Normal);
             
             var selection = ModListView.SelectedItems.Cast<ModInfo>().First();
-            await UpdateModMetaAsync(viewModel, selection);
+            await UpdateModMetaAsync(_viewModel, selection);
         }
         catch (Exception ex)
         {
@@ -577,9 +572,6 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
             var selection = ModListView.SelectedItems.Cast<ModInfo>().First();
             var meta = await GetModMetaAsync(selection.Name);
             
@@ -609,7 +601,7 @@ public partial class MainWindow : Window
             
             ChangeUiState(UiState.Normal);
             
-            await UpdateModMetaAsync(viewModel, selection);
+            await UpdateModMetaAsync(_viewModel, selection);
         }
         catch (Exception ex)
         {
@@ -623,21 +615,18 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (DataContext is not MainWindowViewModel viewModel)
-                return;
-            
-            if (!string.IsNullOrEmpty(viewModel.GameLaunchPath))
+            if (!string.IsNullOrEmpty(_viewModel.GameLaunchPath))
             {
                 if (OperatingSystem.IsWindows())
                 {
-                    Process.Start(new ProcessStartInfo(viewModel.GameLaunchPath)
+                    Process.Start(new ProcessStartInfo(_viewModel.GameLaunchPath)
                     {
                         UseShellExecute = true
                     });
                 }
                 else if (OperatingSystem.IsLinux())
                 {
-                    Process.Start("xdg-open", viewModel.GameLaunchPath);
+                    Process.Start("xdg-open", _viewModel.GameLaunchPath);
                 }
             }
             else
@@ -650,6 +639,54 @@ public partial class MainWindow : Window
             Log.Fatal(ex, "LaunchGame failed!");
             
             await ShowDefaultError();
+        }
+    }
+    
+    private void ModListView_OnContextRequested(object sender, ContextRequestedEventArgs e)
+    {
+        var row = (e.Source as Visual)?.FindAncestorOfType<DataGridRow>(includeSelf: true);
+        
+        if (row?.DataContext is not ModInfo mod)
+        {
+            e.Handled = true;
+            return;
+        }
+        
+        if (!ModListView.SelectedItems.Contains(mod))
+        {
+            ModListView.SelectedItem = mod;
+        }
+    }
+    
+    private async void DeleteMod_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var mods = ModListView.SelectedItems.Cast<ModInfo>().ToList();
+            
+            if (mods.Count == 0)
+                return;
+            
+            var result = await MessageBoxWindow.Show(this, "Warning", "This cannot be undone. Are you sure?", showCancel: true);
+            
+            if (result == MessageBoxResult.Cancel)
+                return;
+            
+            foreach (var mod in mods)
+            {
+                var path = GamePath.GetModDirectory(mod.Name);
+                
+                if (Directory.Exists(path))
+                {
+                    Directory.Delete(path, true);
+                }
+            }
+            
+            await ResetModMetaAsync(_viewModel);
+        }
+        catch
+        {
+            // ignore
         }
     }
     
@@ -697,6 +734,13 @@ public partial class MainWindow : Window
         modImage ??= await UiHelpers.LoadResourceAsBitmapAsync("NoImage.png");
         
         ModImage.Source = modImage;
+    }
+    
+    private async Task ResetModMetaAsync(MainWindowViewModel viewModel)
+    {
+        viewModel.SelectMod(new ModMeta());
+        
+        ModImage.Source = await UiHelpers.LoadResourceAsBitmapAsync("NoImage.png");
     }
     
     private static async Task<ModMeta> GetModMetaAsync(string modName)
@@ -755,13 +799,10 @@ public partial class MainWindow : Window
     
     private void RefreshModList()
     {
-        if (DataContext is not MainWindowViewModel viewModel)
-            return;
-        
-        viewModel.LoadModList();
+        _viewModel.LoadModList();
     }
     
-    private void CreateOrActivateWindow<T>( bool owned = true) where T : Window, new()
+    private void CreateOrActivateWindow<T>(bool owned = true) where T : Window, new()
     {
         var openedWindows = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
             ? desktop.Windows
