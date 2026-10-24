@@ -260,5 +260,11 @@ namespace ShinRyuModManager.Language.Views {
                 return ResourceManager.GetString("Menu_Profile8", resourceCulture);
             }
         }
+        
+        public static string DropFiles_DragDrop {
+            get {
+                return ResourceManager.GetString("DropFiles_DragDrop", resourceCulture);
+            }
+        }
     }
 }

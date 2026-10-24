@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -22,10 +23,20 @@ public partial class MainWindow : Window
 {
     private FileSystemWatcher _modsFolderWatcher;
     private Window _childWindow;
+    private bool _isDragInside;
+    private bool _isEditing;
     
     public MainWindow()
     {
         InitializeComponent();
+        
+        DragDrop.SetAllowDrop(this, true);
+        
+        AddHandler(DragDrop.DragEnterEvent, Window_OnDragEnter);
+        AddHandler(DragDrop.DragLeaveEvent, Window_OnDragLeave);
+        AddHandler(DragDrop.DragOverEvent, Window_OnDragOver);
+        AddHandler(DragDrop.DropEvent, Window_OnDrop);
+        
         Log.Information("MainWindow InitializeComponent");
     }
     
@@ -72,6 +83,67 @@ public partial class MainWindow : Window
         base.OnClosed(e);
     }
     
+    private void Window_OnDragEnter(object sender, DragEventArgs e)
+    {
+        if (_isEditing || !e.DataTransfer.Formats.Contains(DataFormat.File))
+            return;
+        
+        _isDragInside = true;
+        DropOverlay.Classes.Add("Active");
+    }
+    
+    private void Window_OnDragLeave(object sender, DragEventArgs e)
+    {
+        _isDragInside = false;
+        
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_isDragInside)
+                return;
+            
+            DropOverlay.Classes.Remove("Active");
+        }, DispatcherPriority.Background);
+    }
+    
+    private void Window_OnDragOver(object sender, DragEventArgs e)
+    {
+        e.DragEffects = e.DataTransfer.Formats.Contains(DataFormat.File) && !_isEditing
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
+    }
+    
+    private async void Window_OnDrop(object sender, DragEventArgs e)
+    {
+        if (_isEditing)
+            return;
+        
+        _isDragInside = false;
+        DropOverlay.Classes.Remove("Active");
+        
+        try
+        {
+            if (DataContext is not MainWindowViewModel viewModel)
+                return;
+            
+            var files = e.DataTransfer.TryGetFiles()?
+                .OfType<IStorageFile>()
+                .Where(x => CustomFilePickerFileTypes.IsModArchive(x.Name))
+                .ToArray();
+            
+            if (files is null || files.Length == 0)
+                return;
+            
+            Directory.CreateDirectory(GamePath.MODS);
+            
+            await InstallModsAsync(files, viewModel.ModList);
+        }
+        catch
+        {
+            // ignored
+            // Prevents application crashing
+        }
+    }
+    
     private async void FileSystemWatcher_Created(object _, FileSystemEventArgs e)
     {
         try
@@ -85,7 +157,6 @@ public partial class MainWindow : Window
         catch
         {
             // ignored
-            // Prevents application crashing
         }
     }
     
@@ -363,30 +434,7 @@ public partial class MainWindow : Window
             if (files.Count == 0)
                 return;
             
-            var progressWindow = new ProgressWindow("Installing mod(s). Please wait...", true);
-            
-            _ = progressWindow.ShowDialog(this);
-            
-            await Task.Yield();
-            
-            await Task.Run(async () =>
-            {
-                foreach (var file in files)
-                {
-                    var localPath = file.TryGetLocalPath();
-                    
-                    if (!File.Exists(localPath))
-                        return;
-                    
-                    await Utils.TryInstallModZipAsync(localPath);
-                }
-                
-                await Program.InstallAllModDependenciesAsync(viewModel.ModList.ToList());
-            });
-            
-            RefreshModList();
-            
-            progressWindow.Close();
+            await InstallModsAsync(files, viewModel.ModList);
         }
         catch (Exception ex)
         {
@@ -457,7 +505,7 @@ public partial class MainWindow : Window
                 return;
             
             var sampleImage = await UiHelpers.LoadResourceAsBitmapAsync("NoImage.png");
-            sampleImage.Save(saveDialog.TryGetLocalPath()!);
+            sampleImage.Save(saveDialog.TryGetLocalPath()!, PngBitmapEncoderOptions.Default);
         }
         catch (Exception ex)
         {
@@ -659,6 +707,45 @@ public partial class MainWindow : Window
         return meta;
     }
     
+    private async Task InstallModsAsync(IEnumerable<IStorageFile> files, IEnumerable<ModInfo> modList)
+    {
+        var progressWindow = new ProgressWindow("Installing mod(s). Please wait...", true);
+        
+        _ = progressWindow.ShowDialog(this);
+        
+        try
+        {
+            await Task.Yield();
+            
+            await Task.Run(async () =>
+            {
+                foreach (var file in files)
+                {
+                    var localPath = file.TryGetLocalPath();
+                    
+                    if (!File.Exists(localPath))
+                        return;
+                    
+                    await Utils.TryInstallModZipAsync(localPath);
+                }
+                
+                await Program.InstallAllModDependenciesAsync(modList);
+            });
+            
+            RefreshModList();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "ModInstalled failed!");
+            
+            await ShowDefaultError();
+        }
+        finally
+        {
+            progressWindow.Close();
+        }
+    }
+    
     private void RefreshModList()
     {
         if (DataContext is not MainWindowViewModel viewModel)
@@ -691,6 +778,8 @@ public partial class MainWindow : Window
         switch (state)
         {
             case UiState.Normal:
+                _isEditing = false;
+                
                 ModName.IsVisible = true;
                 ModAuthor.IsVisible = true;
                 ModVersion.IsVisible = true;
@@ -708,6 +797,8 @@ public partial class MainWindow : Window
                 
                 break;
             case UiState.Editable:
+                _isEditing = true;
+                
                 ModName.IsVisible = false;
                 ModAuthor.IsVisible = false;
                 ModVersion.IsVisible = false;

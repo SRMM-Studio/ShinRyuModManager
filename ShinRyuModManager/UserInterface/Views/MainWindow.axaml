@@ -93,6 +93,60 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Margin" Value="3" />
         </Style>
+        
+        <!-- Overlay: idle state -->
+        <Style Selector="Border#DropOverlay">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Background" Value="#00000000" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                    <BrushTransition Property="Background" Duration="0:0:0.25" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border#DropOverlay Rectangle#DropOverlayStroke">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="RenderTransform" Value="scale(1.06)" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut" />
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border#DropOverlay StackPanel#DropOverlayText">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="RenderTransform" Value="translateY(12px)" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3"
+                                                   Delay="0:0:0.05" Easing="CubicEaseOut" />
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" Delay="0:0:0.05" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <!-- Overlay: active (file is being dragged over) -->
+        <Style Selector="Border#DropOverlay.Active">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="IsHitTestVisible" Value="True" />
+            <Setter Property="Background" Value="#B0000000" />
+        </Style>
+
+        <Style Selector="Border#DropOverlay.Active Rectangle#DropOverlayStroke">
+            <Setter Property="Opacity" Value="0.7" />
+            <Setter Property="RenderTransform" Value="scale(1)" />
+        </Style>
+
+        <Style Selector="Border#DropOverlay.Active StackPanel#DropOverlayText">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="RenderTransform" Value="translateY(0px)" />
+        </Style>
+        
     </Window.Styles>
     
     <!-- App -->
@@ -346,6 +400,21 @@
                 </Button>
             </StackPanel>
         </Grid>
+        
+        <!-- Overlay (must be last) -->
+        <Border Grid.Row="0" Grid.RowSpan="2" Name="DropOverlay" ZIndex="100">
+            <Panel Margin="20" IsHitTestVisible="False">
+                <Rectangle Name="DropOverlayStroke" Stroke="White" StrokeThickness="3" StrokeDashArray="4,3"
+                           RadiusX="12" RadiusY="12" />
+                <StackPanel Name="DropOverlayText" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                    <TextBlock FontSize="28" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center"
+                               Text="{x:Static lang:MainWindow.DropFiles_DragDrop}"/>
+                    <TextBlock Text="(.zip / .7z / .rar / .tar.gz)" FontSize="16" Foreground="LightGray"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Panel>
+        </Border>
+        
     </Grid>
 
 </Window>

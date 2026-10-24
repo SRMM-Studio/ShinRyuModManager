@@ -615,7 +615,7 @@ public static class Program
         }
     }
     
-    public static async Task InstallAllModDependenciesAsync(List<ModInfo> mods)
+    public static async Task InstallAllModDependenciesAsync(IEnumerable<ModInfo> mods)
     {
         try
         {

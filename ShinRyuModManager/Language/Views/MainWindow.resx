@@ -85,7 +85,7 @@
         <value>Mod Name</value>
     </data>
     <data name="ModList_Title" xml:space="preserve">
-        <value>MOD LOAD ORDER (Hover for more information)</value>
+        <value>MOD LOAD ORDER (Hover for more info)</value>
     </data>
     <data name="ModList_Tooltip" xml:space="preserve">
         <value>Mods will get loaded in order (top to bottom). If a mod has a file conflict with another, the files of the latest mod to load will have priority.</value>
@@ -125,5 +125,8 @@
     </data>
     <data name="Menu_Profile8" xml:space="preserve">
         <value>Profile 8</value>
+    </data>
+    <data name="DropFiles_DragDrop" xml:space="preserve">
+        <value>Drop mod(s) to install</value>
     </data>
 </root>

@@ -1,4 +1,8 @@
-> ### **%{color:gold} Version 5.0.5 %** ###
+> ### **%{color:gold} Version 5.0.6 %** ###
+* Added support for installing mods with drag-and-drop
+---
+
+> ### **%{color:orange} Version 5.0.5 %** ###
 * Fixed game launching bug for GOG users
 * Fixed SRMM failing to launch with certain DLLs in the same folder
 ---

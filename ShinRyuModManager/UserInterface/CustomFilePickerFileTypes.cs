@@ -31,4 +31,15 @@ public static class CustomFilePickerFileTypes
         AppleUniformTypeIdentifiers = ["public.yaml"],
         MimeTypes = ["application/yaml"]
     };
+    
+    // Gross, but gets all the extensions easily
+    private static readonly string[] ModArchiveExtensions = new[] { CompressedZip, CompressedRar, CompressedGzip }
+                                                            .SelectMany(x => x.Patterns ?? [])
+                                                            .Select(x => x.TrimStart('*'))
+                                                            .ToArray();
+    
+    public static bool IsModArchive(string fileName)
+    {
+        return ModArchiveExtensions.Any(x => fileName.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+    }
 }
