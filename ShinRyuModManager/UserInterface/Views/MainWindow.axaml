@@ -80,6 +80,10 @@
             <Setter Property="Width" Value="44" />
         </Style>
         
+        <Style Selector="Menu MenuItem">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        
         <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
             <Setter Property="IsVisible" Value="False"/>
         </Style>
@@ -202,6 +206,8 @@
                 <MenuItem Name="ChangeLog" Header="{x:Static lang:MainWindow.Menu_Changelog}" 
                           Click="ChangeLog_OnClick" />
                 <!--<MenuItem Name="CheckUpdates" Header="{x:Static lang:MainWindow.Menu_CheckUpdates}" />-->
+                <MenuItem Name="ViewLogs" Header="{x:Static lang:MainWindow.Menu_ViewLogs}"
+                          Click="ViewLogs_OnClick"/>
             </MenuItem>
         </Menu>
         

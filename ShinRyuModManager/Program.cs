@@ -14,6 +14,7 @@ using ShinRyuModManager.Helpers;
 using ShinRyuModManager.ModLoadOrder;
 using ShinRyuModManager.ModLoadOrder.Mods;
 using ShinRyuModManager.ModLoadOrder.Mods.Serialization;
+using ShinRyuModManager.Sinks;
 using ShinRyuModManager.Templates;
 using ShinRyuModManager.UserInterface;
 using Utils;
@@ -61,22 +62,30 @@ public static class Program
         LoadConfig();
         
         // Create global logger
-        Log.Logger = new LoggerConfiguration()
-                     .MinimumLevel.ControlledBy(new LoggingLevelSwitch(LogLevel))
-                     .Enrich.WithExceptionDetails()
-                     // Log to SRMM logs file
-                     .WriteTo.Logger(l => l
-                                          .Filter.ByIncludingOnly(e => e.Exception == null)
-                                          .WriteTo.Async(a => a.File(defaultLogsPath, rollingInterval: RollingInterval.Day))
-                                          .WriteTo.Async(a => a.Console()))
-                     // Logs exceptions separately
-                     .WriteTo.Logger(l => l
-                                          .Filter.ByIncludingOnly(e => e.Exception != null)
-                                          .WriteTo.Async(a => a.File(new JsonFormatter(renderMessage: true), errorLogsPath, rollingInterval: RollingInterval.Day)))
-                     .CreateLogger();
+        var loggerConfig = new LoggerConfiguration()
+                           .MinimumLevel.ControlledBy(new LoggingLevelSwitch(LogLevel))
+                           .Enrich.WithExceptionDetails()
+                           // Log to SRMM logs file
+                           .WriteTo.Logger(l => l
+                                                .Filter.ByIncludingOnly(e => e.Exception == null)
+                                                .WriteTo.Async(a => a.File(defaultLogsPath, rollingInterval: RollingInterval.Day))
+                                                .WriteTo.Async(a => a.Console()))
+                           // Log exceptions separately
+                           .WriteTo.Logger(l => l
+                                                .Filter.ByIncludingOnly(e => e.Exception != null)
+                                                .WriteTo.Async(a => a.File(new JsonFormatter(renderMessage: true), errorLogsPath, rollingInterval: RollingInterval.Day)));
+        
+        // Don't log to memory for CLI mode
+        if (args.Length == 0)
+        {
+            // Log in memory for built-in console
+            loggerConfig.WriteTo.Async(a => a.Sink(InMemoryLogSink.Instance));
+        }
+        
+        Log.Logger = loggerConfig.CreateLogger();
         
 #if LINUX_SLIM || DEBUG
-        // Slim versions of Linux need to have .NET 10 installed to run and Proton/Wine makes that
+        // Slim versions of Linux need to have .NET 10 installed to run, and Proton/Wine makes that
         // annoying to find to get this working. Temporarily disabled.
         RebuildMlo = false;
 #endif

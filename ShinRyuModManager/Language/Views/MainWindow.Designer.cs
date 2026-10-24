@@ -266,5 +266,11 @@ namespace ShinRyuModManager.Language.Views {
                 return ResourceManager.GetString("DropFiles_DragDrop", resourceCulture);
             }
         }
+        
+        public static string Menu_ViewLogs {
+            get {
+                return ResourceManager.GetString("Menu_ViewLogs", resourceCulture);
+            }
+        }
     }
 }

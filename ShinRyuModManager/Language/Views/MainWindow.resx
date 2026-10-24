@@ -129,4 +129,7 @@
     <data name="DropFiles_DragDrop" xml:space="preserve">
         <value>Drop mod(s) to install</value>
     </data>
+    <data name="Menu_ViewLogs" xml:space="preserve">
+        <value>View Logs</value>
+    </data>
 </root>

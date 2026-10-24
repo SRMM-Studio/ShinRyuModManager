@@ -1,5 +1,6 @@
 > ### **%{color:gold} Version 5.0.6 %** ###
 * Added support for installing mods with drag-and-drop
+* Added support for viewing logs in a console via Help -> View Logs
 ---
 
 > ### **%{color:orange} Version 5.0.5 %** ###

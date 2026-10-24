@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Serilog;
@@ -35,6 +36,8 @@ public partial class App : Application
             {
                 DataContext = new MainWindowViewModel(),
             };
+            
+            desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
             
             desktop.Exit += DesktopOnExit;
         }

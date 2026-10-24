@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Text;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
@@ -22,7 +24,6 @@ namespace ShinRyuModManager.UserInterface.Views;
 public partial class MainWindow : Window
 {
     private FileSystemWatcher _modsFolderWatcher;
-    private Window _childWindow;
     private bool _isDragInside;
     private bool _isEditing;
     
@@ -77,8 +78,8 @@ public partial class MainWindow : Window
     // Handles properly disposing of the folder watcher
     protected override void OnClosed(EventArgs e)
     {
-        _modsFolderWatcher.EnableRaisingEvents = false;
-        _modsFolderWatcher.Dispose();
+        _modsFolderWatcher?.EnableRaisingEvents = false;
+        _modsFolderWatcher?.Dispose();
         
         base.OnClosed(e);
     }
@@ -525,6 +526,12 @@ public partial class MainWindow : Window
         CreateOrActivateWindow<ChangeLogWindow>();
     }
     
+    private void ViewLogs_OnClick(object sender, RoutedEventArgs e)
+    {
+        // Acts separate, like a real terminal
+        CreateOrActivateWindow<LogWindow>(owned: false);
+    }
+    
     private async void MetaEditEnable_OnClick(object sender, RoutedEventArgs e)
     {
         try
@@ -754,18 +761,35 @@ public partial class MainWindow : Window
         viewModel.LoadModList();
     }
     
-    private void CreateOrActivateWindow<T>() where T : Window, new()
+    private void CreateOrActivateWindow<T>( bool owned = true) where T : Window, new()
     {
-        if (_childWindow is { IsVisible: true })
+        var openedWindows = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            ? desktop.Windows
+            : OwnedWindows;
+        
+        var childWindow = openedWindows.OfType<T>().FirstOrDefault();
+        
+        if (childWindow is not null)
         {
-            // Window visible
-            _childWindow.Activate();
+            if (childWindow.WindowState == WindowState.Minimized)
+            {
+                childWindow.WindowState = WindowState.Normal;
+            }
+            
+            childWindow.Activate();
+            
+            return;
+        }
+        
+        var window = new T();
+        
+        if (owned)
+        {
+            window.Show(this);
         }
         else
         {
-            _childWindow = new T();
-            _childWindow.Closed += (_, _) => _childWindow = null;
-            _childWindow.Show(this);
+            window.Show();
         }
     }
     
