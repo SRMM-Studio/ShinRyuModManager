@@ -249,15 +249,30 @@
                                ToolTip.Tip="{x:Static lang:MainWindow.ModList_Tooltip}" Foreground="LightGray" />
                     
                     <!-- Mod List DataGrid -->
-                    <Panel Grid.Row="1">
-                        
-                        <Panel.ContextMenu>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            Auto
+                            *
+                        </Grid.RowDefinitions>
+                        <Grid.ContextMenu>
                             <ContextMenu Name="ModListContextMenu">
                                 <MenuItem Header="{x:Static lang:MainWindow.DataGridContextMenu_DeleteMod}" 
                                           Click="DeleteMod_OnClick" />
                             </ContextMenu>
-                        </Panel.ContextMenu>
-                        
+                        </Grid.ContextMenu>
+
+                        <Grid Margin="20, 0, 0, 0" 
+                              Background="#FF5D5D5D" 
+                              Width="318" 
+                              Height="30">
+                            <Grid.ColumnDefinitions>
+                                0.2*
+                                0.8*
+                            </Grid.ColumnDefinitions>
+                            <TextBlock FontSize="12" Text="Enabled" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Margin="7, 0, 0, 0" FontSize="12" Text="Mod Name" Grid.Column="1" VerticalAlignment="Center"/>
+                        </Grid>
+
                         <ListBox Name="ModListView"
                                  Margin="20, 0, 0, 20" 
                                  Background="#FF4B4B4B" 
@@ -266,6 +281,7 @@
                                  SelectionChanged="ModList_OnSelectionChanged"
                                  ContextRequested="ModListView_OnContextRequested"
                                  SelectionMode="Multiple"
+                                 Grid.Row="1"
                                  >
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="mods:ModInfo">
@@ -280,7 +296,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                    </Panel>
+                    </Grid>
                     
                     <!-- General Application Controls -->
                     <Grid Grid.Row="2" Grid.Column="0" Classes="Controls">
