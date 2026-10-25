@@ -12,34 +12,7 @@ public class ViewLocator : IDataTemplate
     {
         return data switch
         {
-            MainWindowViewModel vm => new MainWindow
-            {
-                DataContext = vm
-            },
-            AboutWindowViewModel vm => new AboutWindow
-            {
-                DataContext = vm
-            },
-            ChangeLogWindowViewModel vm => new ChangeLogWindow
-            {
-                DataContext = vm
-            },
-            LibraryDisplayControlViewModel vm => new LibraryDisplayControl
-            {
-                DataContext = vm
-            },
-            LibraryManagerViewModel vm => new LibraryManagerWindow
-            {
-                DataContext = vm
-            },
-            MessageBoxWindowViewModel vm => new MessageBoxWindow
-            {
-                DataContext = vm
-            },
-            ProgressWindowViewModel vm => new ProgressWindow
-            {
-                DataContext = vm
-            },
+            LibraryDisplayControlViewModel => new LibraryDisplayControl(),
             _ => new TextBlock
             {
                 Text = $"View not found for {data.GetType().Name}"
