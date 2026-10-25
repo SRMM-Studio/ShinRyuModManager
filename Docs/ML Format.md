@@ -13,11 +13,11 @@
 
 ### ModInfo Format
 
-| Segment          | Value / Range      | Length   | Type   | Encoding / Details                                     |
-|:-----------------|:-------------------|:---------|:-------|:-------------------------------------------------------|
-| Enabled Profiles | `Enabled Profiles` | 1 byte   | uint8  | Bitmask representing profiles where the mod is enabled |
-| Name Length      | 0 - 65,535         | 2 bytes  | utin16 | Length of mod name in bytes                            |
-| Mod Name         | Variable           | Variable | char[] | UTF8 encoded text, length = `Name Length`              |
+| Segment          | Value / Range      | Length   | Type    | Encoding / Details                                     |
+|:-----------------|:-------------------|:---------|:--------|:-------------------------------------------------------|
+| Enabled Profiles | `Enabled Profiles` | 1 byte   | uint8   | Bitmask representing profiles where the mod is enabled |
+| Name Length      | 0 - 65,535         | 2 bytes  | utint16 | Length of mod name in bytes                            |
+| Mod Name         | Variable           | Variable | char[]  | UTF8 encoded text, length = `Name Length`              |
 
 
 ### Enabled Profiles Format
