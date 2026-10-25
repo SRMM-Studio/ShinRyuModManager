@@ -271,8 +271,8 @@
                                 <DataTemplate x:DataType="mods:ModInfo">
                                     <Grid Height="15">
                                         <Grid.ColumnDefinitions>
-                                            0.25*
-                                            1*
+                                            0.2*
+                                            0.8*
                                         </Grid.ColumnDefinitions>
                                         <CheckBox IsChecked="{Binding Enabled}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding Name}" Foreground="White" Grid.Column="1" VerticalAlignment="Center"/>
