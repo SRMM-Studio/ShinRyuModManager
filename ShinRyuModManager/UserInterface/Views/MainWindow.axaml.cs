@@ -212,7 +212,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var grid = sender as DataGrid;
+            var grid = sender as ListBox;
             
             if (grid?.SelectedItem is not ModInfo selected)
                 return;
@@ -644,9 +644,9 @@ public partial class MainWindow : Window
     
     private void ModListView_OnContextRequested(object sender, ContextRequestedEventArgs e)
     {
-        var row = (e.Source as Visual)?.FindAncestorOfType<DataGridRow>(includeSelf: true);
+        var item = (e.Source as Visual)?.FindAncestorOfType<ListBoxItem>(includeSelf: true);
         
-        if (row?.DataContext is not ModInfo mod)
+        if (item?.DataContext is not ModInfo mod)
         {
             e.Handled = true;
             return;

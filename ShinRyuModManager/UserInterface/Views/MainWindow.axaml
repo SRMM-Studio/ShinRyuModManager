@@ -258,29 +258,28 @@
                             </ContextMenu>
                         </Panel.ContextMenu>
                         
-                        <ThemeVariantScope RequestedThemeVariant="Light">
-                            <DataGrid Name="ModListView" Margin="20, 0, 0, 20" Background="#FF4B4B4B" 
-                                      Width="318" ItemsSource="{Binding ModList}" 
-                                      SelectionChanged="ModList_OnSelectionChanged"
-                                      ContextRequested="ModListView_OnContextRequested">
-                                
-                                <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="{x:Static lang:MainWindow.ModList_Enabled}" 
-                                                            CanUserSort="False">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate DataType="mods:ModInfo">
-                                                <CheckBox IsChecked="{Binding Enabled}" 
-                                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    
-                                    <DataGridTextColumn Header="{x:Static lang:MainWindow.ModList_ModName}" Width="*" 
-                                                        Binding="{Binding Name}" CanUserSort="False" 
-                                                        IsReadOnly="True" Foreground="White" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </ThemeVariantScope>
+                        <ListBox Name="ModListView"
+                                 Margin="20, 0, 0, 20" 
+                                 Background="#FF4B4B4B" 
+                                 Width="318" 
+                                 ItemsSource="{Binding ModList}"
+                                 SelectionChanged="ModList_OnSelectionChanged"
+                                 ContextRequested="ModListView_OnContextRequested"
+                                 SelectionMode="Multiple"
+                                 >
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="mods:ModInfo">
+                                    <Grid Height="15">
+                                        <Grid.ColumnDefinitions>
+                                            0.25*
+                                            1*
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox IsChecked="{Binding Enabled}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" Foreground="White" Grid.Column="1" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                     </Panel>
                     
                     <!-- General Application Controls -->
