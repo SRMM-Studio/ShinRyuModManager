@@ -124,7 +124,9 @@ public static class Generator
         
         // Generate MLO
         var mlo = new MLO(modIndices, modNames, files, loose.ParlessFolders, cpkDictionary);
-        
+
+        ParReplacer.RestoreFromMLO(mlo);
+
         mlo.WriteMLO(Path.Combine(GamePath.FullGamePath, Constants.MLO));
         
         Log.Information("Finished generating MLO.");

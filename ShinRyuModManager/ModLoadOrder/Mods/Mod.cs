@@ -64,6 +64,36 @@ public class Mod
             Log.Information("Nothing found for {Name}, skipping", Name);
         }
     }
+
+    // Used when we want to control a file being added to the MLO
+    // Example: profile.par in Yakuza 5 which replaces the file directly (the original is backed up)
+    // Or stuff managed by vortex
+    private bool ShouldAddFile(string filePath)
+    {
+        FileInfo file = new FileInfo(filePath);
+
+        if (file.Name.EndsWith(Constants.VORTEX_MANAGED_FILE))
+            return false;
+
+        if (GamePath.CurrentGame == Game.Yakuza5)
+        {
+            switch (file.Directory.Name)
+            {
+                case "stage":
+                    {
+                        switch(file.Name.ToLowerInvariant())
+                        {
+                            case "profile.par":
+                                return false;
+                        }
+                        break;
+                    }
+            }
+        }
+
+
+        return true;
+    }
     
     public void AddFiles(string path, string check)
     {
@@ -131,10 +161,30 @@ public class Mod
                     {
                         check = CheckFolder(basename);
                     }
+
+                    //Janky: Back up the original profile.par if we spot a mod overriding it
+                    //Profile.par wont be added to the MLO as well, we're treating this file very specially
+                    //Because there is no other way
+                    if(GamePath.CurrentGame == Game.Yakuza5)
+                    {
+                        if(basename == "stage")
+                        {
+                            string profilePath = Path.Combine(path, "profile.par");
+                            bool profileExists = File.Exists(profilePath);
+
+                            if (profileExists)
+                            {
+                                string origProfilePath = Path.Combine(GamePath.DataPath, "stage", "profile.par");
+
+                                ParReplacer.CreateBackup(origProfilePath);
+                                File.Copy(profilePath, origProfilePath, true);
+                            }
+                        }
+                    }
                     
                     break;
             }
-            
+
             // Check for CPK directories
             string cpkDataPath;
             
@@ -271,7 +321,7 @@ public class Mod
         else
         {
             // Add files in current directory
-            var files = Directory.GetFiles(path).Where(f => !f.EndsWith(Constants.VORTEX_MANAGED_FILE)).Select(GamePath.GetDataPathFrom);
+            var files = Directory.GetFiles(path).Where(f => ShouldAddFile(f)).Select(GamePath.GetDataPathFrom);
             
             foreach (var file in files)
             {
@@ -284,7 +334,7 @@ public class Mod
             }
             
             var isParlessMod = GetType() == typeof(ParlessMod);
-            
+
             // Get files for all subdirectories
             foreach (var folder in Directory.GetDirectories(path))
             {

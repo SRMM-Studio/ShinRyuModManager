@@ -12,7 +12,28 @@ public static class Utils
 {
     // Static to be used through project
     public static HttpClient Client { get; } = new();
-    
+
+    private static void DeleteDirectory(string targetDirectory)
+    {
+        File.SetAttributes(targetDirectory, FileAttributes.Normal);
+
+        var files = Directory.GetFiles(targetDirectory);
+        var dirs = Directory.GetDirectories(targetDirectory);
+
+        foreach (var file in files)
+        {
+            File.SetAttributes(file, FileAttributes.Normal);
+            File.Delete(file);
+        }
+
+        foreach (var dir in dirs)
+        {
+            DeleteDirectory(dir);
+        }
+
+        Directory.Delete(targetDirectory, false);
+    }
+
     public static string NormalizeNameLower(string path)
     {
         return NormalizeSeparator(path.ToLowerInvariant());
@@ -149,7 +170,30 @@ public static class Utils
             CopyDirectory(dir, destSubDir);
         }
     }
-    
+
+    public static void MoveDirectory(string srcDirectory, string destDirectory)
+    {
+        if (!Directory.Exists(srcDirectory))
+            throw new DirectoryNotFoundException($"Directory \"{srcDirectory}\" doesn't exist.");
+
+        Directory.CreateDirectory(destDirectory);
+
+        foreach (var file in Directory.EnumerateFiles(srcDirectory))
+        {
+            var destFile = Path.Combine(destDirectory, Path.GetFileName(file));
+
+            File.Move(file, destFile, true);
+        }
+
+        foreach (var dir in Directory.EnumerateDirectories(srcDirectory))
+        {
+            var destSubDir = Path.Combine(destDirectory, Path.GetFileName(dir));
+
+            CopyDirectory(dir, destSubDir);
+            DeleteDirectory(dir); 
+        }
+    }
+
     public static void CreateParFromDirectory(string inputPath, string outputPath)
     {
         var parameters = new ParArchiveWriterParameters

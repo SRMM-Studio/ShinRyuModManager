@@ -3,6 +3,10 @@
 * Added support for viewing logs in a console via Help -> View Logs
 * Fixed issues with SRMM looking wrong on light vs dark theme
 * Added ability to delete selected mods with right-click
+* Shader file support
+  * Yakuza 0 & Director's Cut
+  * Kiwami 1 & Remastered
+* Stage profile support (.par only) for Yakuza 5
 * Reworked Mod List for better maintainability
   * Thanks Aura39
 ---

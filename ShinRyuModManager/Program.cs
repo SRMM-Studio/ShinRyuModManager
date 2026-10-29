@@ -526,7 +526,7 @@ public static class Program
         
         var meta = YamlHelpers.DeserializeYamlFromPath<ModMeta>(metaFile);
         
-        if (string.IsNullOrEmpty(meta.Dependencies))
+        if (meta == null || string.IsNullOrEmpty(meta.Dependencies))
             return [];
         
         return meta.Dependencies.Split(';');
