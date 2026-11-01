@@ -31,7 +31,7 @@ jobs:
           version: "5.0.0-beta2"
 
       - name: Setup MSVC
-        uses: TheMrMilchmann/setup-msvc-dev@b32310cf3353cde843c148420832887707d66c66 # v4.1.0
+        uses: TheMrMilchmann/setup-msvc-dev@79dac248aac9d0059f86eae9d8b5bfab4e95e97c # v4.0.0
         with:
           arch: x64
       
