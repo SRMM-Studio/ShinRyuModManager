@@ -6,9 +6,9 @@ IS_PREVIEW=false
 
 ### Check arguments
 while getopts "p" flag; do
-    case "${flag}" in
-      p) IS_PREVIEW=true ;;
-    esac
+  case "${flag}" in
+    p) IS_PREVIEW=true ;;
+  esac
 done
 
 ### Variables
@@ -69,13 +69,7 @@ for TARGET in "${!TARGET_ARGS[@]}"; do
     ${arr[1]}
     
   for FILE in "${FILES_TO_COPY[@]}"; do
-    SRC="${TEMP_DIR}/external/${FILE}"
-    
-    if [[ -f "${SRC}" ]]; then
-      cp "${SRC}" "${OUT_DIR}/${FILE}"
-      echo "  Copied: ${FILE}"
-    else
-      echo "  Warning: Missing file in release: ${FILE}"
-    fi
+    cp "${TEMP_DIR}/external/${FILE}" "${OUT_DIR}/${FILE}"
+    echo "  Copied: ${FILE}"
   done
 done

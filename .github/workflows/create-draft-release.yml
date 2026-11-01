@@ -19,7 +19,7 @@ jobs:
       
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: SRMM-Studio/YakuzaParless
           path: external/parless
@@ -31,7 +31,7 @@ jobs:
           version: "5.0.0-beta2"
 
       - name: Setup MSVC
-        uses: TheMrMilchmann/setup-msvc-dev@79dac248aac9d0059f86eae9d8b5bfab4e95e97c # v4.0.0
+        uses: TheMrMilchmann/setup-msvc-dev@915a33ef4611c9b2a4cb159aab65226c633ff445 # v4.1.0
         with:
           arch: x64
       
@@ -44,34 +44,10 @@ jobs:
         run: msbuild YakuzaParless.sln /p:Configuration=Release /p:Platform=Win64
         
       - name: Upload Parless Artifact
-        id: upload-unsigned-parless
         uses: actions/upload-artifact@v7
         with: 
-          name: 'ParlessArtifact-unsigned'
-          path: external\parless\build\bin\Win64\Release\YakuzaParless.asi
-          if-no-files-found: 'error'
-          retention-days: 1
-          compression-level: 0
-          overwrite: true
-          
-      - name: Sign Parless
-        uses: signpath/github-action-submit-signing-request@v2
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-          organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
-          project-slug: 'ShinRyuModManager'
-          signing-policy-slug: 'release-signing'
-          artifact-configuration-slug: 'parless'
-          github-artifact-id: '${{ steps.upload-unsigned-parless.outputs.artifact-id }}'
-          wait-for-completion: true
-          output-artifact-directory: '${{ runner.temp }}/external/signed'
-
-      - name: Upload Signed Parless Artifact
-        id: upload-signed-parless
-        uses: actions/upload-artifact@v7
-        with:
           name: 'ParlessArtifact'
-          path: '${{ runner.temp }}/external/signed/**/YakuzaParless.asi'
+          path: external\parless\build\bin\Win64\Release\YakuzaParless.asi
           if-no-files-found: 'error'
           retention-days: 1
           compression-level: 0
@@ -101,29 +77,30 @@ jobs:
           echo "79c74febb21082474c5dfff54fa4a2514b1fc3b6e02245cf491eb6f2d055bfe5  $RUNNER_TEMP/external/version.dll" | sha256sum --check
       
       - name: Install .NET SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
       - name: Add .NET tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
         
+      - name: Build SRMM Versions
+        run: ./Scripts/build.sh
+        
+      - name: Prepare Binaries for Signing
+        run: |
+          cd "${{ github.workspace }}/dist/srmm"
+          zip -r "${{ runner.temp }}/to-sign.zip" windows/ShinRyuModManager.exe windows-slim/ShinRyuModManager.exe
+          zip -j "${{ runner.temp }}/to-sign.zip" "${{ runner.temp }}/external/YakuzaParless.asi"
+
       - name: Create Draft Release
         id: create_release
-        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21
+        uses: ncipollo/release-action@4197432cf2a5d841d2b2bd8b3dff50ec1284542b # v1.21
         with:
           tag: "v${{ env.PR_TAG }}"
           name: ${{ env.PR_NAME }}
           draft: true
           generateReleaseNotesPreviousTag: true
-        
-      - name: Build SRMM Versions
-        run: ./Scripts/build.sh
-        
-      - name: Prepare Windows Binaries for Signing
-        run: |
-          cd "${{ github.workspace }}/dist/srmm"
-          zip -r "${{ runner.temp }}/to-sign.zip" windows/ShinRyuModManager.exe windows-slim/ShinRyuModManager.exe
           
       - name: Upload SRMM Artifact
         id: upload-unsigned-srmm
@@ -137,14 +114,14 @@ jobs:
           overwrite: true
           archive: false
           
-      - name: Sign SRMM Binaries
+      - name: Sign Binaries
         uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
           organization-id: '${{ secrets.SIGNPATH_ORGANIZATION_ID }}'
           project-slug: 'ShinRyuModManager'
           signing-policy-slug: 'release-signing'
-          artifact-configuration-slug: 'srmm-exe'
+          artifact-configuration-slug: 'release-binaries'
           github-artifact-id: '${{ steps.upload-unsigned-srmm.outputs.artifact-id }}'
           wait-for-completion: true
           output-artifact-directory: '${{ runner.temp }}/signed'
@@ -153,6 +130,11 @@ jobs:
         run: |
           cp "${{ runner.temp }}/signed/windows/ShinRyuModManager.exe" dist/srmm/windows/ShinRyuModManager.exe
           cp "${{ runner.temp }}/signed/windows-slim/ShinRyuModManager.exe" dist/srmm/windows-slim/ShinRyuModManager.exe
+          for dir in dist/srmm/*/; do
+            if [ -f "${dir}YakuzaParless.asi" ]; then
+              cp "${{ runner.temp }}/signed/YakuzaParless.asi" "${dir}YakuzaParless.asi"
+            fi
+          done
       
       - name: Package Binaries
         run: ./Scripts/package.sh -s $PR_TAG

@@ -7,11 +7,11 @@ set -euo pipefail
 IS_PREVIEW=false;
 
 while getopts "s:u:p" flag; do
-    case "${flag}" in
-      s) SRMM_VERSION="${OPTARG}";;
-      p) IS_PREVIEW=true;;
-      *) echo "Usage: $0 -s <SRMM Version Number>"; exit 1;;
-    esac
+  case "${flag}" in
+    s) SRMM_VERSION="${OPTARG}";;
+    p) IS_PREVIEW=true;;
+    *) echo "Usage: $0 -s <SRMM Version Number>"; exit 1;;
+  esac
 done
 
 if ! [[ "${SRMM_VERSION}" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9_]+)?$ ]]; then
@@ -32,8 +32,6 @@ SRMM_SELECTOR="${DIST_SELECTOR}/srmm"
 
 SRMM_OUTPUT_DIR="${SRMM_SELECTOR}/out"
 
-APPCAST_OUTPUT_DIR="${DIST_SELECTOR}/appcast"
-
 rm -rf "${SRMM_OUTPUT_DIR}"
 
 readarray -t SRMM_BUILD_DIRS < <(find "${SRMM_SELECTOR}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n')
@@ -51,8 +49,6 @@ for TARGET in "${SRMM_BUILD_DIRS[@]}"; do
 
   7za a "${SRMM_OUTPUT_DIR}/${OUTPUT_FILE_BASE}.zip" -tzip -bd -y "${DIR}/*" > /dev/null
   
-  ### Create Appcast
-  
   # Really hate how this is done, but I can't think of anything better
   if [[ "${OUTPUT_FILE_BASE}" =~ -Linux- ]]; then
     OS_NAME="linux"
@@ -61,5 +57,4 @@ for TARGET in "${SRMM_BUILD_DIRS[@]}"; do
     OS_NAME="windows"
     EXEC_NAME="ShinRyuModManager.exe"
   fi
-  
 done
