@@ -34,7 +34,7 @@ public static class Generator
                 }
             }
             
-            Log.Information($"Done reading {Constants.PARLESS_NAME}\n");
+            Log.Information("Done reading  {ParlessName}\n", Constants.PARLESS_NAME);
         }
         
         var modsObjects = new Mod[mods.Count];
@@ -118,7 +118,7 @@ public static class Generator
         // Reverse the list because the last mod in the list should have the highest priority
         mods.Reverse();
         
-        Log.Information($"Generating {Constants.MLO} file...");
+        Log.Information("Generating {Mlo} file...", Constants.MLO);
         
         var modNames = mods.Select(x => x.Name).ToList();
         

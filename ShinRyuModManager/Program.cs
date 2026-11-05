@@ -211,7 +211,7 @@ public static class Program
                 int.Parse(iniVersion) < ParlessIni.CURRENT_VERSION)
             {
                 // Update if ini version is old (or does not exist)
-                Log.Information($"{Constants.INI} is outdated. Updating ini to the latest version... ");
+                Log.Information("{Ini} is outdated. Updating ini to the latest version... ", Constants.INI);
                 
                 if (int.Parse(iniVersion) <= 3)
                 {
@@ -221,13 +221,13 @@ public static class Program
                 }
                 
                 IniParser.WriteFile(Constants.INI, IniTemplate.UpdateIni(_iniData));
-                Log.Information($"Updated {Constants.INI}");
+                Log.Information("Updated {Ini}", Constants.INI);
             }
         }
         else
         {
             // Create ini if it does not exist
-            Log.Information($"{Constants.INI} was not found. Creating default ini...");
+            Log.Information("{Ini} was not found. Creating default ini...", Constants.INI);
             IniParser.WriteFile(Constants.INI, IniTemplate.NewIni());
         }
     }
@@ -283,7 +283,7 @@ public static class Program
             }
             else
             {
-                Log.Information($"{Constants.MOD_LIST} was not found. Will load all existing mods.\n");
+                Log.Information("{ModList} was not found. Will load all existing mods.\n", Constants.MOD_LIST);
             }
             
             if (Directory.Exists(GamePath.ModsPath))
@@ -445,13 +445,14 @@ public static class Program
         // Check if the ASI loader is not in the directory (possibly due to incorrect zip extraction)
         if (MissingDll())
         {
-            Log.Warning($"Warning: Neither \"{Constants.VERSIONDLL}\", \"{Constants.DINPUT8DLL}\" or \"{Constants.WINMMDLL}\" is present in this directory. Shin Ryu Mod Manager will NOT function properly without these files.");
+            Log.Warning("Warning: Neither \"{VersionDll}\", \"{DinputDll}\" or \"{WinmmDll}\" is present in this directory. Shin Ryu Mod Manager will NOT function properly without these files.",
+                Constants.VERSIONDLL, Constants.DINPUT8DLL, Constants.WINMMDLL);
         }
         
         // Check if the ASI is not in the directory
         if (MissingAsi())
         {
-            Log.Warning($"Warning: \"{Constants.ASI}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file");
+            Log.Warning("Warning: \"{Asi}\" is missing from this directory. Shin Ryu Mod Manager will NOT function properly without this file", Constants.ASI);
         }
         
         if (!_isSilent)
