@@ -7,7 +7,7 @@ namespace ShinRyuModManager.ModLoadOrder;
 
 public static class Generator
 {
-    public static async Task<MLO> GenerateModeLoadOrder(List<ModInfo> mods, bool looseFilesEnabled, bool cpkRepackingEnabled)
+    public static MLO GenerateModLoadOrder(List<ModInfo> mods, bool looseFilesEnabled, bool cpkRepackingEnabled)
     {
         List<int> modIndices = [0];
         var files = new OrderedSet<string>();
@@ -156,20 +156,24 @@ public static class Generator
         {
             foreach (var str in modObj.RepackCpKs)
             {
-                if (!cpkDictionary.ContainsKey(str))
+                if (cpkDictionary.ContainsKey(str))
+                    continue;
+                
+                if (!cpkRepackDict.TryGetValue(str, out var list))
                 {
-                    cpkRepackDict.Add(str, []);
+                    list = [];
+                    cpkRepackDict[str] = list;
                 }
                 
-                cpkRepackDict[str].Add(modObj.Name);
+                list.Add(modObj.Name);
             }
         }
         
-        await ParRepacker.RepackDictionary(parDictionary);
+        ParRepacker.RepackDictionary(parDictionary);
         
         if (cpkRepackingEnabled)
         {
-            await CpkPatcher.RepackDictionary(cpkRepackDict);
+            CpkPatcher.RepackDictionary(cpkRepackDict);
         }
         
         if (Program.LogLevel > LogEventLevel.Warning)

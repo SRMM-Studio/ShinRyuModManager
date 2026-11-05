@@ -92,7 +92,7 @@ public sealed class LogWindowViewModel : ViewModelBase, IDisposable
     
     public void Dispose()
     {
-        _flushTimer.Stop();
+        _flushTimer?.Stop();
         
         InMemoryLogSink.Instance.Unsubscribe(OnLine);
     }

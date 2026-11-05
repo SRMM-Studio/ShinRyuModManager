@@ -9,7 +9,7 @@ namespace ShinRyuModManager.ModLoadOrder;
 // Intended only for OE bgm/se.cpk
 internal static class CpkPatcher
 {
-    public static async Task RepackDictionary(Dictionary<string, List<string>> cpkDict)
+    public static void RepackDictionary(Dictionary<string, List<string>> cpkDict)
     {
         if (cpkDict.IsNullOrEmpty())
         {
@@ -54,8 +54,6 @@ internal static class CpkPatcher
             
             Modify(origCpk, cpkDir, new DirectoryInfo(cpkDir).FullName + ".cpk");
         }
-        
-        await Task.CompletedTask;
     }
     
     private static void Modify(string inputCpk, string replaceDir, string outputCpk)

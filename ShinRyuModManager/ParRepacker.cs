@@ -49,10 +49,8 @@ public static class ParRepacker
         Log.Information("Removed old pars.");
     }
     
-    public static async Task RepackDictionary(Dictionary<string, List<string>> parDictionary)
+    public static void RepackDictionary(Dictionary<string, List<string>> parDictionary)
     {
-        var parTasks = new List<Task>();
-        
         if (parDictionary.IsNullOrEmpty())
         {
             Log.Information("No pars to repack.");
@@ -62,12 +60,10 @@ public static class ParRepacker
         
         Log.Information("Repacking pars...");
         
-        foreach (var parModPair in parDictionary)
+        Parallel.ForEach(parDictionary, (parModPair, _) =>
         {
-            parTasks.Add(Task.Run(() => RepackPar(parModPair.Key, parModPair.Value)));
-        }
-        
-        await Task.WhenAll(parTasks);
+            RepackPar(parModPair.Key, parModPair.Value);
+        });
         
         Log.Information("Repacked {ParDictionaryCount} par(s)!", parDictionary.Count);
     }

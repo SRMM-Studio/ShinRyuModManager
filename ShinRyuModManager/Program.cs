@@ -360,7 +360,7 @@ public static class Program
             
             var sw = Stopwatch.StartNew();
             
-            var result = await Generator.GenerateModeLoadOrder(mods, _looseFilesEnabled, _cpkRepackingEnabled);
+            var result = Generator.GenerateModLoadOrder(mods, _looseFilesEnabled, _cpkRepackingEnabled);
             
             if (GameModel.SupportsUBIK(GamePath.CurrentGame))
             {
@@ -529,7 +529,7 @@ public static class Program
         if (meta == null || string.IsNullOrEmpty(meta.Dependencies))
             return [];
         
-        return meta.Dependencies.Split(';');
+        return meta.Dependencies.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
     
     //Read cached data at startup if it exists

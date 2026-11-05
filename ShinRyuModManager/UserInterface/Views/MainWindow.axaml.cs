@@ -217,7 +217,7 @@ public partial class MainWindow : Window
             if (grid?.SelectedItem is not ModInfo selected)
                 return;
 
-            await UpdateModMetaAsync(DataContext as MainWindowViewModel, selected);
+            await UpdateModMetaAsync(_viewModel, selected);
         }
         catch (Exception ex)
         {

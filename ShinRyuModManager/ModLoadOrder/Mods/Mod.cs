@@ -40,7 +40,7 @@ public class Mod
         Log.Information("Reading directory: {Name} ...", name);
     }
     
-    public void PrintInfo()
+    public virtual void PrintInfo()
     {
         if (Files.Count > 0 || ParFolders.Count > 0)
         {
@@ -95,7 +95,7 @@ public class Mod
         return true;
     }
     
-    public void AddFiles(string path, string check)
+    public virtual void AddFiles(string path, string check)
     {
         var needsRepack = false;
         var basename = GamePath.GetBasename(path);

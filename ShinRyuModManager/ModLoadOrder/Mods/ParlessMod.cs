@@ -7,7 +7,7 @@ public class ParlessMod() : Mod(Constants.PARLESS_NAME)
 {
     public List<ParlessFolder> ParlessFolders { get; } = [];
     
-    public new void PrintInfo()
+    public override void PrintInfo()
     {
         if (ParlessFolders.Count > 0)
         {
@@ -17,7 +17,7 @@ public class ParlessMod() : Mod(Constants.PARLESS_NAME)
         base.PrintInfo();
     }
     
-    public new void AddFiles(string path, string check)
+    public override void AddFiles(string path, string check)
     {
         if (string.IsNullOrEmpty(check))
         {
