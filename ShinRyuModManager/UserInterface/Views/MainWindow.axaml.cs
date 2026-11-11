@@ -16,6 +16,10 @@ using ShinRyuModManager.Helpers;
 using ShinRyuModManager.ModLoadOrder.Mods;
 using ShinRyuModManager.Services.ReleaseCheck;
 using ShinRyuModManager.UserInterface.ViewModels;
+using SoundFlow.Backends.MiniAudio;
+using SoundFlow.Components;
+using SoundFlow.Providers;
+using SoundFlow.Structs;
 using Utils;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
@@ -356,6 +360,8 @@ public partial class MainWindow : Window
                 {
                     progressWindow.Close();
                 }
+                
+                await PlaySuccessJingle();
             }
             else
             {
@@ -372,6 +378,41 @@ public partial class MainWindow : Window
 
             await ShowDefaultError();
         }
+    }
+    
+    private static async Task PlaySuccessJingle()
+    {
+        using var engine = new MiniAudioEngine();
+        using var jingleMs = await UiHelpers.LoadResourceAsStreamAsync("Audio/JingleSuccess.wav");
+        
+        var format = AudioFormat.GetFormatFromStream(jingleMs);
+        
+        if (format is null)
+            return;
+        
+        jingleMs.Position = 0;
+        
+        engine.UpdateAudioDevicesInfo();
+        
+        var defaultDevice = engine.PlaybackDevices.FirstOrDefault(x => x.IsDefault);
+        
+        using var playbackDevice = engine.InitializePlaybackDevice(defaultDevice, format.Value);
+        using var dataProvider = new StreamDataProvider(engine, format.Value, jingleMs);
+        using var player = new SoundPlayer(engine, format.Value, dataProvider);
+        
+        // Need to force the thread to wait, since this isn't on the main thread
+        var tcs = new TaskCompletionSource();
+        
+        player.PlaybackEnded += (_, _) => tcs.TrySetResult();
+        
+        playbackDevice.MasterMixer.AddComponent(player);
+        
+        playbackDevice.Start();
+        player.Play();
+        
+        await tcs.Task;
+        
+        playbackDevice.Stop();
     }
 
     private async Task CheckModDependenciesAsync(List<ModInfo> mods)

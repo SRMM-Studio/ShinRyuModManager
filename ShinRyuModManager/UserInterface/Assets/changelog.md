@@ -3,6 +3,7 @@
 * Added support for viewing logs in a console via Help -> View Logs
 * Fixed issues with SRMM looking wrong on light vs dark theme
 * Added ability to delete selected mods with right-click
+* Added jingle on MLO generation success
 * Shader file support
   * Yakuza 0 & Director's Cut
   * Kiwami 1 & Remastered
@@ -26,7 +27,7 @@
 ---
 
 > ### **%{color:orange} Version 5.0.2 %** ###
-* Add update prompt when a update is available
+* Add update prompt when an update is available
 * Unlike the old auto updater, this is only for reminder and does not install the update by itself
 * Fix a potential issue where the mod manager won't start unless version.dll is renamed
 ---
