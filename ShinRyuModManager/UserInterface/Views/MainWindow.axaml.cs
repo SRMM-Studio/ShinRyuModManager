@@ -12,6 +12,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Serilog;
 using Serilog.Events;
+using ShinRyuModManager.Config;
 using ShinRyuModManager.Helpers;
 using ShinRyuModManager.ModLoadOrder.Mods;
 using ShinRyuModManager.Services.ReleaseCheck;
@@ -197,7 +198,7 @@ public partial class MainWindow : Window
             await MessageBoxWindow.Show(this, "Warning", "External mods folder detected. Please run Shin Ryu Mod Manager in CLI mode (use --cli parameter) and use the external mod manager instead.");
         }
 
-        if (Program.LogLevel <= LogEventLevel.Warning)
+        if (Program.LogLevelSwitch.MinimumLevel <= LogEventLevel.Warning)
         {
             if (Program.MissingDll())
             {
@@ -336,7 +337,7 @@ public partial class MainWindow : Window
                 await CheckModDependenciesAsync(mods);
 
                 // Run generation only if it will not be run on game launch (i.e., if RebuildMlo is disabled or unsupported)
-                if (Program.RebuildMlo && Program.IsRebuildMloSupported)
+                if (ConfigManager.Current.Overrides.RebuildMlo && Program.IsRebuildMloSupported)
                 {
                     await MessageBoxWindow.Show(this, "Information", "Mod list was saved. Mods will be applied next time the game is run.");
 

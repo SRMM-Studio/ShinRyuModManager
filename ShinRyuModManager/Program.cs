@@ -2,20 +2,19 @@ using System.Diagnostics;
 using System.IO.Compression;
 using Avalonia;
 using Avalonia.Svg.Skia;
-using IniParser;
-using IniParser.Model;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Formatting.Json;
+using ShinRyuModManager.Config;
+using ShinRyuModManager.Config.Models;
 using ShinRyuModManager.Extensions;
 using ShinRyuModManager.Helpers;
 using ShinRyuModManager.ModLoadOrder;
 using ShinRyuModManager.ModLoadOrder.Mods;
 using ShinRyuModManager.ModLoadOrder.Mods.Serialization;
 using ShinRyuModManager.Sinks;
-using ShinRyuModManager.Templates;
 using ShinRyuModManager.UserInterface;
 using Utils;
 using Constants = Utils.Constants;
@@ -24,31 +23,16 @@ namespace ShinRyuModManager;
 
 public static class Program
 {
-    private static bool _externalModsOnly = true;
-    private static bool _looseFilesEnabled;
     private static bool _cpkRepackingEnabled = true;
     private static bool _isSilent;
-    private static IniData _iniData;
-    
-    private static readonly FileIniDataParser IniParser = new()
-    {
-        Parser =
-        {
-            Configuration =
-            {
-                AssigmentSpacer = string.Empty
-            }
-        }
-    };
     
     // Mod List file information
-    public static byte CurrentModListVersion { get => 2; }
+    public static byte CurrentModListVersion => 2;
     
     public static Profile ActiveProfile { get; set; } = Profile.Profile1;
     
-    public static bool RebuildMlo { get; private set; } = true;
     public static bool IsRebuildMloSupported { get; private set; } = true;
-    public static LogEventLevel LogLevel { get; private set; } = LogEventLevel.Information;
+    public static LoggingLevelSwitch LogLevelSwitch { get; private set; } = new();
     public static List<LibMeta> LibraryMetaCache { get; set; } = [];
     
     [STAThread]
@@ -59,11 +43,9 @@ public static class Program
         var defaultLogsPath = Path.Combine(Constants.LOGS_BASE_PATH, "srmm_logs.log");
         var errorLogsPath = Path.Combine(Constants.LOGS_BASE_PATH, "srmm_errors.log");
         
-        LoadConfig();
-        
         // Create global logger
         var loggerConfig = new LoggerConfiguration()
-                           .MinimumLevel.ControlledBy(new LoggingLevelSwitch(LogLevel))
+                           .MinimumLevel.ControlledBy(LogLevelSwitch)
                            .Enrich.WithExceptionDetails()
                            // Log to SRMM logs file
                            .WriteTo.Logger(l => l
@@ -84,10 +66,18 @@ public static class Program
         
         Log.Logger = loggerConfig.CreateLogger();
         
+        ConfigManager.Load();
+        
+        ApplyConfig(ConfigManager.Current);
+        
+        ConfigManager.Changed += ApplyConfig;
+        
 #if LINUX_SLIM || DEBUG
         // Slim versions of Linux need to have .NET 10 installed to run, and Proton/Wine makes that
         // annoying to find to get this working. Temporarily disabled.
-        RebuildMlo = false;
+        ConfigManager.Update(x => x.Overrides.RebuildMlo = false);
+        
+        IsRebuildMloSupported = false;
 #endif
         
         HandleLoader();
@@ -145,7 +135,7 @@ public static class Program
             _isSilent = true;
         }
         
-        await RunGeneration(PreRun().Where(x => x.Enabled).ToList());
+        RunGeneration(PreRun().Where(x => x.Enabled).ToList());
         
         PostRun();
         
@@ -176,59 +166,16 @@ public static class Program
         }
     }
     
-    private static void LoadConfig()
+    private static void ApplyConfig(ParlessConfig config)
     {
-        if (File.Exists(Constants.INI))
+        if (config.ModManager.ShowWarnings)
         {
-            _iniData = IniParser.ReadFile(Constants.INI);
-            
-            if (_iniData.TryGetKey("Overrides.LooseFilesEnabled", out var looseFiles))
-            {
-                _looseFilesEnabled = int.Parse(looseFiles) == 1;
-            }
-            
-            if (_iniData.TryGetKey("RyuModManager.Verbose", out var verbose) && int.Parse(verbose) == 1)
-            {
-                LogLevel = LogEventLevel.Verbose;
-            }
-            
-            if (_iniData.TryGetKey("RyuModManager.ShowWarnings", out var showWarnings))
-            {
-                //ConsoleOutput.ShowWarnings = int.Parse(showWarnings) == 1;
-            }
-            
-            if (_iniData.TryGetKey("RyuModManager.LoadExternalModsOnly", out var extMods))
-            {
-                _externalModsOnly = int.Parse(extMods) == 1;
-            }
-            
-            if (_iniData.TryGetKey("Overrides.RebuildMLO", out var rebuildMlo))
-            {
-                RebuildMlo = int.Parse(rebuildMlo) == 1;
-            }
-            
-            if (!_iniData.TryGetKey("Parless.IniVersion", out var iniVersion) ||
-                int.Parse(iniVersion) < ParlessIni.CURRENT_VERSION)
-            {
-                // Update if ini version is old (or does not exist)
-                Log.Information("{Ini} is outdated. Updating ini to the latest version... ", Constants.INI);
-                
-                if (int.Parse(iniVersion) <= 3)
-                {
-                    // Force enable RebuildMLO option
-                    _iniData.Sections["Overrides"]["RebuildMLO"] = "1";
-                    RebuildMlo = true;
-                }
-                
-                IniParser.WriteFile(Constants.INI, IniTemplate.UpdateIni(_iniData));
-                Log.Information("Updated {Ini}", Constants.INI);
-            }
+            // Deprecated
         }
-        else
+        
+        if (config.ModManager.Verbose)
         {
-            // Create ini if it does not exist
-            Log.Information("{Ini} was not found. Creating default ini...", Constants.INI);
-            IniParser.WriteFile(Constants.INI, IniTemplate.NewIni());
+            LogLevelSwitch.MinimumLevel = LogEventLevel.Verbose;
         }
     }
     
@@ -242,18 +189,14 @@ public static class Program
         
         Log.Information("Active Profile: {Profile}", profile?.GetDescription() ?? ActiveProfile.GetDescription());
         
-        // Read ini (again) to check if we should try importing the old load order file
-        _iniData = IniParser.ReadFile(Constants.INI);
-        
+        // Check if we should try importing the old load order file
         if (GamePath.CurrentGame is Game.Judgment or Game.LostJudgment or Game.LikeADragonPirates
-            && _iniData.TryGetKey("Overrides.RebuildMLO", out _))
+            && ConfigManager.Current.Overrides.RebuildMlo)
         {
             // Disable RebuildMLO when using an external mod manager
             Log.Warning("Game specific patch: Disabling RebuildMLO for some games when using an external mod manager...");
             
-            _iniData.Sections["Overrides"]["RebuildMLO"] = "0";
-            IniParser.WriteFile(Constants.INI, _iniData);
-            RebuildMlo = false;
+            ConfigManager.Update(x => x.Overrides.RebuildMlo = false);
         }
         
         var mods = new List<ModInfo>();
@@ -307,19 +250,17 @@ public static class Program
             }
         }
         
-        if (!GamePath.IsXbox(Path.Combine(GamePath.FullGamePath)) || !_iniData.TryGetKey("Overrides.RebuildMLO", out _))
+        if (!GamePath.IsXbox(Path.Combine(GamePath.FullGamePath)) || !ConfigManager.Current.Overrides.RebuildMlo)
             return mods;
         
         Log.Warning("Game specific patch: Disabling RebuildMLO for Xbox games...");
         
-        _iniData.Sections["Overrides"]["RebuildMLO"] = "0";
-        IniParser.WriteFile(Constants.INI, _iniData);
-        RebuildMlo = false;
+        ConfigManager.Update(x => x.Overrides.RebuildMlo = false);
         
         return mods;
     }
     
-    internal static async Task RunGeneration(List<ModInfo> mods)
+    internal static void RunGeneration(List<ModInfo> mods)
     {
         if (File.Exists(Constants.MLO))
         {
@@ -339,7 +280,9 @@ public static class Program
             return;
         }
         
-        if (!mods.IsNullOrEmpty() || _looseFilesEnabled)
+        var looseFilesEnabled = ConfigManager.Current.Overrides.LooseFilesEnabled;
+        
+        if (!mods.IsNullOrEmpty() || looseFilesEnabled)
         {
             // Create Parless mod as highest priority
             var parlessEntry = mods.FirstOrDefault(x => string.Equals(x.Name, "Parless", StringComparison.InvariantCultureIgnoreCase));
@@ -360,7 +303,7 @@ public static class Program
             
             var sw = Stopwatch.StartNew();
             
-            var result = Generator.GenerateModLoadOrder(mods, _looseFilesEnabled, _cpkRepackingEnabled);
+            var result = Generator.GenerateModLoadOrder(mods, looseFilesEnabled, _cpkRepackingEnabled);
             
             if (GameModel.SupportsUBIK(GamePath.CurrentGame))
             {
@@ -464,20 +407,20 @@ public static class Program
     
     internal static bool ShouldBeExternalOnly()
     {
-        return _externalModsOnly && Directory.Exists(GamePath.ExternalModsPath);
+        return ConfigManager.Current.ModManager.LoadExternalModsOnly
+            && Directory.Exists(GamePath.ExternalModsPath);
     }
     
-    private static void HandleLoader() {
-        if (File.Exists(Constants.VERSIONDLL))
-        {
-            Game game = GamePath.CurrentGame;
-
-            if (game <= Game.Yakuza6)
-            {
-                if (!File.Exists(Constants.DINPUT8DLL))
-                    File.Move(Constants.VERSIONDLL, Constants.DINPUT8DLL);
-            }
-        }
+    private static void HandleLoader()
+    {
+        if (!File.Exists(Constants.VERSIONDLL))
+            return;
+        
+        if (GamePath.CurrentGame > Game.Yakuza6)
+            return;
+        
+        if (!File.Exists(Constants.DINPUT8DLL))
+            File.Move(Constants.VERSIONDLL, Constants.DINPUT8DLL);
     }
     
     private static List<ModInfo> ScanMods(ProfileMask activeProfiles = ProfileMask.All)

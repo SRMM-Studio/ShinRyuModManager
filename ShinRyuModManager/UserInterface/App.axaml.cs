@@ -13,7 +13,6 @@ public partial class App : Application
 {
     public override void Initialize()
     {
-        Log.Information("Avalonia App Init");
         AvaloniaXamlLoader.Load(this);
     }
     

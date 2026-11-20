@@ -176,14 +176,14 @@ public static class Generator
             CpkPatcher.RepackDictionary(cpkRepackDict);
         }
         
-        if (Program.LogLevel > LogEventLevel.Warning)
+        if (Program.LogLevelSwitch.MinimumLevel > LogEventLevel.Warning)
             return mlo;
         
         foreach (var key in modsWithFoldersNotFound.Keys.ToList())
         {
             Log.Warning("Warning: Some folders in the root of \"{Key}\" do not exist in the game's data. Check if the mod was extracted correctly.", key);
             
-            if (Program.LogLevel != LogEventLevel.Verbose)
+            if (Program.LogLevelSwitch.MinimumLevel != LogEventLevel.Verbose)
                 continue;
             
             foreach (var folder in modsWithFoldersNotFound[key])
