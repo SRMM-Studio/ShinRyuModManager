@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace ShinRyuModManager.Attributes;
 
 [AttributeUsage(AttributeTargets.Property)]

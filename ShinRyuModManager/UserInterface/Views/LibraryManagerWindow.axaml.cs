@@ -9,9 +9,11 @@ namespace ShinRyuModManager.UserInterface.Views;
 
 public partial class LibraryManagerWindow : Window
 {
+    private readonly LibraryManagerViewModel _viewModel = new();
+    
     public LibraryManagerWindow()
     {
-        DataContext = new LibraryManagerViewModel();
+        DataContext = _viewModel;
         
         InitializeComponent();
         
@@ -20,10 +22,7 @@ public partial class LibraryManagerWindow : Window
     
     private void PopulateLibraryList()
     {
-        if (DataContext is not LibraryManagerViewModel viewModel)
-            return;
-        
-        viewModel.Library.Clear();
+        _viewModel.Library.Clear();
         
         try
         {
@@ -36,13 +35,13 @@ public partial class LibraryManagerWindow : Window
                     
                     if (targets.Contains(game))
                     {
-                        viewModel.Library.Add(new LibraryDisplayControl(meta));
+                        _viewModel.Library.Add(new LibraryDisplayControl(meta));
                     }
                 }
                 else
                 {
                     // No targets specified. Assume it works with everything (?)
-                    viewModel.Library.Add(new LibraryDisplayControl(meta));
+                    _viewModel.Library.Add(new LibraryDisplayControl(meta));
                 }
             }
         }
@@ -69,7 +68,7 @@ public partial class LibraryManagerWindow : Window
             
             foreach (var meta in metaList)
             {
-                viewModel.Library.Add(new LibraryDisplayControl(meta));
+                _viewModel.Library.Add(new LibraryDisplayControl(meta));
             }
         }
     }

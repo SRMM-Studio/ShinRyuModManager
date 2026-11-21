@@ -14,9 +14,9 @@ public partial class LogWindow : Window
     
     public LogWindow()
     {
-        InitializeComponent();
-        
         DataContext = _viewModel;
+        
+        InitializeComponent();
         
         _viewModel.LinesFlushed += ScrollToEnd;
         Opened += (_, _) => Dispatcher.UIThread.Post(ScrollToEnd, DispatcherPriority.Loaded);

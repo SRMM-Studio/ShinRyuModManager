@@ -7,16 +7,19 @@ namespace ShinRyuModManager.UserInterface.Views;
 
 public partial class UpdateAvailableWindow : Window
 {
+    private readonly UpdateAvailableViewModel _viewModel = new();
+    
     public UpdateAvailableWindow()
     {
         InitializeComponent();
     }
     
-    private UpdateAvailableWindow(Version updateVersion)
+    private UpdateAvailableWindow(Version updateVersion) : this()
     {
-        DataContext = new UpdateAvailableViewModel(updateVersion);
+        var vm = new UpdateAvailableViewModel(updateVersion);
         
-        InitializeComponent();
+        _viewModel = vm;
+        DataContext = vm;
     }
     
     public static Task Show(Window owner, Version updateVersion)
@@ -37,16 +40,13 @@ public partial class UpdateAvailableWindow : Window
     
     private void OpenBrowser_Click(object sender, RoutedEventArgs e)
     {
-        if (DataContext is not UpdateAvailableViewModel viewModel)
-            return;
-        
         if (OperatingSystem.IsWindows())
         {
-            Process.Start(new ProcessStartInfo { FileName = viewModel.LinkToUpdate, UseShellExecute = true });
+            Process.Start(new ProcessStartInfo { FileName = _viewModel.LinkToUpdate, UseShellExecute = true });
         }
         else if (OperatingSystem.IsLinux())
         {
-            Process.Start("xdg-open", viewModel.LinkToUpdate);
+            Process.Start("xdg-open", _viewModel.LinkToUpdate);
         }
         
         Close();
